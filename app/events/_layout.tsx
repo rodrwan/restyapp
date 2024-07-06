@@ -1,16 +1,12 @@
-import "react-native-reanimated";
-import "react-native-url-polyfill/auto";
-import "expo-dev-client";
-
-import { useEffect } from "react";
+import Header from "@/components/Header";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
+import { useEffect } from "react";
 import { NativeWindStyleSheet } from "nativewind";
-
-import Header from "@/components/Header";
-import CartProvider from "@/context/CartProvider";
+import { StatusBar } from "expo-status-bar";
+import Colors from "@/constants/Colors";
 
 NativeWindStyleSheet.setOutput({
   default: "native",
@@ -26,7 +22,7 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+    SpaceMono: require("@/assets/fonts/SpaceMono-Regular.ttf"),
     ...FontAwesome.font,
   });
 
@@ -50,14 +46,21 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   return (
-    <CartProvider>
+    <>
       <Stack>
-        <Stack.Screen name="index" options={{ header: () => <Header /> }} />
-        <Stack.Screen name="events" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="(dashboard)" options={{ headerShown: false }} />
-        <Stack.Screen name="menu" />
+        <Stack.Screen name="[eventId]" />
+        <Stack.Screen name="cart" />
+        <Stack.Screen name="checkout" />
+        <Stack.Screen name="success" />
+        <Stack.Screen name="failure" />
+        <Stack.Screen
+          name="payment"
+          options={{
+            presentation: "modal",
+          }}
+        />
       </Stack>
-    </CartProvider>
+      <StatusBar backgroundColor={Colors.secondary[500]} style="light" />
+    </>
   );
 }
