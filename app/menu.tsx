@@ -70,7 +70,7 @@ const MenuPage = () => {
               setUser(null);
               logout();
               setAccessToken("");
-              router.replace("/index");
+              router.replace("/");
             }}
           >
             <Text className="self-center text-white font-base text-base">

@@ -5,11 +5,13 @@ interface Ticket {
   base64: string;
   event: Event;
 }
+
 interface Drink {
   id: string;
   base64: string;
   event: Event;
 }
+
 interface Event {
   id: string;
   name: string;

@@ -1,15 +1,16 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity } from "react-native";
 import React, { useLayoutEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useNavigation } from "expo-router";
+
 import Colors from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
-import { useCartContext } from "@/context/CartProvider";
+import useCartStore from "@/stores/useCart";
 import CustomButton from "@/components/CustomButton";
 
 const FailurePage = () => {
   const navigation = useNavigation();
-  const { clearCart } = useCartContext();
+  const { clearCart } = useCartStore();
 
   useLayoutEffect(() => {
     navigation.setOptions({

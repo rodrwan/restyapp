@@ -6,20 +6,20 @@ import Accordion from "react-native-collapsible/Accordion";
 import { router, useLocalSearchParams, useNavigation } from "expo-router";
 
 import Colors from "@/constants/Colors";
-import { useCartContext } from "@/context/CartProvider";
 import FormField from "@/components/FormField";
 import CustomButton from "@/components/CustomButton";
 import useCreatePayment from "@/hooks/useCreatePayment";
 import { MANGO_FEE } from "@/constants";
 import { validate, format } from "rut.js";
 import useUserStore from "@/stores/useUser";
+import useCartStore from "@/stores/useCart";
 
 const Checkout = () => {
   const navigation = useNavigation();
   const params: any = useLocalSearchParams();
   const { orderId } = params;
-  const { cartItems, nominees, assignTicket, clearCart } = useCartContext();
   const { user }: any = useUserStore();
+  const { items, nominees, assignTicket, clearCart } = useCartStore();
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -68,7 +68,7 @@ const Checkout = () => {
     }
   };
 
-  const subTotal = cartItems.reduce(
+  const subTotal = items.reduce(
     (acc: number, cur: any) => acc + cur.price * cur.quantity,
     0
   );
@@ -219,13 +219,6 @@ function AccordionView({ orderId, tickets, assignTicket }: any) {
           <CustomButton
             title="Nominar"
             handlePress={() => {
-              console.log(
-                "orderId, section, form[index]",
-                orderId,
-                section,
-                index,
-                form
-              );
               assignTicket(orderId, section, form[index]);
               closeAccordion();
             }}

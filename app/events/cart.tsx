@@ -1,6 +1,5 @@
 import { View, Text, FlatList, TouchableOpacity } from "react-native";
 import React, { useEffect, useLayoutEffect } from "react";
-import { useCartContext } from "@/context/CartProvider";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
@@ -8,18 +7,13 @@ import { router, useNavigation } from "expo-router";
 
 import useCreateOrder from "@/hooks/useCreateOrder";
 import useAuthStore from "@/stores/useAuth";
+import useCartStore from "@/stores/useCart";
 
 const Cart = () => {
   const navigation = useNavigation();
-  const {
-    cartItems,
-    addToCart,
-    removeFromCart,
-    setTicketToNominate,
-    clearCart,
-  } = useCartContext();
+  const { items, addToCart, removeFromCart, setTicketToNominate, clearCart } =
+    useCartStore();
   const { auth }: any = useAuthStore();
-  console.log("isLogged", auth.isLogged);
 
   useEffect(() => {
     if (!auth.isLogged) {
@@ -66,8 +60,7 @@ const Cart = () => {
 
   const onSubmit = async () => {
     try {
-      const newOrder = await create(cartItems);
-      console.log("newOrder", newOrder);
+      const newOrder = await create(items);
       setTicketToNominate(
         newOrder.items.filter((item: any) => item.type === "ENTRANCE")
       );
@@ -77,8 +70,9 @@ const Cart = () => {
     }
   };
 
-  const tickets = cartItems.filter((item: any) => item.type === "ENTRANCE");
-  const drinks = cartItems.filter((item: any) => item.type === "DRINK");
+  const tickets = items.filter((item: any) => item.type === "ENTRANCE");
+  const drinks = items.filter((item: any) => item.type === "DRINK");
+
   return (
     <SafeAreaView className="flex h-full bg-secondary-500">
       <Text className="self-center text-white font-bold text-xl mb-8">
@@ -116,10 +110,10 @@ const Cart = () => {
                       />
                     </TouchableOpacity>
                     <Text className="text-white text-xl">
-                      {(cartItems?.length &&
-                        cartItems.filter(
-                          (item: any) => item.type === "ENTRANCE"
-                        )[index]?.quantity) ??
+                      {(items?.length &&
+                        items.filter((item: any) => item.type === "ENTRANCE")[
+                          index
+                        ]?.quantity) ??
                         0}
                     </Text>
                     <TouchableOpacity onPress={() => addToCart(item)}>
@@ -175,8 +169,8 @@ const Cart = () => {
                       />
                     </TouchableOpacity>
                     <Text className="text-white text-xl">
-                      {(cartItems?.length &&
-                        cartItems.filter((item: any) => item.type === "DRINK")[
+                      {(items?.length &&
+                        items.filter((item: any) => item.type === "DRINK")[
                           index
                         ]?.quantity) ??
                         0}
@@ -206,13 +200,13 @@ const Cart = () => {
       <View className="flex items-end pr-4">
         <Text className="text-lg text-white font-bold">
           Subtotal: $
-          {cartItems.reduce((acc: number, cur: any) => {
+          {items.reduce((acc: number, cur: any) => {
             return acc + cur.price * cur.quantity;
           }, 0)}
         </Text>
       </View>
 
-      {cartItems?.length > 0 ? (
+      {items?.length > 0 ? (
         <View className="flex w-full absolute bottom-12 bg-transparent justify-center">
           <TouchableOpacity
             activeOpacity={0.9}

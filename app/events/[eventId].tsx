@@ -13,11 +13,11 @@ import { Ionicons } from "@expo/vector-icons";
 
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import Colors from "@/constants/Colors";
-import { useCartContext } from "@/context/CartProvider";
+import useCartStore from "@/stores/useCart";
 
 const EventPage = ({}) => {
   const navigation = useNavigation();
-  const { cartItems, addToCart, removeFromCart } = useCartContext();
+  const { items, addToCart, removeFromCart } = useCartStore();
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -129,8 +129,8 @@ const EventPage = ({}) => {
                           />
                         </TouchableOpacity>
                         <Text className="text-white text-xl">
-                          {(cartItems?.length &&
-                            cartItems.filter(
+                          {(items?.length &&
+                            items.filter(
                               (item: any) => item.type === "ENTRANCE"
                             )[index]?.quantity) ??
                             0}
@@ -189,10 +189,10 @@ const EventPage = ({}) => {
                           />
                         </TouchableOpacity>
                         <Text className="text-white text-xl">
-                          {(cartItems?.length &&
-                            cartItems.filter(
-                              (item: any) => item.type === "DRINK"
-                            )[index]?.quantity) ??
+                          {(items?.length &&
+                            items.filter((item: any) => item.type === "DRINK")[
+                              index
+                            ]?.quantity) ??
                             0}
                         </Text>
                         <TouchableOpacity onPress={() => addToCart(item)}>
@@ -248,7 +248,7 @@ const EventPage = ({}) => {
           </View>
         </View>
       </ParallaxScrollView>
-      {cartItems?.length > 0 ? (
+      {items?.length > 0 ? (
         <View className="flex w-full absolute bottom-12 bg-transparent justify-center">
           <TouchableOpacity
             activeOpacity={0.9}
@@ -257,11 +257,8 @@ const EventPage = ({}) => {
           >
             <Text className="text-white font-bold">
               Ir al Carro (
-              {(cartItems?.length &&
-                cartItems.reduce(
-                  (acc: any, cur: any) => acc + cur.quantity,
-                  0
-                )) ??
+              {(items?.length &&
+                items.reduce((acc: any, cur: any) => acc + cur.quantity, 0)) ??
                 0}
               )
             </Text>

@@ -6,7 +6,7 @@ const API_URL = "https://api.cofradia.cl";
 const SSEContext = createContext(null);
 export const useSSEContext = () => useContext(SSEContext);
 
-const SSEProvider = ({ accessToken, children }) => {
+const SSEProvider = ({ accessToken, children }: any) => {
   const options = { headers: { Authorization: `Bearer ${accessToken}` } };
   const eventSource = new RNEventSource(`${API_URL}/sse`, options);
 
@@ -14,7 +14,7 @@ const SSEProvider = ({ accessToken, children }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const listener = (event) => {
+  const listener = (event: any) => {
     if (event.type === "open") {
       console.log("Open SSE connection.");
     } else if (event.type === "message") {

@@ -10,7 +10,6 @@ const useGetEventsFromUser = () => {
   const getEvents = async () => {
     try {
       const orders = await client.getOrderItemsByUser();
-      console.log("orders", orders);
 
       if (orders.length === 0) {
         return {

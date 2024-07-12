@@ -10,16 +10,10 @@ import * as SplashScreen from "expo-splash-screen";
 import { NativeWindStyleSheet } from "nativewind";
 
 import Header from "@/components/Header";
-import CartProvider from "@/context/CartProvider";
 
 NativeWindStyleSheet.setOutput({
   default: "native",
 });
-
-export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: "index",
-};
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -50,14 +44,12 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   return (
-    <CartProvider>
-      <Stack>
-        <Stack.Screen name="index" options={{ header: () => <Header /> }} />
-        <Stack.Screen name="events" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="(dashboard)" options={{ headerShown: false }} />
-        <Stack.Screen name="menu" />
-      </Stack>
-    </CartProvider>
+    <Stack>
+      <Stack.Screen name="index" options={{ header: () => <Header /> }} />
+      <Stack.Screen name="events" options={{ headerShown: false }} />
+      <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+      <Stack.Screen name="(dashboard)" options={{ headerShown: false }} />
+      <Stack.Screen name="menu" />
+    </Stack>
   );
 }

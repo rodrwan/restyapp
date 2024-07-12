@@ -5,13 +5,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { router, useNavigation } from "expo-router";
 
 import CustomButton from "@/components/CustomButton";
-import { useCartContext } from "@/context/CartProvider";
 import Colors from "@/constants/Colors";
 import useGetEventsFromUser from "@/hooks/useGetEventsFromUser.";
+import useCartStore from "@/stores/useCart";
 
 const SuccessPage = () => {
   const navigation = useNavigation();
-  const { clearCart } = useCartContext();
+  const { clearCart } = useCartStore();
   const { getEvents }: any = useGetEventsFromUser();
 
   useLayoutEffect(() => {

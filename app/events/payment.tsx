@@ -30,11 +30,8 @@ const Payment = () => {
         }}
         cacheEnabled={false}
         onNavigationStateChange={async (navState) => {
-          console.log("navState", navState);
-
           if (navState.url.indexOf("/api/payments") > -1) {
             const parsed: any = queryString.parseUrl(navState.url);
-            console.log("parsed.query", parsed.query);
 
             const { TBK_ID_SESION, TBK_ORDEN_COMPRA, TBK_TOKEN, token_ws } =
               parsed.query;

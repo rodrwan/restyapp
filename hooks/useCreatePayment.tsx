@@ -4,7 +4,6 @@ const client = HTTPClient.getInstance();
 
 const useCreatePayment = () => {
   const createPayment = async (nominees: any[]) => {
-    console.log("useCreatePayment createPayment nominees", nominees);
     const orderId = nominees.reduce((acc, cur) => {
       if (cur.orderId) {
         return cur.orderId;
@@ -26,7 +25,6 @@ const useCreatePayment = () => {
         };
       }),
     };
-    console.log("body", body);
 
     try {
       const response: any = await client.createPayment(body);
