@@ -177,9 +177,9 @@ const TicketsPage = () => {
                       <Text className="font-bold text-error-500">
                         Válido hasta {endAt}. o las {item.event.end_hour}.
                       </Text>
-                      <Text className="font-bold text-error-500">
+                      {/* <Text className="font-bold text-error-500">
                         Evento con restricción de edad:
-                      </Text>
+                      </Text> */}
                     </View>
                   </Animatable.View>
                 );

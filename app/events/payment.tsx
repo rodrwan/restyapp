@@ -30,6 +30,7 @@ const Payment = () => {
         }}
         cacheEnabled={false}
         onNavigationStateChange={async (navState) => {
+          console.log("navState", navState);
           if (navState.url.indexOf("/api/payments") > -1) {
             const parsed: any = queryString.parseUrl(navState.url);
 

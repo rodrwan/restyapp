@@ -19,8 +19,8 @@ const SignIn = () => {
   const { getEvents }: any = useGetEventsFromUser();
   const [isSubmitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
-    email: "rfuenzalidac87@gmail.com",
-    password: "TestPassword!!",
+    email: "",
+    password: "",
   });
 
   useLayoutEffect(() => {

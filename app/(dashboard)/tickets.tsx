@@ -158,9 +158,6 @@ const TicketsPage = () => {
                             </Text>
                           </View>
                         </View>
-                        <Text className="flex self-center text-secondary-300 text-xs mt-1">
-                          ID: {item.event.id}
-                        </Text>
                       </View>
                     </View>
                     <View className="flex p-2 flex-col bg-white rounded-xl items-center justify-center mb-4">
@@ -179,11 +176,11 @@ const TicketsPage = () => {
                     </View>
                     <View className="py-4 bg-error-100 justify-center items-center mb-8 rounded-xl">
                       <Text className="font-bold text-error-500">
-                        Válido hasta {endAt}. o las {item.event.end_hour}.
+                        Válido hasta {endAt} o las {item.event.end_hour}
                       </Text>
-                      <Text className="font-bold text-error-500">
+                      {/* <Text className="font-bold text-error-500">
                         Evento con restricción de edad:
-                      </Text>
+                      </Text> */}
                     </View>
                   </Animatable.View>
                 );

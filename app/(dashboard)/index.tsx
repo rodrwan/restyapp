@@ -13,7 +13,7 @@ import {
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-
+import { UserInfoSkeleton } from "./skeletons/home";
 import Colors from "@/constants/Colors";
 import EmptyState from "@/components/EmptyState";
 import useUserStore from "@/stores/useUser";
@@ -35,29 +35,33 @@ const HomePage = () => {
     <SafeAreaView className="flex h-full bg-secondary-500 ">
       <ScrollView className="flex h-full -mt-10">
         {/* Profile view */}
-        <View className="flex flex-row bg-white rounded-xl mx-2 py-6 px-8 justify-between mb-8">
-          <View className="">
-            <Image
-              source={{ uri: user?.picture }}
-              className="w-[80px] h-[80px] rounded-full shadow-2xl"
-              style={styles.elevationLow}
-            />
+        {!Boolean(user) ? (
+          <UserInfoSkeleton />
+        ) : (
+          <View className="flex flex-row bg-white rounded-xl mx-2 py-6 px-8 justify-between mb-8">
+            <View className="">
+              <Image
+                source={{ uri: user?.picture }}
+                className="w-[80px] h-[80px] rounded-full shadow-2xl"
+                style={styles.elevationLow}
+              />
+            </View>
+            <View className="justify-center -ml-8">
+              <Text className="text-base ">
+                {user?.firstname} {user?.lastname}
+              </Text>
+              <Text className="text-base ">{user?.dni}</Text>
+              <Text className="text-xs text-secondary-200 ">{user?.email}</Text>
+            </View>
+            <View className="">
+              <Ionicons
+                name="settings-outline"
+                size={24}
+                color={Colors.primary[500]}
+              />
+            </View>
           </View>
-          <View className="justify-center -ml-8">
-            <Text className="text-base ">
-              {user?.firstname} {user?.lastname}
-            </Text>
-            <Text className="text-base ">{user?.dni}</Text>
-            <Text className="text-xs text-secondary-200 ">{user?.email}</Text>
-          </View>
-          <View className="">
-            <Ionicons
-              name="settings-outline"
-              size={24}
-              color={Colors.primary[500]}
-            />
-          </View>
-        </View>
+        )}
         {/* tickets and drinks */}
         <View className="mb-8">
           <View className="mb-4">
@@ -79,7 +83,7 @@ const HomePage = () => {
                 />
               </View>
               <Text className="text-xs text-secondary-300">
-                {user?.tickets?.length} Disponibles
+                {user?.tickets?.length ?? 0} Disponibles
               </Text>
               <Text className="font-bold">Mis Tickets</Text>
             </TouchableOpacity>
@@ -96,7 +100,7 @@ const HomePage = () => {
                 />
               </View>
               <Text className="text-xs text-secondary-300">
-                {user?.drinks?.length} Disponibles
+                {user?.drinks?.length ?? 0} Disponibles
               </Text>
               <Text className="font-bold">Mis Tragos</Text>
             </TouchableOpacity>
@@ -135,7 +139,7 @@ const HomePage = () => {
                         className="rounded-lg w-[90px] h-[100px]"
                       />
                     </View>
-                    <View className="flex flex-col w-3/4 pl-2">
+                    <View className="flex flex-col w-3/4 pl-2 ml-2">
                       <View className="flex flex-row">
                         <View className="flex flex-wrap grow">
                           <Text className="font-bold text-lg">{item.name}</Text>
@@ -146,10 +150,10 @@ const HomePage = () => {
                             {item.description}
                           </Text>
                         </View>
-                        <View className="">
+                        <View className="mr-1">
                           <TouchableOpacity
                             onPress={() =>
-                              router.push(`/(dashboard)/tickets/${item.id}`)
+                              router.push(`/(dashboard)/(events)/${item.id}`)
                             }
                             className="flex bg-primary-500 w-[80px] h-[80px] items-center justify-center rounded-lg"
                           >
@@ -162,9 +166,6 @@ const HomePage = () => {
                           </TouchableOpacity>
                         </View>
                       </View>
-                      <Text className="flex self-center text-secondary-300 text-xs mt-1">
-                        ID: {item.id}
-                      </Text>
                     </View>
                   </View>
                 );
@@ -178,12 +179,12 @@ const HomePage = () => {
               ListFooterComponent={() => {
                 return (
                   <View className="flex p-2 mt-4">
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
                       onPress={() => router.push("/(dashboard)/events")}
                       className="flex bg-white border rounded-xl p-4 items-center"
                     >
                       <Text className="font-bold">Ver todos</Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                   </View>
                 );
               }}

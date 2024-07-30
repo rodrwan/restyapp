@@ -1,5 +1,12 @@
 import React, { useLayoutEffect, useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import Accordion from "react-native-collapsible/Accordion";
@@ -13,6 +20,7 @@ import { MANGO_FEE } from "@/constants";
 import { validate, format } from "rut.js";
 import useUserStore from "@/stores/useUser";
 import useCartStore from "@/stores/useCart";
+import useEventStore from "@/stores/useEvent";
 
 const Checkout = () => {
   const navigation = useNavigation();
@@ -20,7 +28,7 @@ const Checkout = () => {
   const { orderId } = params;
   const { user }: any = useUserStore();
   const { items, nominees, assignTicket, clearCart } = useCartStore();
-
+  const { event } = useEventStore();
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTransparent: true,
@@ -60,8 +68,17 @@ const Checkout = () => {
 
   const onSubmit = async () => {
     try {
-      const newPayment = await createPayment(nominees);
+      console.log("nominees", nominees);
+      if (event.nominated) {
+        const newPayment = await createPayment(orderId, nominees);
+        const { url, token } = newPayment;
+        console.log(`/events/payment?url=${url}&token=${token}`);
+        return router.push(`/events/payment?url=${url}&token=${token}`);
+      }
+
+      const newPayment = await createPayment(orderId, []);
       const { url, token } = newPayment;
+      console.log(`/events/payment?url=${url}&token=${token}`);
       return router.push(`/events/payment?url=${url}&token=${token}`);
     } catch (error) {
       console.log(error);
@@ -77,64 +94,84 @@ const Checkout = () => {
 
   return (
     <SafeAreaView className="flex h-full bg-secondary-500 p-2">
-      <ScrollView className="flex grow relative">
-        <Text className="self-center text-white font-bold text-xl">
-          Checkout
-        </Text>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={30}
+      >
+        <ScrollView className="flex grow relative">
+          <Text className="self-center text-white font-bold text-xl">
+            Checkout
+          </Text>
 
-        <View className="flex flex-col w-full bg-secondary-700 mt-12 p-4 rounded-xl">
-          <View className="w-full border-b border-secondary-200 pb-2">
-            <Text className="text-white font-bold text-xl">Facturación</Text>
-          </View>
-          <View className="flex flex-row justify-between py-4">
-            <Text className="text-secondary-200 font-semibold text-base">
-              Subtotal
-            </Text>
-            <Text className="text-secondary-200 font-semibold text-base">
-              ${subTotal}
-            </Text>
-          </View>
-          <View className="flex flex-row justify-between py-2 pb-4">
-            <Text className="text-secondary-200 font-semibold text-base">
-              Cargo por servicio
-            </Text>
-            <Text className="text-secondary-200 font-semibold text-base">
-              ${fee}
-            </Text>
-          </View>
-          <View className="flex flex-row justify-between py-2">
-            <Text className="text-white font-semibold text-base">
-              Total a pagar
-            </Text>
-            <Text className="text-primary-500 font-semibold text-base">
-              ${total}
-            </Text>
-          </View>
-        </View>
-
-        <View className="flex mt-4 bg-white p-4 rounded-xl">
-          <View className="w-full pb-2">
-            <Text className="font-bold text-xl">Nominar entradas</Text>
-          </View>
-          <View className="w-full py-2 border-b border-secondary-100 pb-4">
-            <Text className="text-secondary-300 text-base">
-              Las entradas de este evento son nominativas, por lo que
-              <Text className="text-secondary-300 font-bold text-base">
-                {" "}
-                solo podrá ser validad junto a tu cédula de identidad asociada a
-                estos datos.
+          <View className="flex flex-col w-full bg-secondary-700 mt-12 p-4 rounded-xl">
+            <View className="w-full border-b border-secondary-200 pb-2">
+              <Text className="text-white font-bold text-xl">Facturación</Text>
+            </View>
+            <View className="flex flex-row justify-between py-4">
+              <Text className="text-secondary-200 font-semibold text-base">
+                Subtotal
               </Text>
-            </Text>
+              <Text className="text-secondary-200 font-semibold text-base">
+                ${subTotal}
+              </Text>
+            </View>
+            <View className="flex flex-row justify-between py-2 pb-4">
+              <Text className="text-secondary-200 font-semibold text-base">
+                Cargo por servicio
+              </Text>
+              <Text className="text-secondary-200 font-semibold text-base">
+                ${fee}
+              </Text>
+            </View>
+            <View className="flex flex-row justify-between py-2">
+              <Text className="text-white font-semibold text-base">
+                Total a pagar
+              </Text>
+              <Text className="text-primary-500 font-semibold text-base">
+                ${total}
+              </Text>
+            </View>
           </View>
-          <View className="pt-4 pb-8">
-            <AccordionView
-              orderId={orderId}
-              tickets={nominees}
-              assignTicket={assignTicket}
-            />
-          </View>
+
+          {event.nominated ? (
+            <View className="flex mt-4 bg-white p-4 rounded-xl">
+              <View className="w-full pb-2">
+                <Text className="font-bold text-xl">Nominar entradas</Text>
+              </View>
+              <View className="w-full py-2 border-b border-secondary-100 pb-4">
+                <Text className="text-secondary-300 text-base">
+                  Las entradas de este evento son nominativas, por lo que
+                  <Text className="text-secondary-300 font-bold text-base">
+                    {" "}
+                    solo podrá ser validad junto a tu cédula de identidad
+                    asociada a estos datos.
+                  </Text>
+                </Text>
+              </View>
+
+              <View className="pt-4 pb-8">
+                <AccordionView
+                  orderId={orderId}
+                  tickets={nominees}
+                  assignTicket={assignTicket}
+                />
+              </View>
+            </View>
+          ) : null}
+        </ScrollView>
+      </KeyboardAvoidingView>
+      {!event.nominated ? (
+        <View className="flex w-full absolute bottom-12 bg-transparent items-center justify-center">
+          <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={() => onSubmit()}
+            className="bg-primary-400 w-[95%] ml-4 p-4 rounded-3xl items-center justify-center border border-primary-700"
+          >
+            <Text className="text-white font-bold">Pagar</Text>
+          </TouchableOpacity>
         </View>
-      </ScrollView>
+      ) : null}
+
       {nominees.reduce((acc: boolean, cur: any) => acc && cur?.email, true) ? (
         <View className="flex w-full absolute bottom-12 bg-transparent items-center justify-center">
           <TouchableOpacity

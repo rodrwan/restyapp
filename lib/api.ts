@@ -697,6 +697,7 @@ class Client {
               name
               start_at
               place
+              description
               image
             }
           }
@@ -708,6 +709,7 @@ class Client {
             image
             end_hour
             end_at
+            description
           }
           event_item {
             name

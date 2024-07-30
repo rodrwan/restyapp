@@ -3,15 +3,7 @@ import HTTPClient from "@/lib/api";
 const client = HTTPClient.getInstance();
 
 const useCreatePayment = () => {
-  const createPayment = async (nominees: any[]) => {
-    const orderId = nominees.reduce((acc, cur) => {
-      if (cur.orderId) {
-        return cur.orderId;
-      }
-
-      return acc;
-    }, "");
-
+  const createPayment = async (orderId: string, nominees: any[]) => {
     const body: any = {
       order_id: orderId,
       terms_and_conditions_signed: true,
@@ -27,6 +19,7 @@ const useCreatePayment = () => {
     };
 
     try {
+      console.log("body", body);
       const response: any = await client.createPayment(body);
 
       return response;

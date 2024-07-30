@@ -6,7 +6,7 @@ import {
   FlatList,
   TouchableOpacity,
 } from "react-native";
-import React, { useLayoutEffect } from "react";
+import React, { useEffect, useLayoutEffect } from "react";
 import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import useGetEventById from "@/hooks/useGetEventById";
 import { Ionicons } from "@expo/vector-icons";
@@ -14,10 +14,12 @@ import { Ionicons } from "@expo/vector-icons";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import Colors from "@/constants/Colors";
 import useCartStore from "@/stores/useCart";
+import useEventStore from "@/stores/useEvent";
 
 const EventPage = ({}) => {
   const navigation = useNavigation();
   const { items, addToCart, removeFromCart } = useCartStore();
+  const { setEvent } = useEventStore();
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -45,6 +47,10 @@ const EventPage = ({}) => {
     loading,
   }: any = useGetEventById(eventId);
 
+  useEffect(() => {
+    console.log("event", event);
+    setEvent(event);
+  }, [event]);
   if (loading) {
     // Show loader when fetching first page data.
     return (
