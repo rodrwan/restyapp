@@ -3,12 +3,14 @@ import React from "react";
 import { WebView } from "react-native-webview";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import queryString from "query-string";
-import useConfirmPayment from "@/hooks/useConfirmPayment";
+import useConfirmInscription from "@/hooks/useConfirmInscription";
+import useUserStore from "@/stores/useUser";
 
 const Payment = () => {
   const params: any = useLocalSearchParams();
   const router = useRouter();
-  const { confirmPayment } = useConfirmPayment();
+  const { confirmInscription } = useConfirmInscription();
+  const { setTbkCardNumber } = useUserStore();
 
   return (
     <View className="flex flex-1">
@@ -26,23 +28,23 @@ const Payment = () => {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
           },
-          body: `token_ws=${params.token}`,
+          body: `TBK_TOKEN=${params.token}`,
         }}
         cacheEnabled={false}
         onNavigationStateChange={async (navState) => {
           console.log("navState", navState);
-          if (navState.url.indexOf("/api/payments") > -1) {
+          if (navState.url.indexOf("/api/inscription") > -1) {
             const parsed: any = queryString.parseUrl(navState.url);
 
-            const { TBK_ID_SESION, TBK_ORDEN_COMPRA, TBK_TOKEN, token_ws } =
-              parsed.query;
+            const { TBK_TOKEN } = parsed.query;
             // call confirm payment using token_ws
-            if (token_ws) {
-              const result = await confirmPayment(token_ws);
+            if (TBK_TOKEN) {
+              const result = await confirmInscription(TBK_TOKEN);
               if (result) {
                 console.log("success");
                 router.dismissAll();
-                return router.push("/events/success");
+                setTbkCardNumber(result?.tbk_user, result?.card_number);
+                return router.push(`/events/cart`);
               }
               console.log("failure");
               router.dismissAll();

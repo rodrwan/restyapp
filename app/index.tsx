@@ -40,12 +40,12 @@ const HomePage = () => {
           });
           return (
             <TouchableOpacity
-              onPress={() => router.push(`/events/${item.id}`)}
+              onPress={() => router.push(`/(events)/${item.id}`)}
               className="bg-white rounded-3xl mb-4"
             >
-              <View className="bg-white rounded-3xl h-[250px]">
+              <View className="bg-white rounded-3xl h-[300px]">
                 <Image
-                  source={{ uri: item.image }}
+                  source={{ uri: `data:image/png;base64,${item?.image}` }}
                   className="w-full h-full rounded-3xl"
                   resizeMode="cover"
                 />
@@ -77,15 +77,17 @@ const HomePage = () => {
                 className="p-4 w-full bg-primary text-secondary-300"
               />
             </View>
-            <Text className="text-white text-center text-xl font-bold">
-              Mas Eventos
-            </Text>
+            {data?.length > 0 ? (
+              <Text className="text-white text-center text-xl font-bold">
+                Mas Eventos
+              </Text>
+            ) : null}
           </View>
         )}
         ListEmptyComponent={() => (
           <EmptyState
-            title="Aún no hay post"
-            subtitle="No se han creado posts"
+            title="Aún no hay eventos"
+            subtitle="No se han creado eventos"
           />
         )}
         refreshControl={

@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   FlatList,
   TouchableOpacity,
+  Dimensions,
 } from "react-native";
 import React, { useEffect, useLayoutEffect } from "react";
 import { router, useLocalSearchParams, useNavigation } from "expo-router";
@@ -51,6 +52,7 @@ const EventPage = ({}) => {
     console.log("event", event);
     setEvent(event);
   }, [event]);
+
   if (loading) {
     // Show loader when fetching first page data.
     return (
@@ -78,14 +80,18 @@ const EventPage = ({}) => {
         backgroundColor={Colors.secondary[500]}
         style={{
           flex: 1,
-          width: "100%",
-          height: 350,
+          // width: "100%",
+          // height: "100%",
         }}
-        parallaxHeaderHeight={350}
+        parallaxHeaderHeight={450}
         stickyHeaderHeight={100}
         contentBackgroundColor={Colors.secondary[500]}
         renderBackground={() => (
-          <Image source={{ uri: event?.image }} className="h-full w-full" />
+          <Image
+            source={{ uri: `data:image/png;base64,${event?.image}` }}
+            resizeMode="cover"
+            style={{ width: "100%", height: undefined, aspectRatio: 4 / 5 }}
+          />
         )}
         renderStickyHeader={() => (
           <View key="sticky-header" className="ml-24 h-[90px] justify-end">
@@ -110,7 +116,7 @@ const EventPage = ({}) => {
                       className={`flex flex-row justify-between ${
                         index % 2 === 0
                           ? "bg-secondary-500"
-                          : "bg-secondary-300"
+                          : "bg-secondary-600"
                       } p-4 mx-2 rounded-xl`}
                     >
                       <View>
@@ -172,10 +178,10 @@ const EventPage = ({}) => {
                 renderItem={({ item, index }) => {
                   return (
                     <View
-                      className={`flex flex-row justify-between ${
+                      className={`flex flex-row mb-2 justify-between ${
                         index % 2 === 0
                           ? "bg-secondary-500"
-                          : "bg-secondary-300"
+                          : "bg-secondary-600"
                       } p-4 mx-2 rounded-xl`}
                     >
                       <View>

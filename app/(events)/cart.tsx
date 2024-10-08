@@ -1,5 +1,5 @@
-import { View, Text, FlatList, TouchableOpacity } from "react-native";
-import React, { useEffect, useLayoutEffect } from "react";
+import { View, Text, FlatList, TouchableOpacity, Image } from "react-native";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
@@ -8,12 +8,16 @@ import { router, useNavigation } from "expo-router";
 import useCreateOrder from "@/hooks/useCreateOrder";
 import useAuthStore from "@/stores/useAuth";
 import useCartStore from "@/stores/useCart";
+import useUserStore from "@/stores/useUser";
 
 const Cart = () => {
   const navigation = useNavigation();
   const { items, addToCart, removeFromCart, setTicketToNominate, clearCart } =
     useCartStore();
   const { auth }: any = useAuthStore();
+  const { user } = useUserStore();
+  console.log("user", user?.tbk_user_id);
+  console.log("user", user?.tbk_card_number);
 
   useEffect(() => {
     if (!auth.isLogged) {
@@ -61,12 +65,18 @@ const Cart = () => {
   const onSubmit = async () => {
     try {
       const newOrder = await create(items);
+      if (newOrder?.length === 0) {
+        return router.push(
+          `/(auth)/sign-in?redirectTo=/events/checkout?orderId=${newOrder.id}`
+        );
+      }
+
       setTicketToNominate(
         newOrder.items.filter((item: any) => item.type === "ENTRANCE")
       );
       return router.push(`/events/checkout?orderId=${newOrder.id}`);
     } catch (error) {
-      console.log(error);
+      console.log(">>>", error);
     }
   };
 
@@ -149,7 +159,7 @@ const Cart = () => {
               return (
                 <View
                   className={`flex flex-row justify-between ${
-                    index % 2 === 0 ? "bg-secondary-500" : "bg-secondary-300"
+                    index % 2 === 0 ? "bg-secondary-500" : "bg-secondary-600"
                   } p-4 mx-2 rounded-xl`}
                 >
                   <View>
@@ -197,7 +207,7 @@ const Cart = () => {
         </View>
       ) : null}
 
-      <View className="flex items-end pr-4">
+      <View className="flex items-end pr-4 mb-8">
         <Text className="text-lg text-white font-bold">
           Subtotal: $
           {items.reduce((acc: number, cur: any) => {

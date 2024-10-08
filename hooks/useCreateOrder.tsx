@@ -27,6 +27,7 @@ const useCreateOrder = () => {
 
       return response;
     } catch (err: any) {
+      console.log(">>> err", err);
       if (err?.response?.errors[0]?.message === "session has expired") {
         throw new Error("expired session");
       } else {

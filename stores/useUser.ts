@@ -30,6 +30,8 @@ interface User {
   tickets: Ticket[] | null;
   drinks: Drink[] | null;
   events: Event[] | null;
+  tbk_user_id: string | null;
+  tbk_card_number: string | null;
 }
 
 interface Store {
@@ -38,6 +40,7 @@ interface Store {
   setTickets: (tickets: Ticket[]) => void;
   setDrinks: (drinks: Drink[]) => void;
   setEvents: (events: Event[]) => void;
+  setTbkCardNumber: (userId: string, cardNumber: string) => void;
 }
 
 const initialState = {
@@ -49,6 +52,8 @@ const initialState = {
   tickets: null,
   drinks: null,
   events: null,
+  tbk_user_id: null,
+  tbk_card_number: null,
 };
 
 const useUserStore = create<Store>((set) => ({
@@ -66,6 +71,11 @@ const useUserStore = create<Store>((set) => ({
     set((state) => ({ ...state, user: { ...state.user, drinks } })),
   setEvents: (events: Event[]) =>
     set((state) => ({ ...state, user: { ...state.user, events } })),
+  setTbkCardNumber: (userId: string, cardNumber: string) =>
+    set((state) => ({
+      ...state,
+      user: { ...state.user, tbk_user_id: userId, tbk_card_number: cardNumber },
+    })),
 }));
 
 export default useUserStore;

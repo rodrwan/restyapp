@@ -6,6 +6,8 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
+  Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -15,20 +17,27 @@ import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import Colors from "@/constants/Colors";
 import FormField from "@/components/FormField";
 import CustomButton from "@/components/CustomButton";
-import useCreatePayment from "@/hooks/useCreatePayment";
 import { MANGO_FEE } from "@/constants";
 import { validate, format } from "rut.js";
 import useUserStore from "@/stores/useUser";
 import useCartStore from "@/stores/useCart";
 import useEventStore from "@/stores/useEvent";
+import useAuthorizeTransaction from "@/hooks/useAuthorizeTransaction";
+import CreditCard from "@/components/CreditCars";
+import RadioButton from "@/components/RadioButton";
+import useCreateInscription from "@/hooks/useCreateInscription";
 
 const Checkout = () => {
   const navigation = useNavigation();
   const params: any = useLocalSearchParams();
+
   const { orderId } = params;
   const { user }: any = useUserStore();
   const { items, nominees, assignTicket, clearCart } = useCartStore();
   const { event } = useEventStore();
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const [selected, setSelected] = useState(false);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTransparent: true,
@@ -64,22 +73,44 @@ const Checkout = () => {
     });
   }, []);
 
-  const { createPayment } = useCreatePayment();
+  const { authorizeTransaction } = useAuthorizeTransaction();
+  const { createInscription } = useCreateInscription();
 
   const onSubmit = async () => {
+    setLoadingSubmit(true);
     try {
-      console.log("nominees", nominees);
+      // console.log("nominees", nominees);
       if (event.nominated) {
-        const newPayment = await createPayment(orderId, nominees);
-        const { url, token } = newPayment;
-        console.log(`/events/payment?url=${url}&token=${token}`);
-        return router.push(`/events/payment?url=${url}&token=${token}`);
+        const newPayment = await authorizeTransaction(orderId, []);
+        console.log("newPayment", newPayment);
+        const { status } = newPayment;
+        if (status === "AUTHORIZED") {
+          setLoadingSubmit(false);
+          return router.push("/events/success");
+        }
       }
 
-      const newPayment = await createPayment(orderId, []);
+      console.log("orderId", orderId);
+      const newPayment = await authorizeTransaction(orderId, []);
+      console.log("newPayment", newPayment);
+      const { status } = newPayment;
+      if (status === "AUTHORIZED") {
+        setLoadingSubmit(false);
+        return router.push("/events/success");
+      }
+    } catch (error) {
+      console.log(">>>>", error);
+      setLoadingSubmit(false);
+    }
+  };
+
+  const onSubmitRegisterCard = async () => {
+    try {
+      setSelected(true);
+      const newPayment = await createInscription();
       const { url, token } = newPayment;
-      console.log(`/events/payment?url=${url}&token=${token}`);
-      return router.push(`/events/payment?url=${url}&token=${token}`);
+      console.log(`/events/inscription?url=${url}&token=${token}`);
+      return router.push(`/events/inscription?url=${url}&token=${token}`);
     } catch (error) {
       console.log(error);
     }
@@ -158,6 +189,45 @@ const Checkout = () => {
               </View>
             </View>
           ) : null}
+
+          <View className="mt-8">
+            {user?.tbk_card_number === "" ? (
+              <View className="flex bg-secondary-50 p-4 my-8 mx-2 rounded-3xl justify-center items-end">
+                <View className="self-center w-[80%] justify-center justify-center ">
+                  <Text className="text-lg text-black font-bold text-center">
+                    Inscribir medio de pago
+                  </Text>
+                  <View className="flex-row w-full h-[100px] items-center">
+                    <RadioButton selected={selected} />
+                    <TouchableOpacity
+                      onPress={() => onSubmitRegisterCard()}
+                      style={{
+                        marginTop: 8,
+                        width: "100%",
+                        alignSelf: "center",
+                      }}
+                    >
+                      <Image
+                        source={require("../../assets/images/transbank.png")}
+                        style={{
+                          marginTop: 8,
+                          width: "82%",
+                          height: 60,
+                          alignSelf: "center",
+                        }}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            ) : (
+              <CreditCard
+                cardNumber={user?.tbk_card_number ?? ""}
+                firstname={user?.firstname ?? ""}
+                lastname={user?.lastname ?? ""}
+              />
+            )}
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
       {!event.nominated ? (
@@ -165,9 +235,18 @@ const Checkout = () => {
           <TouchableOpacity
             activeOpacity={0.9}
             onPress={() => onSubmit()}
-            className="bg-primary-400 w-[95%] ml-4 p-4 rounded-3xl items-center justify-center border border-primary-700"
+            className="flex-row bg-primary-400 w-[95%] ml-4 p-4 rounded-3xl items-center justify-center border border-primary-700"
+            disabled={loadingSubmit}
           >
             <Text className="text-white font-bold">Pagar</Text>
+            {loadingSubmit && (
+              <ActivityIndicator
+                animating={loadingSubmit}
+                color="#fff"
+                size="small"
+                className="ml-2"
+              />
+            )}
           </TouchableOpacity>
         </View>
       ) : null}
@@ -177,9 +256,19 @@ const Checkout = () => {
           <TouchableOpacity
             activeOpacity={0.9}
             onPress={() => onSubmit()}
-            className="bg-primary-400 w-[95%] ml-4 p-4 rounded-3xl items-center justify-center border border-primary-700"
+            className="flex-row bg-primary-400 w-[95%] ml-4 p-4 rounded-3xl items-center justify-center border border-primary-700"
+            disabled={loadingSubmit}
           >
             <Text className="text-white font-bold">Pagar</Text>
+
+            {loadingSubmit && (
+              <ActivityIndicator
+                animating={loadingSubmit}
+                color="#fff"
+                size="small"
+                className="ml-2"
+              />
+            )}
           </TouchableOpacity>
         </View>
       ) : null}
@@ -260,7 +349,7 @@ function AccordionView({ orderId, tickets, assignTicket }: any) {
               closeAccordion();
             }}
             containerStyles="mt-7"
-            // isLoading={isSubmitting}
+            // isLoading={loadingSubmit}
           />
         </View>
       </View>

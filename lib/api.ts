@@ -69,6 +69,8 @@ class Client {
           birth_date
           picture
           source
+          tbk_user_id
+          tbk_card_number
         }
         can_access
         access_token
@@ -93,6 +95,7 @@ class Client {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
+          "x-user-platform": "mobile",
           ...requestHeaders,
         },
         body: JSON.stringify({
@@ -150,6 +153,8 @@ class Client {
           birth_date
           picture
           source
+          tbk_user_id
+          tbk_card_number
         }
         access_token
       }
@@ -171,6 +176,7 @@ class Client {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
+          "x-user-platform": "mobile",
           ...requestHeaders,
         },
         body: JSON.stringify({
@@ -195,6 +201,79 @@ class Client {
       throw new Error(error);
     }
   }
+  async me(userId: string) {
+    try {
+      const document = graphql.gql`
+    mutation Me {
+      me(userId: String!) {
+        user {
+          id
+          firstname
+          lastname
+          email
+          dni
+          preferences
+          news_subscription
+          roles
+          resale_sign
+          resale_contract_url
+          bank_account {
+            number
+            bank_name
+            type
+            email
+            dni
+          }
+          gender
+          phone
+          birth_date
+          picture
+          source
+          tbk_user_id
+          tbk_card_number
+        }
+      }
+    }
+      `;
+
+      const variables = {
+        userId,
+      };
+
+      const requestHeaders = {
+        "X-User-Roles": "system",
+      };
+
+      const response = await fetch(`${MANGO_API_URL}`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          "x-user-platform": "mobile",
+          ...requestHeaders,
+        },
+        body: JSON.stringify({
+          query: document,
+          variables,
+          operationName: "Me",
+        }),
+      });
+
+      if (response.status === 503) {
+        console.log("Me Unavailable service");
+        return [];
+      } else if (response.status !== 200) {
+        console.log("Me response", response);
+        return [];
+      }
+      const resp = await response.json();
+
+      return [resp?.data?.me, resp?.errors];
+    } catch (error: any) {
+      console.log("error", error);
+      throw new Error(error);
+    }
+  }
 
   // upload a file
   async uploadFile(file: any) {
@@ -213,6 +292,7 @@ class Client {
         headers: {
           Accept: "application/json",
           "Content-Type": "multipart/form-data",
+          "x-user-platform": "mobile",
           Authorization: `Bearer ${this.accessToken}`,
         },
         body,
@@ -263,6 +343,7 @@ class Client {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
+          "x-user-platform": "mobile",
           ...requestHeaders,
         },
         body: JSON.stringify({
@@ -334,6 +415,7 @@ class Client {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
+          "x-user-platform": "mobile",
           ...requestHeaders,
         },
         body: JSON.stringify({
@@ -389,6 +471,7 @@ class Client {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
+          "x-user-platform": "mobile",
           ...requestHeaders,
         },
         body: JSON.stringify({
@@ -405,6 +488,7 @@ class Client {
         console.log("CreateOrder response", response);
         return [];
       }
+
       const { data } = await response.json();
 
       return data.createOrder;
@@ -413,6 +497,7 @@ class Client {
       throw new Error(error);
     }
   }
+
   async createPayment(paymentData: any): Promise<any> {
     try {
       const document = graphql.gql`
@@ -440,6 +525,7 @@ class Client {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
+          "x-user-platform": "mobile",
           ...requestHeaders,
         },
         body: JSON.stringify({
@@ -464,6 +550,7 @@ class Client {
       throw new Error(error);
     }
   }
+
   async getPaymentByToken(token: any): Promise<any> {
     try {
       const document = graphql.gql`
@@ -537,6 +624,7 @@ class Client {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
+          "x-user-platform": "mobile",
           ...requestHeaders,
         },
         body: JSON.stringify({
@@ -600,6 +688,7 @@ class Client {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
+          "x-user-platform": "mobile",
           ...requestHeaders,
         },
         body: JSON.stringify({
@@ -659,6 +748,7 @@ class Client {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
+          "x-user-platform": "mobile",
           ...requestHeaders,
         },
         body: JSON.stringify({
@@ -683,6 +773,7 @@ class Client {
       throw new Error(error);
     }
   }
+
   async getTicketsByUserAndEventID(eventId: string): Promise<any> {
     try {
       const document = graphql.gql`
@@ -736,6 +827,7 @@ class Client {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
+          "x-user-platform": "mobile",
           ...requestHeaders,
         },
         body: JSON.stringify({
@@ -755,6 +847,165 @@ class Client {
       const { data } = await response.json();
 
       return data.getTickets;
+    } catch (error: any) {
+      console.log("error", error);
+      throw new Error(error);
+    }
+  }
+
+  async createInscription(): Promise<any> {
+    try {
+      const document = graphql.gql`
+    mutation CreateInscription() {
+      createInscription() {
+        url
+        token
+      }
+    }
+      `;
+
+      const variables = {};
+
+      const requestHeaders = {
+        "X-User-Roles": "system",
+        Authorization: `Bearer ${this.accessToken}`,
+      };
+
+      const response = await fetch(`${MANGO_API_URL}`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          "x-user-platform": "mobile",
+          ...requestHeaders,
+        },
+        body: JSON.stringify({
+          query: document,
+          variables,
+          operationName: "CreateInscription",
+        }),
+      });
+
+      console.log("response", response);
+      if (response.status === 503) {
+        console.log("CreateInscription Unavailable service");
+        return [];
+      } else if (response.status !== 200) {
+        console.log("CreateInscription response", response);
+        return [];
+      }
+      const { data } = await response.json();
+      console.log("data", data);
+
+      return data.createInscription;
+    } catch (error: any) {
+      console.log("error", error);
+      throw new Error(error);
+    }
+  }
+
+  async confirmInscription(token: string): Promise<any> {
+    try {
+      const document = graphql.gql`
+    mutation ConfirmInscription($input: ConfirmInscriptionData!) {
+      confirmInscription(input: $input) {
+        tbk_user
+        card_number
+      }
+    }
+      `;
+
+      const variables = {
+        input: {
+          token,
+        },
+      };
+
+      const requestHeaders = {
+        "X-User-Roles": "system",
+        Authorization: `Bearer ${this.accessToken}`,
+      };
+
+      const response = await fetch(`${MANGO_API_URL}`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          "x-user-platform": "mobile",
+          ...requestHeaders,
+        },
+        body: JSON.stringify({
+          query: document,
+          variables,
+          operationName: "ConfirmInscription",
+        }),
+      });
+
+      if (response.status === 503) {
+        console.log("ConfirmInscription Unavailable service");
+        return [];
+      } else if (response.status !== 200) {
+        console.log("ConfirmInscription response", response);
+        return [];
+      }
+      const res = await response.json();
+      console.log("data", res);
+
+      return res?.data?.confirmInscription;
+    } catch (error: any) {
+      console.log("error", error);
+      throw new Error(error);
+    }
+  }
+
+  async authorizeTransaction(paymentData: any): Promise<any> {
+    try {
+      const document = graphql.gql`
+    mutation AuthorizeTransaction($input: AuthorizeTransactionData!) {
+      authorizeTransaction(input: $input) {
+        status
+        order_id
+      }
+    }
+      `;
+
+      const variables = {
+        input: {
+          ...paymentData,
+        },
+      };
+
+      const requestHeaders = {
+        "X-User-Roles": "system",
+        Authorization: `Bearer ${this.accessToken}`,
+      };
+
+      const response = await fetch(`${MANGO_API_URL}`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          "x-user-platform": "mobile",
+          ...requestHeaders,
+        },
+        body: JSON.stringify({
+          query: document,
+          variables,
+          operationName: "AuthorizeTransaction",
+        }),
+      });
+
+      if (response.status === 503) {
+        console.log("AuthorizeTransaction Unavailable service");
+        return [];
+      } else if (response.status !== 200) {
+        console.log("AuthorizeTransaction response", response);
+        return [];
+      }
+      const res = await response.json();
+      console.log("data", res);
+
+      return res?.data?.authorizeTransaction;
     } catch (error: any) {
       console.log("error", error);
       throw new Error(error);

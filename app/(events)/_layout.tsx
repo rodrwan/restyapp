@@ -17,6 +17,12 @@ export default function RootLayoutNav() {
             presentation: "modal",
           }}
         />
+        <Stack.Screen
+          name="inscription"
+          options={{
+            presentation: "modal",
+          }}
+        />
       </Stack>
       <StatusBar backgroundColor={Colors.secondary[500]} style="light" />
     </>

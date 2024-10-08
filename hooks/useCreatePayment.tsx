@@ -19,7 +19,6 @@ const useCreatePayment = () => {
     };
 
     try {
-      console.log("body", body);
       const response: any = await client.createPayment(body);
 
       return response;
