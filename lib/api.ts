@@ -857,8 +857,8 @@ class Client {
   async createInscription(): Promise<any> {
     try {
       const document = graphql.gql`
-    mutation CreateInscription() {
-      createInscription() {
+    mutation CreateInscription {
+      createInscription {
         url
         token
       }
