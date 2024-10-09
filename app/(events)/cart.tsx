@@ -75,7 +75,7 @@ const Cart = () => {
       setTicketToNominate(
         newOrder.items.filter((item: any) => item.type === "ENTRANCE")
       );
-      return router.push(`/events/checkout?orderId=${newOrder.id}`);
+      return router.push(`/(events)/checkout?orderId=${newOrder.id}`);
     } catch (error) {
       console.log(">>>", error);
     }
