@@ -21,7 +21,7 @@ const Cart = () => {
 
   useEffect(() => {
     if (!auth.isLogged) {
-      return router.push("/(auth)/sign-in?redirectTo=/events/cart");
+      return router.push("/(auth)/sign-in?redirectTo=/(events)/cart");
     }
   }, [auth.isLogged]);
 
@@ -65,9 +65,10 @@ const Cart = () => {
   const onSubmit = async () => {
     try {
       const newOrder = await create(items);
+      console.log("newOrder", newOrder);
       if (newOrder?.length === 0) {
         return router.push(
-          `/(auth)/sign-in?redirectTo=/events/checkout?orderId=${newOrder.id}`
+          `/(auth)/sign-in?redirectTo=/(events)/checkout?orderId=${newOrder.id}`
         );
       }
 

@@ -44,12 +44,12 @@ const Payment = () => {
                 console.log("success");
                 router.dismissAll();
                 setTbkCardNumber(result?.tbk_user, result?.card_number);
-                return router.push(`/events/cart`);
+                return router.push(`/(events)/cart`);
               }
               console.log("failure");
               router.dismissAll();
               // rejected by other mean.
-              return router.push("/events/failure");
+              return router.push("/(events)/failure");
             } else {
               console.log("failure");
               // this happen when a payment is cancelled

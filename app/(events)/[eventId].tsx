@@ -264,7 +264,7 @@ const EventPage = ({}) => {
         <View className="flex w-full absolute bottom-12 bg-transparent justify-center">
           <TouchableOpacity
             activeOpacity={0.9}
-            onPress={() => router.push("/events/cart")}
+            onPress={() => router.push("/(events)/cart")}
             className="bg-primary-400 w-[90%] mx-auto left-0 right-0 p-4 rounded-3xl items-center justify-center border border-primary-700 content-center"
           >
             <Text className="text-white font-bold">

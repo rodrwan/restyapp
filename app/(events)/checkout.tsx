@@ -86,7 +86,7 @@ const Checkout = () => {
         const { status } = newPayment;
         if (status === "AUTHORIZED") {
           setLoadingSubmit(false);
-          return router.push("/events/success");
+          return router.push("/(events)/success");
         }
       }
 
@@ -96,7 +96,7 @@ const Checkout = () => {
       const { status } = newPayment;
       if (status === "AUTHORIZED") {
         setLoadingSubmit(false);
-        return router.push("/events/success");
+        return router.push("/(events)/success");
       }
     } catch (error) {
       console.log(">>>>", error);
@@ -109,8 +109,8 @@ const Checkout = () => {
       setSelected(true);
       const newPayment = await createInscription();
       const { url, token } = newPayment;
-      console.log(`/events/inscription?url=${url}&token=${token}`);
-      return router.push(`/events/inscription?url=${url}&token=${token}`);
+      console.log(`/(events)/inscription?url=${url}&token=${token}`);
+      return router.push(`/(events)/inscription?url=${url}&token=${token}`);
     } catch (error) {
       console.log(error);
     }

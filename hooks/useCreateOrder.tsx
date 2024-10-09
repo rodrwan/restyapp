@@ -3,6 +3,7 @@ import HTTPClient from "@/lib/api";
 const client = HTTPClient.getInstance();
 
 const useCreateOrder = () => {
+  console.log("useCreateOrder");
   const create = async (cartList: any[]) => {
     const items: any = cartList
       .map((item: any) => {

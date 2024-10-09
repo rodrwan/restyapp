@@ -338,6 +338,7 @@ class Client {
 
       const requestHeaders = {};
 
+      console.log("MANGO_API_URL", `${MANGO_API_URL}`);
       const response = await fetch(`${MANGO_API_URL}`, {
         method: "POST",
         headers: {

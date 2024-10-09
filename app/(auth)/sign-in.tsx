@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 const SignIn = () => {
   const navigation = useNavigation();
   const params: any = useLocalSearchParams();
+  console.log("params", params);
   const { setUser } = useUserStore();
   const { getEvents }: any = useGetEventsFromUser();
   const [isSubmitting, setSubmitting] = useState(false);
