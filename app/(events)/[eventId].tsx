@@ -88,7 +88,7 @@ const EventPage = ({}) => {
         contentBackgroundColor={Colors.secondary[500]}
         renderBackground={() => (
           <Image
-            source={{ uri: `data:image/png;base64,${event?.image}` }}
+            source={{ uri: event?.image }}
             resizeMode="cover"
             style={{ width: "100%", height: undefined, aspectRatio: 4 / 5 }}
           />

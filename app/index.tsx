@@ -45,7 +45,7 @@ const HomePage = () => {
             >
               <View className="bg-white rounded-3xl h-[300px]">
                 <Image
-                  source={{ uri: `data:image/png;base64,${item?.image}` }}
+                  source={{ uri: item?.image }}
                   className="w-full h-full rounded-3xl"
                   resizeMode="cover"
                 />

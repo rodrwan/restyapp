@@ -128,37 +128,30 @@ class Client {
   async signUp(input: RegisterInput) {
     try {
       const document = graphql.gql`
-    mutation Register($input: RegisterData!) {
-      register(input: $input) {
+mutation Register($input: RegisterData!) {
+    register(input: $input) {
         user {
-          id
-          firstname
-          lastname
-          email
-          dni
-          preferences
-          news_subscription
-          roles
-          resale_sign
-          resale_contract_url
-          bank_account {
-            number
-            bank_name
-            type
+            id
+            firstname
+            lastname
             email
             dni
-          }
-          gender
-          phone
-          birth_date
-          picture
-          source
-          tbk_user_id
-          tbk_card_number
+            preferences
+            news_subscription
+            roles
+            resale_sign
+            resale_contract_url
+            gender
+            phone
+            birth_date
+            picture
+            source
+            tbk_user_id
+            tbk_card_number
         }
         access_token
-      }
     }
+}
       `;
 
       const variables = {
