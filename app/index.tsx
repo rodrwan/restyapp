@@ -54,7 +54,7 @@ const HomePage = () => {
                 <Text className="font-bold text-xl">{item.name}</Text>
                 <Text className="text-xl text-primary-500">{startAt}</Text>
                 <Text className="text-md text-secondary-300">
-                  Desde ${item?.items[0]?.price}
+                  Desde ${Number(item?.items[0]?.price).toLocaleString("es-CL")}
                 </Text>
               </View>
             </TouchableOpacity>

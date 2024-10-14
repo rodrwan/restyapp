@@ -16,8 +16,6 @@ const Cart = () => {
     useCartStore();
   const { auth }: any = useAuthStore();
   const { user } = useUserStore();
-  console.log("user", user?.tbk_user_id);
-  console.log("user", user?.tbk_card_number);
 
   useEffect(() => {
     if (!auth.isLogged) {
@@ -109,7 +107,7 @@ const Cart = () => {
                       {item?.name}
                     </Text>
                     <Text className="text-primary-500 text-base mb-2">
-                      ${item?.price} c/u
+                      ${Number(item?.price).toLocaleString("es-CL")} c/u
                     </Text>
                   </View>
                   <View className="flex flex-row gap-2 items-center">
@@ -168,7 +166,7 @@ const Cart = () => {
                       {item?.name}
                     </Text>
                     <Text className="text-primary-500 text-base mb-2">
-                      ${item?.price} c/u
+                      ${Number(item?.price).toLocaleString("es-CL")} c/u
                     </Text>
                   </View>
                   <View className="flex flex-row gap-2 items-center">
@@ -211,9 +209,11 @@ const Cart = () => {
       <View className="flex items-end pr-4 mb-8">
         <Text className="text-lg text-white font-bold">
           Subtotal: $
-          {items.reduce((acc: number, cur: any) => {
-            return acc + cur.price * cur.quantity;
-          }, 0)}
+          {Number(
+            items.reduce((acc: number, cur: any) => {
+              return acc + cur.price * cur.quantity;
+            }, 0)
+          ).toLocaleString("es-CL")}
         </Text>
       </View>
 

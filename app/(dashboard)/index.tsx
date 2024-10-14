@@ -13,15 +13,26 @@ import {
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { useIsFocused } from "@react-navigation/native";
+
 import { UserInfoSkeleton } from "./skeletons/home";
 import Colors from "@/constants/Colors";
 import EmptyState from "@/components/EmptyState";
 import useUserStore from "@/stores/useUser";
 import useAuthStore from "@/stores/useAuth";
+import useGetEventsFromUser from "@/hooks/useGetEventsFromUser.";
 
 const HomePage = () => {
   const { user } = useUserStore();
   const { auth } = useAuthStore();
+  const { getEvents }: any = useGetEventsFromUser();
+
+  // check if screen is focused
+  const isFocused = useIsFocused();
+  React.useEffect(() => {
+    console.log("refresh", isFocused);
+    isFocused && getEvents();
+  }, [isFocused]);
 
   if (!auth.isLogged) {
     return (

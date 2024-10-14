@@ -188,12 +188,17 @@ mutation Register($input: RegisterData!) {
       }
       const resp = await response.json();
 
+      if (!resp.errors) {
+        this.accessToken = resp?.data?.register.access_token;
+      }
+
       return [resp?.data?.register, resp?.errors];
     } catch (error: any) {
       console.log("error", error);
       throw new Error(error);
     }
   }
+
   async me(userId: string) {
     try {
       const document = graphql.gql`
@@ -785,6 +790,7 @@ mutation Register($input: RegisterData!) {
               description
               image
             }
+            is_validated
           }
           event {
             id

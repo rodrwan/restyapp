@@ -42,6 +42,7 @@ const useGetEventsFromUser = () => {
           return {
             id: cur.ticket.id,
             base64: cur.ticket.base64,
+            isValidated: cur.ticket.is_validated,
             name: cur.event_item.name,
             event: cur.event,
           };
@@ -57,6 +58,7 @@ const useGetEventsFromUser = () => {
           return {
             id: cur.ticket.id,
             base64: cur.ticket.base64,
+            isValidated: cur.ticket.is_validated,
             name: cur.event_item.name,
             event: cur.event,
           };
@@ -65,8 +67,14 @@ const useGetEventsFromUser = () => {
 
       const result = {
         orders,
-        tickets: tickets.flat().filter(Boolean),
-        drinks: drinks.flat().filter(Boolean),
+        tickets: tickets
+          .flat()
+          .filter(Boolean)
+          .filter((ticket) => ticket.isValidated === false),
+        drinks: drinks
+          .flat()
+          .filter(Boolean)
+          .filter((ticket) => ticket.isValidated === false),
         events: response.events,
       };
 

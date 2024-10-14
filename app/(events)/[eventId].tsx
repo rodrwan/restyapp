@@ -49,7 +49,6 @@ const EventPage = ({}) => {
   }: any = useGetEventById(eventId);
 
   useEffect(() => {
-    console.log("event", event);
     setEvent(event);
   }, [event]);
 
@@ -111,6 +110,17 @@ const EventPage = ({}) => {
                 data={tickets}
                 keyExtractor={(item: any) => item.id}
                 renderItem={({ item, index }) => {
+                  const quantity =
+                    items?.length &&
+                    items
+                      .filter((item: any) => item.type === "ENTRANCE")
+                      .reduce((acc: any, cur: any) => acc + cur.quantity, 0);
+                  const maxPerSale =
+                    item?.max_per_sale < item?.stock
+                      ? item?.max_per_sale
+                      : item?.stock;
+                  const disabledAdd = maxPerSale <= quantity;
+
                   return (
                     <View
                       className={`flex flex-row justify-between ${
@@ -129,32 +139,55 @@ const EventPage = ({}) => {
                           </Text>
                         )}
                         <Text className="text-primary-500 text-base mb-2">
-                          ${item?.price} c/u
+                          ${Number(item?.price).toLocaleString("es-CL")} c/u
                         </Text>
+
+                        {disabledAdd && (
+                          <Text className="text-error-300 text-xs">
+                            No puedes agregar más entradas
+                          </Text>
+                        )}
                       </View>
-                      <View className="flex flex-row gap-2 items-center">
-                        <TouchableOpacity onPress={() => removeFromCart(item)}>
-                          <Ionicons
-                            name="remove-circle-outline"
-                            color={Colors.white}
-                            size={32}
-                          />
-                        </TouchableOpacity>
-                        <Text className="text-white text-xl">
-                          {(items?.length &&
-                            items.filter(
-                              (item: any) => item.type === "ENTRANCE"
-                            )[index]?.quantity) ??
-                            0}
-                        </Text>
-                        <TouchableOpacity onPress={() => addToCart(item)}>
-                          <Ionicons
-                            name="add-circle-outline"
-                            color={Colors.primary[500]}
-                            size={32}
-                          />
-                        </TouchableOpacity>
-                      </View>
+                      {item?.stock > 0 ? (
+                        <View className="flex flex-row gap-2 items-center">
+                          <TouchableOpacity
+                            onPress={() => removeFromCart(item)}
+                          >
+                            <Ionicons
+                              name="remove-circle-outline"
+                              color={Colors.white}
+                              size={32}
+                            />
+                          </TouchableOpacity>
+                          <Text className="text-white text-xl">
+                            {(items?.length &&
+                              items.filter(
+                                (item: any) => item.type === "ENTRANCE"
+                              )[index]?.quantity) ??
+                              0}
+                          </Text>
+                          <TouchableOpacity
+                            onPress={() => addToCart(item)}
+                            disabled={disabledAdd}
+                          >
+                            <Ionicons
+                              name="add-circle-outline"
+                              color={
+                                disabledAdd
+                                  ? Colors.secondary[300]
+                                  : Colors.primary[500]
+                              }
+                              size={32}
+                            />
+                          </TouchableOpacity>
+                        </View>
+                      ) : (
+                        <View className="flex flex-col items-center justify-center">
+                          <Text className="text-error-300 text-xl">
+                            Agotado
+                          </Text>
+                        </View>
+                      )}
                     </View>
                   );
                 }}
@@ -176,6 +209,17 @@ const EventPage = ({}) => {
                 data={drinks}
                 keyExtractor={(item: any) => item.id}
                 renderItem={({ item, index }) => {
+                  const quantity =
+                    items?.length &&
+                    items
+                      .filter((item: any) => item.type === "DRINK")
+                      .reduce((acc: any, cur: any) => acc + cur.quantity, 0);
+                  const maxPerSale =
+                    item?.max_per_sale < item?.stock
+                      ? item?.max_per_sale
+                      : item?.stock;
+                  const disabledAdd = maxPerSale <= quantity;
+
                   return (
                     <View
                       className={`flex flex-row mb-2 justify-between ${
@@ -189,32 +233,49 @@ const EventPage = ({}) => {
                           {item?.name}
                         </Text>
                         <Text className="text-primary-500 text-base mb-2">
-                          ${item?.price} c/u
+                          ${Number(item?.price).toLocaleString("es-CL")} c/u
                         </Text>
                       </View>
-                      <View className="flex flex-row gap-2 items-center">
-                        <TouchableOpacity onPress={() => removeFromCart(item)}>
-                          <Ionicons
-                            name="remove-circle-outline"
-                            color={Colors.white}
-                            size={32}
-                          />
-                        </TouchableOpacity>
-                        <Text className="text-white text-xl">
-                          {(items?.length &&
-                            items.filter((item: any) => item.type === "DRINK")[
-                              index
-                            ]?.quantity) ??
-                            0}
-                        </Text>
-                        <TouchableOpacity onPress={() => addToCart(item)}>
-                          <Ionicons
-                            name="add-circle-outline"
-                            color={Colors.primary[500]}
-                            size={32}
-                          />
-                        </TouchableOpacity>
-                      </View>
+                      {item?.stock > 0 ? (
+                        <View className="flex flex-row gap-2 items-center">
+                          <TouchableOpacity
+                            onPress={() => removeFromCart(item)}
+                          >
+                            <Ionicons
+                              name="remove-circle-outline"
+                              color={Colors.white}
+                              size={32}
+                            />
+                          </TouchableOpacity>
+                          <Text className="text-white text-xl">
+                            {(items?.length &&
+                              items.filter(
+                                (item: any) => item.type === "DRINK"
+                              )[index]?.quantity) ??
+                              0}
+                          </Text>
+                          <TouchableOpacity
+                            onPress={() => addToCart(item)}
+                            disabled={disabledAdd}
+                          >
+                            <Ionicons
+                              name="add-circle-outline"
+                              color={
+                                disabledAdd
+                                  ? Colors.secondary[300]
+                                  : Colors.primary[500]
+                              }
+                              size={32}
+                            />
+                          </TouchableOpacity>
+                        </View>
+                      ) : (
+                        <View className="flex flex-col items-center justify-center">
+                          <Text className="text-error-300 text-xl">
+                            Agotado
+                          </Text>
+                        </View>
+                      )}
                     </View>
                   );
                 }}
