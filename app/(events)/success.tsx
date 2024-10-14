@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from "react";
+import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -14,7 +14,7 @@ const SuccessPage = () => {
   const { clearCart } = useCartStore();
   const { getEvents }: any = useGetEventsFromUser();
 
-  useLayoutEffect(() => {
+  React.useLayoutEffect(() => {
     navigation.setOptions({
       headerTransparent: true,
       headerTitle: "Pago exitoso",
@@ -34,7 +34,6 @@ const SuccessPage = () => {
       headerRight: () => (
         <TouchableOpacity
           onPress={() => {
-            clearCart();
             return router.push("/");
           }}
           className="flex flex-row items-center justify-center items-center p-2"
@@ -43,6 +42,10 @@ const SuccessPage = () => {
         </TouchableOpacity>
       ),
     });
+  }, []);
+
+  React.useEffect(() => {
+    clearCart();
   }, []);
 
   return (

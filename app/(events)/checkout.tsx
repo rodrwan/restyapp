@@ -116,12 +116,25 @@ const Checkout = () => {
     }
   };
 
-  const subTotal = items.reduce(
-    (acc: number, cur: any) => acc + cur.price * cur.quantity,
-    0
-  );
-  const fee = subTotal * MANGO_FEE;
-  const total = Math.floor(subTotal + fee);
+  const subTotal = items.reduce((acc: number, cur: any) => {
+    return acc + cur.price * cur.quantity;
+  }, 0);
+
+  const fee = items.reduce((acc: number, cur: any) => {
+    if (cur.type === "ENTRANCE") {
+      return (acc + cur.price * cur.quantity) * MANGO_FEE;
+    }
+
+    return acc;
+  }, 0);
+
+  const total = items.reduce((acc: number, cur: any) => {
+    if (cur.type === "ENTRANCE") {
+      return (acc + cur.price * cur.quantity) * (1 + MANGO_FEE);
+    }
+
+    return acc + cur.price * cur.quantity;
+  }, 0);
 
   return (
     <SafeAreaView className="flex h-full bg-secondary-500 p-2">
@@ -143,7 +156,7 @@ const Checkout = () => {
                 Subtotal
               </Text>
               <Text className="text-secondary-200 font-semibold text-base">
-                ${subTotal}
+                ${Number(subTotal).toLocaleString("es-CL")}
               </Text>
             </View>
             <View className="flex flex-row justify-between py-2 pb-4">
@@ -151,7 +164,7 @@ const Checkout = () => {
                 Cargo por servicio
               </Text>
               <Text className="text-secondary-200 font-semibold text-base">
-                ${fee}
+                ${Number(fee).toLocaleString("es-CL")}
               </Text>
             </View>
             <View className="flex flex-row justify-between py-2">
@@ -159,7 +172,7 @@ const Checkout = () => {
                 Total a pagar
               </Text>
               <Text className="text-primary-500 font-semibold text-base">
-                ${total}
+                ${Number(total).toLocaleString("es-CL")}
               </Text>
             </View>
           </View>
@@ -235,8 +248,10 @@ const Checkout = () => {
           <TouchableOpacity
             activeOpacity={0.9}
             onPress={() => onSubmit()}
-            className="flex-row bg-primary-400 w-[95%] ml-4 p-4 rounded-3xl items-center justify-center border border-primary-700"
-            disabled={loadingSubmit}
+            className={`flex-row w-[95%] ml-4 p-4 rounded-3xl items-center justify-center border border-primary-700 ${
+              user?.tbk_card_number === "" ? "bg-primary-200" : "bg-primary-400"
+            }`}
+            disabled={user?.tbk_card_number === "" || loadingSubmit}
           >
             <Text className="text-white font-bold">Pagar</Text>
             {loadingSubmit && (
@@ -256,8 +271,10 @@ const Checkout = () => {
           <TouchableOpacity
             activeOpacity={0.9}
             onPress={() => onSubmit()}
-            className="flex-row bg-primary-400 w-[95%] ml-4 p-4 rounded-3xl items-center justify-center border border-primary-700"
-            disabled={loadingSubmit}
+            className={`flex-row w-[95%] ml-4 p-4 rounded-3xl items-center justify-center border border-primary-700 ${
+              user?.tbk_card_number === "" ? "bg-primary-200" : "bg-primary-400"
+            }`}
+            disabled={user?.tbk_card_number === "" || loadingSubmit}
           >
             <Text className="text-white font-bold">Pagar</Text>
 

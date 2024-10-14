@@ -38,13 +38,16 @@ const SignWithGoogle = ({ setUser, getEvents, redirectTo }: any) => {
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
+      console.log("userInfo", userInfo);
       const sessionResp = await createSession(
         userInfo?.user?.email,
         userInfo?.user?.id,
         "google"
       );
 
+      console.log("sessionResp", sessionResp);
       if (!sessionResp && userInfo && userInfo.user) {
+        console.log("create new user");
         const sessionResp = await createUser(
           userInfo?.user?.givenName ?? "",
           userInfo?.user?.familyName ?? "",
@@ -53,6 +56,8 @@ const SignWithGoogle = ({ setUser, getEvents, redirectTo }: any) => {
           userInfo?.user?.photo ?? "",
           "google"
         );
+
+        console.log("sessionResp after create", sessionResp);
 
         setUser({
           ...userInfo?.user,
