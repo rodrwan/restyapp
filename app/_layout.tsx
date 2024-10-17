@@ -46,6 +46,7 @@ function RootLayoutNav() {
   return (
     <Stack>
       <Stack.Screen name="index" options={{ header: () => <Header /> }} />
+      <Stack.Screen name="(cart)" options={{ headerShown: false }} />
       <Stack.Screen name="(events)" options={{ headerShown: false }} />
       <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       <Stack.Screen name="(dashboard)" options={{ headerShown: false }} />

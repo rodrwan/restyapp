@@ -1,23 +1,23 @@
 import {
-  View,
-  Text,
   ScrollView,
+  Text,
   TouchableOpacity,
+  Animated,
+  View,
   FlatList,
   Image,
   Dimensions,
-  Animated,
 } from "react-native";
-import React, { useLayoutEffect, useState } from "react";
+import React from "react";
+import { router, useNavigation, useLocalSearchParams } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import * as Animatable from "react-native-animatable";
 
-import useUserStore from "@/stores/useUser";
-import ScalingDots from "@/components/ScalingDots";
 import Colors from "@/constants/Colors";
-import { Ionicons } from "@expo/vector-icons";
+import useUserStore from "@/stores/useUser";
 import EmptyState from "@/components/EmptyState";
+import ScalingDots from "@/components/ScalingDots";
 
 const zoomIn = {
   0: {
@@ -37,13 +37,13 @@ const zoomOut = {
   },
 };
 
-const TicketsPage = () => {
+const drinks = () => {
   const { eventId }: any = useLocalSearchParams();
   const navigation = useNavigation();
   const scrollX = React.useRef(new Animated.Value(0)).current;
   const { user } = useUserStore();
 
-  useLayoutEffect(() => {
+  React.useLayoutEffect(() => {
     navigation.setOptions({
       headerTransparent: true,
       headerTitle: "",
@@ -67,13 +67,11 @@ const TicketsPage = () => {
       ),
     });
   }, []);
-
-  if (!user?.tickets) {
+  if (!user?.drinks) {
     return;
   }
 
-  console.log(user?.tickets);
-  const [activeItem, setActiveItem] = useState(user?.tickets[0]);
+  const [activeItem, setActiveItem] = React.useState(user?.drinks[0]);
 
   const viewableItemsChanged = ({ viewableItems }: any) => {
     if (viewableItems.length > 0) {
@@ -88,7 +86,7 @@ const TicketsPage = () => {
         <View className="flex mx-2 h-full">
           <View>
             <Text className="text-white font-bold text-xl mx-2">
-              Tus Tickets
+              Tus Tragos
             </Text>
           </View>
           <View className="rounded-xl">
@@ -103,8 +101,8 @@ const TicketsPage = () => {
                 }
               )}
               className="p-2 h-full"
-              data={user?.tickets.filter(
-                (ticket) => ticket?.event?.id === eventId
+              data={user?.drinks?.filter(
+                (drink) => drink.event?.id === eventId
               )}
               onViewableItemsChanged={viewableItemsChanged}
               contentOffset={{ x: 0, y: 0 }}
@@ -112,6 +110,9 @@ const TicketsPage = () => {
                 itemVisiblePercentThreshold: 70,
               }}
               keyExtractor={(item: any) => item.id}
+              contentContainerStyle={{
+                alignItems: "stretch",
+              }}
               renderItem={({ item }: any) => {
                 const splittedStartAt = item.event.start_at.split(" ");
                 const joinedStartAt =
@@ -157,12 +158,6 @@ const TicketsPage = () => {
                             <Text className="text-primary-500 text-base">
                               {startAt}
                             </Text>
-                            <Text className="text-secondary-300 text-sm">
-                              {item.event.description}
-                            </Text>
-                            <Text className="text-secondary-300 text-sm">
-                              {item.event.place}
-                            </Text>
                           </View>
                         </View>
                       </View>
@@ -177,31 +172,20 @@ const TicketsPage = () => {
                         }}
                         className="w-[200px] h-[200px] mb-8"
                       />
-                      <Text className="text-xd text-secondary-200">
-                        {item.id}
-                      </Text>
-                    </View>
-                    <View className="py-4 bg-error-100 justify-center items-center mb-8 rounded-xl">
-                      <Text className="font-bold text-error-500">
-                        Válido hasta {endAt} o las {item.event.end_hour}
-                      </Text>
-                      {/* <Text className="font-bold text-error-500">
-                          Evento con restricción de edad:
-                        </Text> */}
                     </View>
                   </Animatable.View>
                 );
               }}
               ListEmptyComponent={() => (
                 <EmptyState
-                  title="No tienes entradas"
-                  subtitle="No has comprado entradas para algún evento."
+                  title="No tienes tragos"
+                  subtitle="No has comprado nuevos tragos"
                 />
               )}
             />
           </View>
           <ScalingDots
-            data={user?.tickets}
+            data={user?.drinks}
             scrollX={scrollX}
             inActiveDotColor={Colors.secondary[400]}
             activeDotColor={Colors.secondary[500]}
@@ -212,4 +196,4 @@ const TicketsPage = () => {
   );
 };
 
-export default TicketsPage;
+export default drinks;

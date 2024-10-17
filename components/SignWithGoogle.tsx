@@ -21,7 +21,7 @@ const SignWithGoogle = ({ setUser, getEvents, redirectTo }: any) => {
   useEffect(() => {
     GoogleSignin.configure({
       webClientId:
-        "769679276829-5qoogc0in6sguim4akqsn3nnf5ikg5m0.apps.googleusercontent.com",
+        "769679276829-2bojhmuhkfggk5d9q98hb4i909836msg.apps.googleusercontent.com",
       scopes: [
         "https://www.googleapis.com/auth/userinfo.profile",
         "https://www.googleapis.com/auth/userinfo.email",

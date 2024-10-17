@@ -6,6 +6,7 @@ import {
   FlatList,
   TouchableOpacity,
   Dimensions,
+  Platform,
 } from "react-native";
 import React, { useEffect, useLayoutEffect } from "react";
 import { router, useLocalSearchParams, useNavigation } from "expo-router";
@@ -18,8 +19,13 @@ import useCartStore from "@/stores/useCart";
 import useEventStore from "@/stores/useEvent";
 
 const EventPage = ({}) => {
-  const navigation = useNavigation();
-  const { items, addToCart, removeFromCart } = useCartStore();
+  const navigation = useNavigation<any>();
+  const {
+    items: itemsInCart,
+    addToCart,
+    removeFromCart,
+    clearCart,
+  } = useCartStore();
   const { setEvent } = useEventStore();
 
   useLayoutEffect(() => {
@@ -27,22 +33,29 @@ const EventPage = ({}) => {
       headerTransparent: true,
       headerTitle: "",
       headerTintColor: Colors.primary[500],
-      headerLeft: () => (
-        <TouchableOpacity
-          onPress={() => navigation?.goBack()}
-          className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2"
-        >
-          <Ionicons
-            name="chevron-back-outline"
-            size={20}
-            color={Colors.primary[500]}
-          />
-        </TouchableOpacity>
-      ),
+      headerLeft: () =>
+        Platform.OS === "ios" ? (
+          <TouchableOpacity
+            onPress={() => {
+              clearCart();
+              navigation?.goBack();
+            }}
+            className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2"
+          >
+            <Ionicons
+              name="chevron-back-outline"
+              size={20}
+              color={Colors.primary[500]}
+            />
+          </TouchableOpacity>
+        ) : (
+          <View className="flex flex-row justify-center items-center p-2" />
+        ),
     });
   }, []);
 
   const { eventId }: any = useLocalSearchParams();
+  console.log("eventId", eventId);
   const {
     data: { event },
     loading,
@@ -111,8 +124,8 @@ const EventPage = ({}) => {
                 keyExtractor={(item: any) => item.id}
                 renderItem={({ item, index }) => {
                   const quantity =
-                    items?.length &&
-                    items
+                    itemsInCart?.length &&
+                    itemsInCart
                       .filter((item: any) => item.type === "ENTRANCE")
                       .reduce((acc: any, cur: any) => acc + cur.quantity, 0);
                   const maxPerSale =
@@ -160,8 +173,8 @@ const EventPage = ({}) => {
                             />
                           </TouchableOpacity>
                           <Text className="text-white text-xl">
-                            {(items?.length &&
-                              items.filter(
+                            {(itemsInCart?.length &&
+                              itemsInCart.filter(
                                 (item: any) => item.type === "ENTRANCE"
                               )[index]?.quantity) ??
                               0}
@@ -210,8 +223,8 @@ const EventPage = ({}) => {
                 keyExtractor={(item: any) => item.id}
                 renderItem={({ item, index }) => {
                   const quantity =
-                    items?.length &&
-                    items
+                    itemsInCart?.length &&
+                    itemsInCart
                       .filter((item: any) => item.type === "DRINK")
                       .reduce((acc: any, cur: any) => acc + cur.quantity, 0);
                   const maxPerSale =
@@ -248,8 +261,8 @@ const EventPage = ({}) => {
                             />
                           </TouchableOpacity>
                           <Text className="text-white text-xl">
-                            {(items?.length &&
-                              items.filter(
+                            {(itemsInCart?.length &&
+                              itemsInCart.filter(
                                 (item: any) => item.type === "DRINK"
                               )[index]?.quantity) ??
                               0}
@@ -321,17 +334,25 @@ const EventPage = ({}) => {
           </View>
         </View>
       </ParallaxScrollView>
-      {items?.length > 0 ? (
+      {itemsInCart?.length > 0 ? (
         <View className="flex w-full absolute bottom-12 bg-transparent justify-center">
           <TouchableOpacity
             activeOpacity={0.9}
-            onPress={() => router.push("/(events)/cart")}
+            onPress={() => {
+              navigation.replace("(cart)", {
+                screen: "index",
+                initial: false,
+              });
+            }}
             className="bg-primary-400 w-[90%] mx-auto left-0 right-0 p-4 rounded-3xl items-center justify-center border border-primary-700 content-center"
           >
             <Text className="text-white font-bold">
               Ir al Carro (
-              {(items?.length &&
-                items.reduce((acc: any, cur: any) => acc + cur.quantity, 0)) ??
+              {(itemsInCart?.length &&
+                itemsInCart.reduce(
+                  (acc: any, cur: any) => acc + cur.quantity,
+                  0
+                )) ??
                 0}
               )
             </Text>

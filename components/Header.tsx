@@ -8,7 +8,7 @@ import { router } from "expo-router";
 
 const Header = (props: any) => {
   return (
-    <SafeAreaView className="flex bg-secondary-500 border-b border-secondary-700 h-[110px]">
+    <SafeAreaView className="flex bg-secondary-500 border-b border-secondary-700 h-[70px]">
       <View className="flex flex-row w-full items-center justify-between px-2">
         {!props?.navigation ? (
           <View className="ml-2">
