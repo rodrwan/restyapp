@@ -10,7 +10,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from "react-native";
-import { router } from "expo-router";
+import { router, Href } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useIsFocused } from "@react-navigation/native";
@@ -44,7 +44,7 @@ const HomePage = () => {
 
   return (
     <SafeAreaView className="flex h-full bg-secondary-500 ">
-      <ScrollView className="flex h-full -mt-10">
+      <ScrollView className="flex h-full">
         {/* Profile view */}
         {!Boolean(user) ? (
           <UserInfoSkeleton />
@@ -142,6 +142,7 @@ const HomePage = () => {
                     day: "numeric",
                   }
                 );
+                const url: string = `/(dashboard)/events/${item.id}`;
                 return (
                   <View className="flex p-2 flex-row bg-white rounded-xl">
                     <View className="flex w-1/4">
@@ -163,9 +164,7 @@ const HomePage = () => {
                         </View>
                         <View className="mr-1">
                           <TouchableOpacity
-                            onPress={() =>
-                              router.push(`/(dashboard)/(events)/${item.id}`)
-                            }
+                            onPress={() => router.push(url as Href)}
                             className="flex bg-primary-500 w-[80px] h-[80px] items-center justify-center rounded-lg"
                           >
                             <Text className="text-white font-semibold mb-4">

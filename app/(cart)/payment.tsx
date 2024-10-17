@@ -42,12 +42,12 @@ const Payment = () => {
               if (result) {
                 console.log("success");
                 router.dismissAll();
-                return router.push("/(events)/success");
+                return router.push("/(cart)/success");
               }
               console.log("failure");
               router.dismissAll();
               // rejected by other mean.
-              return router.push("/(events)/failure");
+              return router.push("/(cart)/failure");
             } else {
               console.log("failure");
               // this happen when a payment is cancelled

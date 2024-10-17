@@ -8,14 +8,11 @@ const CheckAuth = ({ redirectTo, children }: any) => {
   const segment = useSegments();
 
   useEffect(() => {
-    if (segment.length === 0) {
-      return router.replace("/");
-    }
-
+    console.log("segment", segment);
     if (!auth.isLogged) {
       return router.replace(`/(auth)/sign-in?redirectTo=${redirectTo}`);
     }
-  }, [auth]);
+  }, [auth, segment]);
 
   return <>{children}</>;
 };

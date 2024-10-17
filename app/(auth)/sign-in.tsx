@@ -1,7 +1,14 @@
 import { useLayoutEffect, useState } from "react";
 import { Link, router, useLocalSearchParams, useNavigation } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { View, Text, Dimensions, Alert, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  Dimensions,
+  Alert,
+  TouchableOpacity,
+  Platform,
+} from "react-native";
 
 import CustomButton from "@/components/CustomButton";
 import FormField from "@/components/FormField";
@@ -29,18 +36,21 @@ const SignIn = () => {
       headerTransparent: true,
       headerTitle: "",
       headerTintColor: Colors.primary[500],
-      headerLeft: () => (
-        <TouchableOpacity
-          onPress={() => navigation?.goBack()}
-          className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2"
-        >
-          <Ionicons
-            name="chevron-back-outline"
-            size={20}
-            color={Colors.primary[500]}
-          />
-        </TouchableOpacity>
-      ),
+      headerLeft: () =>
+        Platform.OS === "ios" ? (
+          <TouchableOpacity
+            onPress={() => navigation?.goBack()}
+            className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2"
+          >
+            <Ionicons
+              name="chevron-back-outline"
+              size={20}
+              color={Colors.primary[500]}
+            />
+          </TouchableOpacity>
+        ) : (
+          <View />
+        ),
     });
   }, []);
 

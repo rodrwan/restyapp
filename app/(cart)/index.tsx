@@ -1,4 +1,11 @@
-import { View, Text, FlatList, TouchableOpacity, Image } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  Image,
+  Platform,
+} from "react-native";
 import React, { useEffect, useLayoutEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
@@ -15,11 +22,10 @@ const Cart = () => {
   const { items, addToCart, removeFromCart, setTicketToNominate, clearCart } =
     useCartStore();
   const { auth }: any = useAuthStore();
-  const { user } = useUserStore();
 
   useEffect(() => {
     if (!auth.isLogged) {
-      return router.push("/(auth)/sign-in?redirectTo=/(events)/cart");
+      return router.push("/(auth)/sign-in?redirectTo=/(cart)");
     }
   }, [auth.isLogged]);
 
@@ -30,18 +36,21 @@ const Cart = () => {
       headerTransparent: true,
       headerTitle: "",
       headerTintColor: Colors.primary[500],
-      headerLeft: () => (
-        <TouchableOpacity
-          onPress={() => navigation?.goBack()}
-          className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2"
-        >
-          <Ionicons
-            name="chevron-back-outline"
-            size={20}
-            color={Colors.primary[500]}
-          />
-        </TouchableOpacity>
-      ),
+      headerLeft: () =>
+        Platform.OS === "ios" ? (
+          <TouchableOpacity
+            onPress={() => navigation?.goBack()}
+            className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2"
+          >
+            <Ionicons
+              name="chevron-back-outline"
+              size={20}
+              color={Colors.primary[500]}
+            />
+          </TouchableOpacity>
+        ) : (
+          <View />
+        ),
       headerRight: () => (
         <TouchableOpacity
           onPress={() => {
@@ -66,14 +75,14 @@ const Cart = () => {
       console.log("newOrder", newOrder);
       if (newOrder?.length === 0) {
         return router.push(
-          `/(auth)/sign-in?redirectTo=/(events)/checkout?orderId=${newOrder.id}`
+          `/(auth)/sign-in?redirectTo=/(cart)/checkout?orderId=${newOrder.id}`
         );
       }
 
       setTicketToNominate(
         newOrder.items.filter((item: any) => item.type === "ENTRANCE")
       );
-      return router.push(`/(events)/checkout?orderId=${newOrder.id}`);
+      return router.push(`/(cart)/checkout?orderId=${newOrder.id}`);
     } catch (error) {
       console.log(">>>", error);
     }

@@ -8,7 +8,7 @@ import useAuthStore from "@/stores/useAuth";
 import useUserStore from "@/stores/useUser";
 
 const MenuPage = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const { setAccessToken, logout, auth } = useAuthStore();
   const { setUser } = useUserStore();
 
@@ -47,17 +47,19 @@ const MenuPage = () => {
   return (
     <SafeAreaView className="flex h-full bg-secondary-500 p-2 justify-between">
       <View className="flex flex-col gap-10 mt-12">
-        <TouchableOpacity onPress={() => router.push("/")}>
+        <TouchableOpacity onPress={() => router.replace("/")}>
           <Text className="self-center text-white font-bold text-xl">
             Eventos
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.push("/(dashboard)")}>
+        <TouchableOpacity onPress={() => router.replace("/(dashboard)")}>
           <Text className="self-center text-white font-bold text-xl">
             Mi Cuenta
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.push("/(dashboard)/tickets")}>
+        <TouchableOpacity
+          onPress={() => router.replace("/(dashboard)/tickets")}
+        >
           <Text className="self-center text-white font-bold text-xl">
             Mis Tickets
           </Text>

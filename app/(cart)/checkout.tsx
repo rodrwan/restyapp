@@ -43,18 +43,21 @@ const Checkout = () => {
       headerTransparent: true,
       headerTitle: "",
       headerTintColor: Colors.primary[500],
-      headerLeft: () => (
-        <TouchableOpacity
-          onPress={() => navigation?.goBack()}
-          className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2"
-        >
-          <Ionicons
-            name="chevron-back-outline"
-            size={20}
-            color={Colors.primary[500]}
-          />
-        </TouchableOpacity>
-      ),
+      headerLeft: () =>
+        Platform.OS === "ios" ? (
+          <TouchableOpacity
+            onPress={() => navigation?.goBack()}
+            className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2"
+          >
+            <Ionicons
+              name="chevron-back-outline"
+              size={20}
+              color={Colors.primary[500]}
+            />
+          </TouchableOpacity>
+        ) : (
+          <View />
+        ),
       headerRight: () => (
         <TouchableOpacity
           onPress={() => {
@@ -86,7 +89,7 @@ const Checkout = () => {
         const { status } = newPayment;
         if (status === "AUTHORIZED") {
           setLoadingSubmit(false);
-          return router.push("/(events)/success");
+          return router.push("/(cart)/success");
         }
       }
 
@@ -96,7 +99,7 @@ const Checkout = () => {
       const { status } = newPayment;
       if (status === "AUTHORIZED") {
         setLoadingSubmit(false);
-        return router.push("/(events)/success");
+        return router.push("/(cart)/success");
       }
     } catch (error) {
       console.log(">>>>", error);
@@ -110,7 +113,7 @@ const Checkout = () => {
       const newPayment = await createInscription();
       const { url, token } = newPayment;
       console.log(`/(events)/inscription?url=${url}&token=${token}`);
-      return router.push(`/(events)/inscription?url=${url}&token=${token}`);
+      return router.push(`/(cart)/inscription?url=${url}&token=${token}`);
     } catch (error) {
       console.log(error);
     }
