@@ -174,9 +174,11 @@ const EventPage = ({}) => {
                           </TouchableOpacity>
                           <Text className="text-white text-xl">
                             {(itemsInCart?.length &&
-                              itemsInCart.filter(
-                                (item: any) => item.type === "ENTRANCE"
-                              )[index]?.quantity) ??
+                              itemsInCart.find(
+                                (iic: any) =>
+                                  iic?.type === "ENTRANCE" &&
+                                  iic?.id === item?.id
+                              )?.quantity) ??
                               0}
                           </Text>
                           <TouchableOpacity
@@ -262,9 +264,10 @@ const EventPage = ({}) => {
                           </TouchableOpacity>
                           <Text className="text-white text-xl">
                             {(itemsInCart?.length &&
-                              itemsInCart.filter(
-                                (item: any) => item.type === "DRINK"
-                              )[index]?.quantity) ??
+                              itemsInCart.find(
+                                (iic: any) =>
+                                  iic?.type === "DRINK" && iic?.id === item?.id
+                              )?.quantity) ??
                               0}
                           </Text>
                           <TouchableOpacity

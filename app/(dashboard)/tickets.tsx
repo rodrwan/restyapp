@@ -141,7 +141,8 @@ const TicketsPage = () => {
                       <View className="flex">
                         <Image
                           source={{ uri: item.event.image }}
-                          className="rounded-lg w-[90px] h-[100px]"
+                          style={{ aspectRatio: 1 }}
+                          className="rounded-lg w-[90px] h-[90px]"
                         />
                       </View>
                       <View className="flex flex-col pl-2">
@@ -160,7 +161,7 @@ const TicketsPage = () => {
                         </View>
                       </View>
                     </View>
-                    <View className="flex p-2 flex-col bg-white rounded-xl items-center justify-center mb-4">
+                    <View className="flex p-2 flex-col bg-white rounded-xl items-center justify-center">
                       <Text className="font-bold mb-8 text-base">
                         {item.name}
                       </Text>
@@ -170,9 +171,6 @@ const TicketsPage = () => {
                         }}
                         className="w-[200px] h-[200px] mb-8"
                       />
-                      <Text className="text-xd text-secondary-200">
-                        {item.id}
-                      </Text>
                     </View>
                     <View className="py-4 bg-error-100 justify-center items-center mb-8 rounded-xl">
                       <Text className="font-bold text-error-500">

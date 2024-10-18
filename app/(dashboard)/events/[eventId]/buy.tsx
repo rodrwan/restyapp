@@ -13,7 +13,12 @@ const drinks = () => {
   const { eventId }: any = useLocalSearchParams();
   const navigation = useNavigation<any>();
   const { user } = useUserStore();
-  const { items: itemsInCart, addToCart, removeFromCart } = useCartStore();
+  const {
+    items: itemsInCart,
+    addToCart,
+    removeFromCart,
+    clearCart,
+  } = useCartStore();
   const {
     data: { event },
   }: any = useGetEventById(eventId);
@@ -25,7 +30,10 @@ const drinks = () => {
       headerTintColor: Colors.primary[500],
       headerLeft: () => (
         <TouchableOpacity
-          onPress={() => navigation?.goBack()}
+          onPress={() => {
+            clearCart();
+            navigation?.goBack();
+          }}
           className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2"
         >
           <Ionicons
@@ -96,9 +104,10 @@ const drinks = () => {
                         </TouchableOpacity>
                         <Text className="text-white text-xl">
                           {(itemsInCart?.length &&
-                            itemsInCart.filter(
-                              (item: any) => item.type === "DRINK"
-                            )[index]?.quantity) ??
+                            itemsInCart.find(
+                              (iic: any) =>
+                                iic.type === "DRINK" && iic.id === item?.id
+                            )?.quantity) ??
                             0}
                         </Text>
                         <TouchableOpacity
