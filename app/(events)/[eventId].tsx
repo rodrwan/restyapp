@@ -225,10 +225,11 @@ const EventPage = ({}) => {
                 keyExtractor={(item: any) => item.id}
                 renderItem={({ item, index }) => {
                   const quantity =
-                    itemsInCart?.length &&
-                    itemsInCart
-                      .filter((item: any) => item.type === "DRINK")
-                      .reduce((acc: any, cur: any) => acc + cur.quantity, 0);
+                    itemsInCart?.find(
+                      (iic: any) =>
+                        iic?.type === "DRINK" && iic?.id === item?.id
+                    )?.quantity ?? 0;
+
                   const maxPerSale =
                     item?.max_per_sale < item?.stock
                       ? item?.max_per_sale

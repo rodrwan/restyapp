@@ -69,10 +69,10 @@ const drinks = () => {
               keyExtractor={(item: any) => item.id}
               renderItem={({ item, index }) => {
                 const quantity =
-                  itemsInCart?.length &&
-                  itemsInCart
-                    .filter((item: any) => item.type === "DRINK")
-                    .reduce((acc: any, cur: any) => acc + cur.quantity, 0);
+                  itemsInCart?.find(
+                    (iic: any) => iic?.type === "DRINK" && iic?.id === item?.id
+                  )?.quantity ?? 0;
+
                 const maxPerSale =
                   item?.max_per_sale < item?.stock
                     ? item?.max_per_sale
@@ -151,7 +151,10 @@ const drinks = () => {
                 navigation.navigate("(cart)", {
                   screen: "index",
                   initial: false,
-                  params: { eventId, goBackTo: "(dashboard)" },
+                  params: {
+                    eventId,
+                    goBackTo: `/(dashboard)/events/${eventId}`,
+                  },
                 });
               }}
               className="bg-primary-400 w-[90%] mx-auto left-0 right-0 p-4 rounded-3xl items-center justify-center border border-primary-700 content-center"

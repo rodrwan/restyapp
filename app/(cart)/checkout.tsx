@@ -221,7 +221,7 @@ const Checkout = () => {
 
           <View className="mt-6">
             {user?.tbk_card_number === "" ? (
-              <View className="flex bg-secondary-50 p-4 my-8 mx-2 rounded-3xl justify-center items-end">
+              <View className="flex bg-secondary-50 p-4 mx-2 rounded-3xl justify-center items-end">
                 <View className="self-center w-[80%] justify-center justify-center ">
                   <Text className="text-lg text-black font-bold text-center">
                     Inscribir medio de pago
@@ -240,7 +240,7 @@ const Checkout = () => {
                         source={require("../../assets/images/transbank.png")}
                         style={{
                           marginTop: 8,
-                          width: "82%",
+                          width: "100%",
                           height: 60,
                           alignSelf: "center",
                         }}

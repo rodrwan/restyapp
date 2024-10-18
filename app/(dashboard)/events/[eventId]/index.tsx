@@ -26,7 +26,7 @@ const TicketPage = () => {
       headerTintColor: Colors.primary[500],
       headerLeft: () => (
         <TouchableOpacity
-          onPress={() => navigation?.goBack()}
+          onPress={() => router.replace("/(dashboard)")}
           className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2"
         >
           <Ionicons

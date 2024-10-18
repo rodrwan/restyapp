@@ -125,13 +125,6 @@ const drinks = () => {
                     day: "numeric",
                   }
                 );
-                const splittedEndAt = item.event.end_at.split(" ");
-                const joinedEndAt = splittedEndAt[0] + " " + splittedEndAt[1];
-                const endAt = new Date(joinedEndAt).toLocaleString("es-CL", {
-                  weekday: "short",
-                  month: "short",
-                  day: "numeric",
-                });
 
                 return (
                   <Animatable.View

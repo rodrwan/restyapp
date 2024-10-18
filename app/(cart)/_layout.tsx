@@ -19,6 +19,7 @@ export default function RootLayoutNav() {
         <Stack.Screen
           name="inscription"
           options={{
+            title: "Registra tu tarjeta",
             presentation: "modal",
           }}
         />

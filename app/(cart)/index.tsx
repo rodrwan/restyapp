@@ -11,8 +11,13 @@ import useCartStore from "@/stores/useCart";
 
 const Cart = () => {
   const navigation = useNavigation();
-  const { items, addToCart, removeFromCart, setTicketToNominate, clearCart } =
-    useCartStore();
+  const {
+    items: itemsInCart,
+    addToCart,
+    removeFromCart,
+    setTicketToNominate,
+    clearCart,
+  } = useCartStore();
   const { auth }: any = useAuthStore();
   const params: any = useLocalSearchParams();
   console.log("params", params);
@@ -66,7 +71,7 @@ const Cart = () => {
 
   const onSubmit = async () => {
     try {
-      const newOrder = await create(items);
+      const newOrder = await create(itemsInCart);
       console.log("newOrder", newOrder);
       if (newOrder?.length === 0) {
         return router.push(
@@ -85,8 +90,8 @@ const Cart = () => {
     }
   };
 
-  const tickets = items.filter((item: any) => item.type === "ENTRANCE");
-  const drinks = items.filter((item: any) => item.type === "DRINK");
+  const tickets = itemsInCart.filter((item: any) => item.type === "ENTRANCE");
+  const drinks = itemsInCart.filter((item: any) => item.type === "DRINK");
 
   return (
     <SafeAreaView className="flex h-full bg-secondary-500">
@@ -101,7 +106,19 @@ const Cart = () => {
             scrollEnabled={false}
             data={tickets}
             keyExtractor={(item: any) => item.id}
-            renderItem={({ item, index }) => {
+            renderItem={({ item, index }: any) => {
+              const quantity =
+                itemsInCart?.find(
+                  (iic: any) => iic?.type === "ENTRANCE" && iic?.id === item?.id
+                )?.quantity ?? 0;
+
+              const maxPerSale =
+                item?.max_per_sale < item?.stock
+                  ? item?.max_per_sale
+                  : item?.stock;
+
+              const disabledAdd = maxPerSale <= quantity;
+
               return (
                 <View
                   className={`flex flex-row justify-between ${
@@ -125,16 +142,23 @@ const Cart = () => {
                       />
                     </TouchableOpacity>
                     <Text className="text-white text-xl">
-                      {(items?.length &&
-                        items.filter((item: any) => item.type === "ENTRANCE")[
-                          index
-                        ]?.quantity) ??
+                      {(itemsInCart?.length &&
+                        itemsInCart.filter(
+                          (item: any) => item.type === "ENTRANCE"
+                        )[index]?.quantity) ??
                         0}
                     </Text>
-                    <TouchableOpacity onPress={() => addToCart(item)}>
+                    <TouchableOpacity
+                      disabled={disabledAdd}
+                      onPress={() => addToCart(item)}
+                    >
                       <Ionicons
                         name="add-circle-outline"
-                        color={Colors.primary[500]}
+                        color={
+                          disabledAdd
+                            ? Colors.secondary[300]
+                            : Colors.primary[500]
+                        }
                         size={32}
                       />
                     </TouchableOpacity>
@@ -160,7 +184,18 @@ const Cart = () => {
             scrollEnabled={false}
             data={drinks}
             keyExtractor={(item: any) => item.id}
-            renderItem={({ item, index }) => {
+            renderItem={({ item, index }: any) => {
+              const quantity =
+                itemsInCart?.find(
+                  (iic: any) => iic?.type === "DRINK" && iic?.id === item?.id
+                )?.quantity ?? 0;
+
+              const maxPerSale =
+                item?.max_per_sale < item?.stock
+                  ? item?.max_per_sale
+                  : item?.stock;
+              const disabledAdd = maxPerSale <= quantity;
+
               return (
                 <View
                   className={`flex flex-row justify-between ${
@@ -184,16 +219,23 @@ const Cart = () => {
                       />
                     </TouchableOpacity>
                     <Text className="text-white text-xl">
-                      {(items?.length &&
-                        items.filter((item: any) => item.type === "DRINK")[
-                          index
-                        ]?.quantity) ??
+                      {(itemsInCart?.length &&
+                        itemsInCart.filter(
+                          (item: any) => item.type === "DRINK"
+                        )[index]?.quantity) ??
                         0}
                     </Text>
-                    <TouchableOpacity onPress={() => addToCart(item)}>
+                    <TouchableOpacity
+                      disabled={disabledAdd}
+                      onPress={() => addToCart(item)}
+                    >
                       <Ionicons
                         name="add-circle-outline"
-                        color={Colors.primary[500]}
+                        color={
+                          disabledAdd
+                            ? Colors.secondary[300]
+                            : Colors.primary[500]
+                        }
                         size={32}
                       />
                     </TouchableOpacity>
@@ -216,14 +258,14 @@ const Cart = () => {
         <Text className="text-lg text-white font-bold">
           Subtotal: $
           {Number(
-            items.reduce((acc: number, cur: any) => {
+            itemsInCart.reduce((acc: number, cur: any) => {
               return acc + cur.price * cur.quantity;
             }, 0)
           ).toLocaleString("es-CL")}
         </Text>
       </View>
 
-      {items?.length > 0 ? (
+      {itemsInCart?.length > 0 ? (
         <View className="flex w-full absolute bottom-12 bg-transparent justify-center">
           <TouchableOpacity
             activeOpacity={0.9}
