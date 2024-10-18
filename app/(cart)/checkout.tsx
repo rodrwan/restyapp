@@ -158,7 +158,7 @@ const Checkout = () => {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={30}
       >
-        <ScrollView className="flex grow relative">
+        <ScrollView className="flex grow relative mb-16">
           <Text className="self-center text-white font-bold text-xl">
             Checkout
           </Text>

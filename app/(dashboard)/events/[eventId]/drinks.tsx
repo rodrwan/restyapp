@@ -178,7 +178,7 @@ const drinks = () => {
             />
           </View>
           <ScalingDots
-            data={user?.drinks}
+            data={user?.drinks?.filter((drink) => drink.event?.id === eventId)}
             scrollX={scrollX}
             inActiveDotColor={Colors.secondary[400]}
             activeDotColor={Colors.secondary[500]}
