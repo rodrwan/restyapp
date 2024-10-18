@@ -22,6 +22,13 @@ export default function RootLayoutNav() {
             presentation: "modal",
           }}
         />
+        <Stack.Screen
+          name="(modal)/payments"
+          options={{
+            title: "Medios de pago",
+            presentation: "modal",
+          }}
+        />
       </Stack>
       <StatusBar backgroundColor={Colors.secondary[500]} style="light" />
     </>

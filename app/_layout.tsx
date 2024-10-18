@@ -44,8 +44,9 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   return (
-    <Stack>
+    <Stack initialRouteName="index">
       <Stack.Screen name="index" options={{ header: () => <Header /> }} />
+      <Stack.Screen name="home" options={{ header: () => <Header /> }} />
       <Stack.Screen name="(cart)" options={{ headerShown: false }} />
       <Stack.Screen name="(events)" options={{ headerShown: false }} />
       <Stack.Screen name="(auth)" options={{ headerShown: false }} />

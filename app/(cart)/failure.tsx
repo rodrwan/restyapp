@@ -51,8 +51,8 @@ const FailurePage = () => {
   }, []);
 
   return (
-    <SafeAreaView className="flex h-full bg-secondary-500 p-2">
-      <Text className="self-center text-white font-bold text-xl mb-8">
+    <SafeAreaView className="flex h-full bg-secondary-500 p-2 pt-16">
+      <Text className="self-center text-white font-bold text-xl mb-8 mt-8">
         No fue posible procesar tu pago
       </Text>
 

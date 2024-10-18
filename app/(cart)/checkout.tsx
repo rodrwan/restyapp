@@ -12,7 +12,12 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import Accordion from "react-native-collapsible/Accordion";
-import { router, useLocalSearchParams, useNavigation } from "expo-router";
+import {
+  router,
+  useLocalSearchParams,
+  useNavigation,
+  useSegments,
+} from "expo-router";
 
 import Colors from "@/constants/Colors";
 import FormField from "@/components/FormField";
@@ -30,6 +35,7 @@ import useCreateInscription from "@/hooks/useCreateInscription";
 const Checkout = () => {
   const navigation = useNavigation();
   const params: any = useLocalSearchParams();
+  console.log("checkout params", params);
 
   const { orderId } = params;
   const { user }: any = useUserStore();
@@ -37,7 +43,13 @@ const Checkout = () => {
   const { event } = useEventStore();
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [selected, setSelected] = useState(false);
+  const [termAndConditions, setTermAndConditions] = useState(false);
 
+  console.log(
+    "event.nominated",
+    event.nominated,
+    nominees.reduce((acc: boolean, cur: any) => acc && cur?.email, true)
+  );
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTransparent: true,
@@ -62,7 +74,8 @@ const Checkout = () => {
         <TouchableOpacity
           onPress={() => {
             clearCart();
-            return router.push("/");
+            if (params?.goBackTo) return router.replace(`/${params?.goBackTo}`);
+            return router.replace("/home");
           }}
           className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2"
         >
@@ -150,7 +163,7 @@ const Checkout = () => {
             Checkout
           </Text>
 
-          <View className="flex flex-col w-full bg-secondary-700 mt-12 p-4 rounded-xl">
+          <View className="flex flex-col w-full bg-secondary-700 mt-4 p-4 rounded-xl">
             <View className="w-full border-b border-secondary-200 pb-2">
               <Text className="text-white font-bold text-xl">Facturación</Text>
             </View>
@@ -206,7 +219,7 @@ const Checkout = () => {
             </View>
           ) : null}
 
-          <View className="mt-8">
+          <View className="mt-6">
             {user?.tbk_card_number === "" ? (
               <View className="flex bg-secondary-50 p-4 my-8 mx-2 rounded-3xl justify-center items-end">
                 <View className="self-center w-[80%] justify-center justify-center ">
@@ -237,61 +250,61 @@ const Checkout = () => {
                 </View>
               </View>
             ) : (
-              <CreditCard
-                cardNumber={user?.tbk_card_number ?? ""}
-                firstname={user?.firstname ?? ""}
-                lastname={user?.lastname ?? ""}
-              />
+              <View className="flex items-center">
+                <TouchableOpacity
+                  onPress={() => router.push("/(modal)/payments")}
+                >
+                  <CreditCard
+                    cardNumber={user?.tbk_card_number ?? ""}
+                    firstname={user?.firstname ?? ""}
+                    lastname={user?.lastname ?? ""}
+                  />
+                </TouchableOpacity>
+              </View>
             )}
+          </View>
+          <View>
+            <TouchableOpacity
+              onPress={() => setTermAndConditions(!termAndConditions)}
+              className="flex flex-row items-center justify-center mt-4"
+            >
+              <RadioButton selected={termAndConditions} />
+              <Text className="text-white font-base text-base ml-4">
+                Términos y condiciones
+              </Text>
+            </TouchableOpacity>
+            <Text className="text-center text-primary-500">
+              Debes aceptar los términos y condiciones antes de continuar
+            </Text>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-      {!event.nominated ? (
-        <View className="flex w-full absolute bottom-12 bg-transparent items-center justify-center">
-          <TouchableOpacity
-            activeOpacity={0.9}
-            onPress={() => onSubmit()}
-            className={`flex-row w-[95%] ml-4 p-4 rounded-3xl items-center justify-center border border-primary-700 ${
-              user?.tbk_card_number === "" ? "bg-primary-200" : "bg-primary-400"
-            }`}
-            disabled={user?.tbk_card_number === "" || loadingSubmit}
-          >
-            <Text className="text-white font-bold">Pagar</Text>
-            {loadingSubmit && (
-              <ActivityIndicator
-                animating={loadingSubmit}
-                color="#fff"
-                size="small"
-                className="ml-2"
-              />
-            )}
-          </TouchableOpacity>
-        </View>
-      ) : null}
 
-      {nominees.reduce((acc: boolean, cur: any) => acc && cur?.email, true) ? (
-        <View className="flex w-full absolute bottom-12 bg-transparent items-center justify-center">
-          <TouchableOpacity
-            activeOpacity={0.9}
-            onPress={() => onSubmit()}
-            className={`flex-row w-[95%] ml-4 p-4 rounded-3xl items-center justify-center border border-primary-700 ${
-              user?.tbk_card_number === "" ? "bg-primary-200" : "bg-primary-400"
-            }`}
-            disabled={user?.tbk_card_number === "" || loadingSubmit}
-          >
-            <Text className="text-white font-bold">Pagar</Text>
+      <View className="flex w-full absolute bottom-2 bg-transparent items-center justify-center">
+        <TouchableOpacity
+          activeOpacity={0.9}
+          onPress={() => onSubmit()}
+          className={`flex-row w-[95%] ml-4 p-4 rounded-3xl items-center justify-center border border-primary-700 ${
+            user?.tbk_card_number === "" || !termAndConditions
+              ? "bg-primary-200"
+              : "bg-primary-400"
+          }`}
+          disabled={
+            user?.tbk_card_number === "" || loadingSubmit || !termAndConditions
+          }
+        >
+          <Text className="text-white font-bold">Pagar</Text>
 
-            {loadingSubmit && (
-              <ActivityIndicator
-                animating={loadingSubmit}
-                color="#fff"
-                size="small"
-                className="ml-2"
-              />
-            )}
-          </TouchableOpacity>
-        </View>
-      ) : null}
+          {loadingSubmit && (
+            <ActivityIndicator
+              animating={loadingSubmit}
+              color="#fff"
+              size="small"
+              className="ml-2"
+            />
+          )}
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 };

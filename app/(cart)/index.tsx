@@ -1,27 +1,21 @@
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  Image,
-  Platform,
-} from "react-native";
+import { View, Text, FlatList, TouchableOpacity, Platform } from "react-native";
 import React, { useEffect, useLayoutEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
-import { router, useNavigation } from "expo-router";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
 
 import useCreateOrder from "@/hooks/useCreateOrder";
 import useAuthStore from "@/stores/useAuth";
 import useCartStore from "@/stores/useCart";
-import useUserStore from "@/stores/useUser";
 
 const Cart = () => {
   const navigation = useNavigation();
   const { items, addToCart, removeFromCart, setTicketToNominate, clearCart } =
     useCartStore();
   const { auth }: any = useAuthStore();
+  const params: any = useLocalSearchParams();
+  console.log("params", params);
 
   useEffect(() => {
     if (!auth.isLogged) {
@@ -55,7 +49,8 @@ const Cart = () => {
         <TouchableOpacity
           onPress={() => {
             clearCart();
-            return router.push("/");
+            if (params?.goBackTo) return router.replace(`/${params?.goBackTo}`);
+            return router.replace("/home");
           }}
           className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2"
         >
@@ -75,14 +70,16 @@ const Cart = () => {
       console.log("newOrder", newOrder);
       if (newOrder?.length === 0) {
         return router.push(
-          `/(auth)/sign-in?redirectTo=/(cart)/checkout?orderId=${newOrder.id}`
+          `/(auth)/sign-in?redirectTo=/(cart)/checkout?orderId=${newOrder.id}&goBackTo=${params?.goBackTo}`
         );
       }
 
       setTicketToNominate(
         newOrder.items.filter((item: any) => item.type === "ENTRANCE")
       );
-      return router.push(`/(cart)/checkout?orderId=${newOrder.id}`);
+      return router.push(
+        `/(cart)/checkout?orderId=${newOrder.id}&goBackTo=${params?.goBackTo}`
+      );
     } catch (error) {
       console.log(">>>", error);
     }

@@ -39,17 +39,24 @@ const Payment = () => {
             const { TBK_TOKEN } = parsed.query;
             // call confirm payment using token_ws
             if (TBK_TOKEN) {
-              const result = await confirmInscription(TBK_TOKEN);
-              if (result) {
-                console.log("success");
+              try {
+                const result = await confirmInscription(TBK_TOKEN);
+                if (result) {
+                  console.log("success");
+                  router.dismissAll();
+                  setTbkCardNumber(result?.tbk_user, result?.card_number);
+                  return router.push(`/(cart)`);
+                }
+                console.log("failure");
                 router.dismissAll();
-                setTbkCardNumber(result?.tbk_user, result?.card_number);
-                return router.push(`/(cart)`);
+                // rejected by other mean.
+                return router.push("/(cart)/failure");
+              } catch (err) {
+                console.log("failure", err);
+                router.dismissAll();
+                // rejected by other mean.
+                return router.push("/(cart)/failure");
               }
-              console.log("failure");
-              router.dismissAll();
-              // rejected by other mean.
-              return router.push("/(cart)/failure");
             } else {
               console.log("failure");
               // this happen when a payment is cancelled
