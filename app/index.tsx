@@ -27,7 +27,7 @@ const HomePage = () => {
   };
 
   return (
-    <View className="flex h-full bg-secondary-500 pt-4">
+    <View className="flex h-full bg-secondary-500">
       <FlatList
         className="p-2"
         data={data}

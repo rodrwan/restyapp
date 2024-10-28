@@ -35,7 +35,6 @@ import useCreateInscription from "@/hooks/useCreateInscription";
 const Checkout = () => {
   const navigation = useNavigation();
   const params: any = useLocalSearchParams();
-  console.log("checkout params", params);
 
   const { orderId } = params;
   const { user }: any = useUserStore();
@@ -45,11 +44,6 @@ const Checkout = () => {
   const [selected, setSelected] = useState(false);
   const [termAndConditions, setTermAndConditions] = useState(false);
 
-  console.log(
-    "event.nominated",
-    event.nominated,
-    nominees.reduce((acc: boolean, cur: any) => acc && cur?.email, true)
-  );
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTransparent: true,
