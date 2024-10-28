@@ -148,31 +148,35 @@ const HomePage = () => {
                       className="rounded-lg w-[90px] h-[100px]"
                     />
                   </View>
-                  <View className="flex flex-col w-3/4 pl-2 ml-2">
+                  <View className="flex flex-col w-2/4 pl-2 ml-2 truncate">
                     <View className="flex flex-row">
-                      <View className="flex flex-wrap grow">
-                        <Text className="font-bold text-lg">{item.name}</Text>
+                      <View className="">
+                        <Text
+                          numberOfLines={1}
+                          className="overflow-hidden font-bold text-lg "
+                        >
+                          {item.name}
+                        </Text>
                         <Text className="text-primary-500 text-base">
                           {startAt}
                         </Text>
-                        <Text className="text-secondary-300 text-sm">
+                        <Text
+                          numberOfLines={2}
+                          className="text-secondary-300 text-sm"
+                        >
                           {item.description}
                         </Text>
                       </View>
-                      <View className="mr-1">
-                        <TouchableOpacity
-                          onPress={() => router.push(url as Href)}
-                          className="flex bg-primary-500 w-[80px] h-[80px] items-center justify-center rounded-lg"
-                        >
-                          <Text className="text-white font-semibold mb-4">
-                            Ver
-                          </Text>
-                          <Text className="text-white font-semibold ">
-                            Evento
-                          </Text>
-                        </TouchableOpacity>
-                      </View>
                     </View>
+                  </View>
+                  <View className="w-1/4 ml-2">
+                    <TouchableOpacity
+                      onPress={() => router.push(url as Href)}
+                      className="flex bg-primary-500 w-[80px] h-[80px] items-center justify-center rounded-lg"
+                    >
+                      <Text className="text-white font-semibold mb-4">Ver</Text>
+                      <Text className="text-white font-semibold ">Evento</Text>
+                    </TouchableOpacity>
                   </View>
                 </View>
               );

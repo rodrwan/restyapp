@@ -36,9 +36,7 @@ const SuccessPage = () => {
         ),
       headerRight: () => (
         <TouchableOpacity
-          onPress={() => {
-            return router.push("/");
-          }}
+          onPress={() => router.push("/menu")}
           className="flex flex-row items-center justify-center items-center p-2"
         >
           <Ionicons name="menu-outline" size={32} color={Colors.primary[500]} />
