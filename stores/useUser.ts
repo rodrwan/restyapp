@@ -4,12 +4,14 @@ interface Ticket {
   id: string;
   base64: string;
   event: Event;
+  isValidated: boolean;
 }
 
 interface Drink {
   id: string;
   base64: string;
   event: Event;
+  isValidated: boolean;
 }
 
 interface Event {
@@ -36,11 +38,15 @@ interface User {
 
 interface Store {
   user: User;
+  upcomingEventFetched: boolean;
+  upcomingEvent: any;
   setUser: (user: User | null) => void;
   setTickets: (tickets: Ticket[]) => void;
   setDrinks: (drinks: Drink[]) => void;
   setEvents: (events: Event[]) => void;
   setTbkCardNumber: (userId: string, cardNumber: string) => void;
+  setUpcomingEvent: (event: any) => void;
+  updateTicket: (ticket: Ticket) => void;
 }
 
 const initialState = {
@@ -58,6 +64,8 @@ const initialState = {
 
 const useUserStore = create<Store>((set) => ({
   user: initialState,
+  upcomingEventFetched: false,
+  upcomingEvent: {},
   setUser: (user: User | null) => {
     if (user) {
       set((state) => ({ ...state, user: { ...state.user, ...user } }));
@@ -76,6 +84,41 @@ const useUserStore = create<Store>((set) => ({
       ...state,
       user: { ...state.user, tbk_user_id: userId, tbk_card_number: cardNumber },
     })),
+  setUpcomingEvent: (event: any) => {
+    set((state) => ({
+      ...state,
+      upcomingEvent: event,
+      upcomingEventFetched: true,
+    }));
+  },
+  updateTicket: (ticket: Ticket) => {
+    set((state) => {
+      const tickets = state?.user?.tickets ? [...state.user.tickets] : [];
+      const ticketIndex = tickets.findIndex((t) => t.id === ticket.id);
+
+      if (ticketIndex > -1) {
+        tickets[ticketIndex] = {
+          ...tickets[ticketIndex],
+          isValidated: ticket?.is_validated,
+        };
+
+        return { ...state, user: { ...state.user, tickets } };
+      }
+
+      const drinks = state?.user?.drinks ? [...state.user.drinks] : [];
+      const drinkIndex = drinks.findIndex((t) => t.id === ticket.id);
+      if (drinkIndex > -1) {
+        drinks[drinkIndex] = {
+          ...drinks[drinkIndex],
+          isValidated: ticket?.is_validated,
+        };
+
+        return { ...state, user: { ...state.user, drinks } };
+      }
+
+      return state;
+    });
+  },
 }));
 
 export default useUserStore;

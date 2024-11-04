@@ -89,9 +89,10 @@ const Checkout = () => {
   const onSubmit = async () => {
     setLoadingSubmit(true);
     try {
-      // console.log("nominees", nominees);
+      console.log("nominees", nominees);
+      console.log("event.nominated", event.nominated);
       if (event.nominated) {
-        const newPayment = await authorizeTransaction(orderId, []);
+        const newPayment = await authorizeTransaction(orderId, nominees);
         console.log("newPayment", newPayment);
         const { status } = newPayment;
         if (status === "AUTHORIZED") {
@@ -132,11 +133,12 @@ const Checkout = () => {
 
   const fee = items.reduce((acc: number, cur: any) => {
     if (cur.type === "ENTRANCE") {
-      return (acc + cur.price * cur.quantity) * MANGO_FEE;
+      return acc + cur.price * cur.quantity * MANGO_FEE;
     }
 
     return acc;
   }, 0);
+  console.log("fee", fee);
 
   const total = items.reduce((acc: number, cur: any) => {
     if (cur.type === "ENTRANCE") {
@@ -220,8 +222,8 @@ const Checkout = () => {
                   <Text className="text-lg text-black font-bold text-center">
                     Inscribir medio de pago
                   </Text>
-                  <View className="flex-row w-full h-[100px] items-center">
-                    <RadioButton selected={selected} />
+                  <View className="flex-row w-full h-[120px] items-center">
+                    {/* <RadioButton selected={selected} /> */}
                     <TouchableOpacity
                       onPress={() => onSubmitRegisterCard()}
                       style={{
@@ -234,8 +236,7 @@ const Checkout = () => {
                         source={require("../../assets/images/transbank.png")}
                         style={{
                           marginTop: 8,
-                          width: "100%",
-                          height: 60,
+                          height: 80,
                           alignSelf: "center",
                         }}
                       />
@@ -257,48 +258,54 @@ const Checkout = () => {
               </View>
             )}
           </View>
-          <View>
-            <TouchableOpacity
-              onPress={() => setTermAndConditions(!termAndConditions)}
-              className="flex flex-row items-center justify-center mt-4"
-            >
-              <RadioButton selected={termAndConditions} />
-              <Text className="text-white font-base text-base ml-4">
-                Términos y condiciones
+          {user?.tbk_card_number !== "" && (
+            <View>
+              <TouchableOpacity
+                onPress={() => setTermAndConditions(!termAndConditions)}
+                className="flex flex-row items-center justify-center mt-4"
+              >
+                <RadioButton selected={termAndConditions} />
+                <Text className="text-white font-base text-base ml-4">
+                  Términos y condiciones
+                </Text>
+              </TouchableOpacity>
+              <Text className="text-center text-primary-500">
+                Debes aceptar los términos y condiciones antes de continuar
               </Text>
-            </TouchableOpacity>
-            <Text className="text-center text-primary-500">
-              Debes aceptar los términos y condiciones antes de continuar
-            </Text>
-          </View>
+            </View>
+          )}
         </ScrollView>
       </KeyboardAvoidingView>
 
-      <View className="flex w-full absolute bottom-2 bg-transparent items-center justify-center">
-        <TouchableOpacity
-          activeOpacity={0.9}
-          onPress={() => onSubmit()}
-          className={`flex-row w-[95%] ml-4 p-4 rounded-3xl items-center justify-center border border-primary-700 ${
-            user?.tbk_card_number === "" || !termAndConditions
-              ? "bg-primary-200"
-              : "bg-primary-400"
-          }`}
-          disabled={
-            user?.tbk_card_number === "" || loadingSubmit || !termAndConditions
-          }
-        >
-          <Text className="text-white font-bold">Pagar</Text>
+      {user?.tbk_card_number !== "" && (
+        <View className="flex w-full absolute bottom-8 bg-transparent items-center justify-center">
+          <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={() => onSubmit()}
+            className={`flex-row w-[95%] ml-4 p-4 rounded-3xl items-center justify-center border border-primary-700 ${
+              user?.tbk_card_number === "" || !termAndConditions
+                ? "bg-primary-200"
+                : "bg-primary-400"
+            }`}
+            disabled={
+              user?.tbk_card_number === "" ||
+              loadingSubmit ||
+              !termAndConditions
+            }
+          >
+            <Text className="text-white font-bold">Pagar</Text>
 
-          {loadingSubmit && (
-            <ActivityIndicator
-              animating={loadingSubmit}
-              color="#fff"
-              size="small"
-              className="ml-2"
-            />
-          )}
-        </TouchableOpacity>
-      </View>
+            {loadingSubmit && (
+              <ActivityIndicator
+                animating={loadingSubmit}
+                color="#fff"
+                size="small"
+                className="ml-2"
+              />
+            )}
+          </TouchableOpacity>
+        </View>
+      )}
     </SafeAreaView>
   );
 };

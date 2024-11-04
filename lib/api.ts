@@ -336,8 +336,7 @@ mutation Register($input: RegisterData!) {
 
       const requestHeaders = {};
 
-      console.log("MANGO_API_URL", `${MANGO_API_URL}`);
-      const response = await fetch(`${MANGO_API_URL}`, {
+      const response = await fetch(MANGO_API_URL, {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -363,7 +362,7 @@ mutation Register($input: RegisterData!) {
 
       return data.getEvents;
     } catch (error: any) {
-      console.log("error", error);
+      console.log("getEvents error", error);
       throw new Error(error);
     }
   }
@@ -661,6 +660,7 @@ mutation Register($input: RegisterData!) {
           image
           description
           start_at
+          place
           items {
             price
             name
@@ -1006,6 +1006,213 @@ mutation Register($input: RegisterData!) {
       console.log("data", res);
 
       return res?.data?.authorizeTransaction;
+    } catch (error: any) {
+      console.log("error", error);
+      throw new Error(error);
+    }
+  }
+
+  async getUserFirstUpcomingEvent(): Promise<any> {
+    try {
+      const document = graphql.gql`
+query GetUserFirstUpcomingEvent {
+  getUserFirstUpcomingEvent {
+    tickets {
+      id
+      base64
+      event {
+        id
+        name
+        start_at
+        place
+        description
+        image
+      }
+      is_validated
+    }
+    event {
+      id
+      name
+      start_at
+      place
+      image
+      end_hour
+      end_at
+      description
+    }
+    event_item {
+      name
+      type
+    }
+  }
+}
+      `;
+
+      const variables = {};
+
+      const requestHeaders = {
+        "X-User-Roles": "system",
+        Authorization: `Bearer ${this.accessToken}`,
+      };
+
+      const response = await fetch(`${MANGO_API_URL}`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          "x-user-platform": "mobile",
+          ...requestHeaders,
+        },
+        body: JSON.stringify({
+          query: document,
+          variables,
+          operationName: "GetUserFirstUpcomingEvent",
+        }),
+      });
+
+      if (response.status === 503) {
+        console.log("GetUserFirstUpcomingEvent Unavailable service");
+        return [];
+      } else if (response.status !== 200) {
+        if (response.status === 401) {
+          throw new Error("unauthorized");
+        }
+        console.log("GetUserFirstUpcomingEvent response", response);
+        return [];
+      }
+      const res = await response.json();
+
+      return res?.data?.getUserFirstUpcomingEvent;
+    } catch (error: any) {
+      console.log("error", error);
+      throw new Error(error);
+    }
+  }
+  async getUserUpcomingEvents(): Promise<any> {
+    try {
+      const document = graphql.gql`
+query GetUserUpcomingEvents {
+  getUserUpcomingEvents {
+    data {
+      tickets {
+        id
+        base64
+        event {
+          id
+          name
+          start_at
+          place
+          description
+          image
+        }
+        is_validated
+      }
+      event {
+        id
+        name
+        start_at
+        place
+        image
+        end_hour
+        end_at
+        description
+      }
+      event_item {
+        name
+        type
+      }
+    }
+  }
+}
+      `;
+
+      const variables = {};
+
+      const requestHeaders = {
+        "X-User-Roles": "system",
+        Authorization: `Bearer ${this.accessToken}`,
+      };
+
+      const response = await fetch(`${MANGO_API_URL}`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          "x-user-platform": "mobile",
+          ...requestHeaders,
+        },
+        body: JSON.stringify({
+          query: document,
+          variables,
+          operationName: "GetUserUpcomingEvents",
+        }),
+      });
+
+      if (response.status === 503) {
+        console.log("GetUserUpcomingEvents Unavailable service");
+        return [];
+      } else if (response.status !== 200) {
+        if (response.status === 401) {
+          throw new Error("unauthorized");
+        }
+        console.log("GetUserUpcomingEvents response", response);
+        return [];
+      }
+      const res = await response.json();
+
+      return res?.data?.getUserUpcomingEvents;
+    } catch (error: any) {
+      console.log("error", error);
+      throw new Error(error);
+    }
+  }
+
+  async getTicketById(id: string): Promise<any> {
+    try {
+      const document = graphql.gql`
+        query GetTicketById($id: ID!) {
+          getTicketById(id: $id) {
+            id
+            is_validated
+          }
+        }
+      `;
+
+      const variables = {
+        id,
+      };
+
+      console.log("variables", variables);
+      const requestHeaders = {
+        "X-User-Roles": "system",
+        Authorization: `Bearer ${this.accessToken}`,
+      };
+
+      const response = await fetch(`${MANGO_API_URL}`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          "x-user-platform": "mobile",
+          ...requestHeaders,
+        },
+        body: JSON.stringify({
+          query: document,
+          variables,
+          operationName: "GetTicketById",
+        }),
+      });
+
+      if (response.status === 503) {
+        console.log("GetTicketById Unavailable service");
+        return [];
+      } else if (response.status !== 200) {
+        console.log("GetTicketById response", response);
+        return [];
+      }
+      const { data } = await response.json();
+
+      return data.getTicketById;
     } catch (error: any) {
       console.log("error", error);
       throw new Error(error);

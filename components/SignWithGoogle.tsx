@@ -12,11 +12,13 @@ import Colors from "@/constants/Colors";
 import useSession from "@/hooks/useSession";
 import useAuthStore from "@/stores/useAuth";
 import { router } from "expo-router";
+import useGetEventsFromUser from "@/hooks/useGetEventsFromUser.";
 
-const SignWithGoogle = ({ setUser, getEvents, redirectTo }: any) => {
+const SignWithGoogle = ({ setUser, redirectTo }: any) => {
   const [isSubmitting, setSubmitting] = useState(false);
   const { createSession, createUser } = useSession();
   const { login, setAccessToken } = useAuthStore();
+  const { getEvents, getUserFirstUpcomingEvent } = useGetEventsFromUser();
 
   useEffect(() => {
     GoogleSignin.configure({
@@ -45,7 +47,6 @@ const SignWithGoogle = ({ setUser, getEvents, redirectTo }: any) => {
         "google"
       );
 
-      console.log("sessionResp", sessionResp);
       if (!sessionResp && userInfo && userInfo.user) {
         console.log("create new user");
         const sessionResp = await createUser(
@@ -57,8 +58,6 @@ const SignWithGoogle = ({ setUser, getEvents, redirectTo }: any) => {
           "google"
         );
 
-        console.log("sessionResp after create", sessionResp);
-
         setUser({
           ...userInfo?.user,
           ...sessionResp.user,
@@ -66,6 +65,7 @@ const SignWithGoogle = ({ setUser, getEvents, redirectTo }: any) => {
         login();
         setAccessToken(sessionResp.access_token);
         getEvents();
+        getUserFirstUpcomingEvent();
         router.replace(redirectTo);
       } else {
         setUser({
@@ -75,6 +75,7 @@ const SignWithGoogle = ({ setUser, getEvents, redirectTo }: any) => {
         login();
         setAccessToken(sessionResp.access_token);
         getEvents();
+        getUserFirstUpcomingEvent();
         router.replace(redirectTo);
       }
     } catch (error) {

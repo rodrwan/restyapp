@@ -12,13 +12,11 @@ import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import EmptyState from "@/components/EmptyState";
 import useGetEventsWithPagination from "@/hooks/useGetEvents";
-import { router, useSegments } from "expo-router";
+import { router } from "expo-router";
 
 const HomePage = () => {
   const { data, refetch } = useGetEventsWithPagination();
   const [refreshing, setRefreshing] = useState(false);
-  const segment = useSegments();
-  console.log("segment", segment);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -33,6 +31,8 @@ const HomePage = () => {
         data={data}
         keyExtractor={(item: any) => item.id}
         renderItem={({ item }: any) => {
+          console.log("item", item);
+          console.log("items", item?.items);
           const splittedStartAt = item.start_at.split(" ");
           const joinedStartAt = splittedStartAt[0] + " " + splittedStartAt[1];
           const startAt = new Date(joinedStartAt).toLocaleString("es-CL", {
@@ -56,7 +56,8 @@ const HomePage = () => {
                 <Text className="font-bold text-xl">{item.name}</Text>
                 <Text className="text-xl text-primary-500">{startAt}</Text>
                 <Text className="text-md text-secondary-300">
-                  Desde ${Number(item?.items[0]?.price).toLocaleString("es-CL")}
+                  Desde $
+                  {Number(item?.items?.[0]?.price).toLocaleString("es-CL")}
                 </Text>
               </View>
             </TouchableOpacity>
@@ -64,9 +65,6 @@ const HomePage = () => {
         }}
         ListHeaderComponent={() => (
           <View className="flex justify-center">
-            {/* <View className="h-[250px] border border-primary-100 rounded-md mb-4">
-              <Text>Hero</Text>
-            </View> */}
             <View className="flex-row items-center bg-white border border-primary-100 rounded-md mb-4">
               <Ionicons
                 name="search"
@@ -80,7 +78,7 @@ const HomePage = () => {
               />
             </View>
             {data?.length > 0 ? (
-              <Text className="text-white text-center text-xl font-bold">
+              <Text className="text-white text-center text-xl font-bold pb-4">
                 Mas Eventos
               </Text>
             ) : null}

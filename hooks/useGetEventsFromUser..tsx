@@ -1,12 +1,13 @@
 import { Alert } from "react-native";
-import { useEffect, useRef, useState } from "react";
+import { router } from "expo-router";
+
 import HTTPClient from "@/lib/api";
 import useUserStore from "@/stores/useUser";
 
 const client = HTTPClient.getInstance();
 
 const useGetEventsFromUser = () => {
-  const { setTickets, setDrinks, setEvents } = useUserStore();
+  const { setTickets, setDrinks, setEvents, setUpcomingEvent } = useUserStore();
   const getEvents = async () => {
     try {
       const orders = await client.getOrderItemsByUser();
@@ -67,10 +68,8 @@ const useGetEventsFromUser = () => {
 
       const result = {
         orders,
-        tickets: tickets
-          .flat()
-          .filter(Boolean)
-          .filter((ticket) => ticket.isValidated === false),
+        tickets: tickets.flat().filter(Boolean),
+        // .filter((ticket) => ticket.isValidated === false),
         drinks: drinks
           .flat()
           .filter(Boolean)
@@ -84,12 +83,37 @@ const useGetEventsFromUser = () => {
       return result;
     } catch (error: any) {
       console.log("error", error);
+      if (String(error).includes("unauthorized")) {
+        console.log("getUserFirstUpcomingEvent error", error);
+        return router.push("/(auth)/sign-in?redirectTo=/(dashboard)");
+      }
+
       Alert.alert(">> Error", error.message);
       throw new Error(error);
     }
   };
 
-  return { getEvents };
+  const getUserFirstUpcomingEvent = async () => {
+    try {
+      const result = await client.getUserFirstUpcomingEvent();
+      setUpcomingEvent(result);
+      return result;
+    } catch (err: any) {
+      if (String(err).includes("unauthorized")) {
+        console.log("getUserFirstUpcomingEvent error", err);
+        return router.push("/(auth)/sign-in?redirectTo=/(dashboard)");
+      }
+
+      throw err;
+    }
+  };
+
+  // React.useEffect(() => {
+  //   getEvents();
+  //   getUserFirstUpcomingEvent();
+  // }, []);
+
+  return { getEvents, getUserFirstUpcomingEvent };
 };
 
 export default useGetEventsFromUser;

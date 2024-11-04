@@ -78,12 +78,19 @@ const EventPage = ({}) => {
   const drinks = event.items.filter((elem: any) => elem.type === "DRINK");
 
   const splittedStartAt = event.start_at.split(" ");
-  const joinedStartAt = splittedStartAt[0] + " " + splittedStartAt[1];
+  const hour = event.start_hour.split("T")[1];
+  const joinedStartAt = splittedStartAt[0] + " " + hour.replace("Z", "");
+
   const startAt = new Date(joinedStartAt).toLocaleString("es-CL", {
     weekday: "long",
     year: "numeric",
     month: "long",
     day: "numeric",
+  });
+
+  const startHour = new Date(joinedStartAt).toLocaleString("es-CL", {
+    minute: "2-digit",
+    hour: "2-digit",
   });
 
   return (
@@ -307,18 +314,24 @@ const EventPage = ({}) => {
             </View>
           ) : null}
           {/* About */}
-          <View className="bg-secondary-700 py-8 px-4 gap-4">
+          <View className="bg-secondary-700 py-8 px-4 gap-4 mb-32">
             <Text className="text-white font-bold text-2xl">
               Acerca del evento
             </Text>
             <Text className="text-white font-bold text-xl">{event?.name}</Text>
 
-            <Text className="text-lg text-primary-500">{startAt}</Text>
-            <Text className="text-secondary-300 text-base">
+            <Text className="text-secondary-100 text-base">
               {event?.description}
             </Text>
-            {/* Date */}
-            <View></View>
+
+            <View className="flex-row">
+              <Text className="text-base text-secondary-300">Cuando: </Text>
+              <Text className="text-base text-primary-500">{startAt}</Text>
+            </View>
+            <View className="flex-row">
+              <Text className="text-base text-secondary-300">Comienza: </Text>
+              <Text className="text-base text-primary-400">{startHour}</Text>
+            </View>
             {/* Place */}
             <View>
               <Text className="text-white font-bold text-xl mb-2">

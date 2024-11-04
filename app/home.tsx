@@ -12,13 +12,11 @@ import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import EmptyState from "@/components/EmptyState";
 import useGetEventsWithPagination from "@/hooks/useGetEvents";
-import { router, useSegments } from "expo-router";
+import { router } from "expo-router";
 
 const HomePage = () => {
   const { data, refetch } = useGetEventsWithPagination();
   const [refreshing, setRefreshing] = useState(false);
-  const segment = useSegments();
-  console.log("segment", segment);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -27,7 +25,7 @@ const HomePage = () => {
   };
 
   return (
-    <View className="flex h-full bg-secondary-500 pt-4">
+    <View className="flex h-full bg-secondary-500">
       <FlatList
         className="p-2"
         data={data}
@@ -64,9 +62,6 @@ const HomePage = () => {
         }}
         ListHeaderComponent={() => (
           <View className="flex justify-center">
-            {/* <View className="h-[250px] border border-primary-100 rounded-md mb-4">
-              <Text>Hero</Text>
-            </View> */}
             <View className="flex-row items-center bg-white border border-primary-100 rounded-md mb-4">
               <Ionicons
                 name="search"
@@ -80,7 +75,7 @@ const HomePage = () => {
               />
             </View>
             {data?.length > 0 ? (
-              <Text className="text-white text-center text-xl font-bold">
+              <Text className="text-white text-center text-xl font-bold pb-4">
                 Mas Eventos
               </Text>
             ) : null}
