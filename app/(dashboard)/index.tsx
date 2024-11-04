@@ -19,7 +19,7 @@ import Colors from "@/constants/Colors";
 import EmptyState from "@/components/EmptyState";
 import useUserStore from "@/stores/useUser";
 import useAuthStore from "@/stores/useAuth";
-import useGetEventsFromUser from "@/hooks/useGetEventsFromUser.";
+import useGetEventsFromUser from "@/hooks/useGetEventsFromUser";
 
 const HomePage = () => {
   const { user, upcomingEvent, upcomingEventFetched } = useUserStore();
@@ -49,7 +49,9 @@ const HomePage = () => {
     );
   }
 
-  const nextEvents = user?.events?.slice(1);
+  const nextEvents = user?.events?.filter(
+    (event: any) => event.id !== upcomingEvent?.event?.id
+  );
 
   const splittedStartAt = upcomingEvent?.event?.start_at.split(" ");
   const joinedStartAt = splittedStartAt?.[0] + " " + splittedStartAt?.[1];
@@ -232,7 +234,7 @@ const HomePage = () => {
                         className="rounded-lg w-[90px] h-[100px]"
                       />
                     </View>
-                    <View className="flex flex-col w-2/4 pl-2 ml-2 truncate">
+                    <View className="flex flex-col w-2/4 pl-2 ml-2">
                       <View className="flex flex-row">
                         <View className="">
                           <Text
@@ -253,7 +255,7 @@ const HomePage = () => {
                         </View>
                       </View>
                     </View>
-                    <View className="w-1/4 ml-2">
+                    <View className="w-1/4">
                       <TouchableOpacity
                         onPress={() => router.push(url as Href)}
                         className="flex bg-primary-500 w-[80px] h-[80px] items-center justify-center rounded-lg"

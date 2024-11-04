@@ -31,8 +31,6 @@ const HomePage = () => {
         data={data}
         keyExtractor={(item: any) => item.id}
         renderItem={({ item }: any) => {
-          console.log("item", item);
-          console.log("items", item?.items);
           const splittedStartAt = item.start_at.split(" ");
           const joinedStartAt = splittedStartAt[0] + " " + splittedStartAt[1];
           const startAt = new Date(joinedStartAt).toLocaleString("es-CL", {

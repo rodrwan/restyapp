@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 
 import { router, useSegments } from "expo-router";
 import useAuthStore from "@/stores/useAuth";
-import useGetEventsFromUser from "@/hooks/useGetEventsFromUser.";
+import useGetEventsFromUser from "@/hooks/useGetEventsFromUser";
 
 const CheckAuth = ({ redirectTo, children }: any) => {
   // const { getEvents }: any = useGetEventsFromUser();

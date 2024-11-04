@@ -18,8 +18,15 @@ import SignWithGoogle from "@/components/SignWithGoogle";
 import useUserStore from "@/stores/useUser";
 import Colors from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
+import useSession from "@/hooks/useSession";
+import useAuthStore from "@/stores/useAuth";
+import useGetEventsFromUser from "@/hooks/useGetEventsFromUser";
 
 const SignIn = () => {
+  const { createSession, createUser } = useSession();
+  const { getEvents, getUserFirstUpcomingEvent } = useGetEventsFromUser();
+
+  const { login, setAccessToken } = useAuthStore();
   const navigation = useNavigation();
   const params: any = useLocalSearchParams();
   console.log("params", params);
@@ -40,7 +47,7 @@ const SignIn = () => {
         Platform.OS === "ios" ? (
           <TouchableOpacity
             onPress={() => router.push("/")}
-            className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2"
+            className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2 bg-secondary-500"
           >
             <Ionicons
               name="chevron-back-outline"
@@ -57,7 +64,22 @@ const SignIn = () => {
   const submit = async () => {
     if (form.email === "" || form.password === "") {
       Alert.alert("Error", "Please fill in all fields");
+      return;
     }
+
+    const sessionResp = await createSession(
+      form.email,
+      form.password,
+      "mangoticket"
+    );
+    setUser({
+      ...sessionResp.user,
+    });
+    login();
+    setAccessToken(sessionResp.access_token);
+    getEvents();
+    getUserFirstUpcomingEvent();
+    router.replace(params?.redirectTo);
   };
 
   return (

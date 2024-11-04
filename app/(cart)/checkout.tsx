@@ -89,8 +89,6 @@ const Checkout = () => {
   const onSubmit = async () => {
     setLoadingSubmit(true);
     try {
-      console.log("nominees", nominees);
-      console.log("event.nominated", event.nominated);
       if (event.nominated) {
         const newPayment = await authorizeTransaction(orderId, nominees);
         console.log("newPayment", newPayment);
@@ -101,9 +99,7 @@ const Checkout = () => {
         }
       }
 
-      console.log("orderId", orderId);
       const newPayment = await authorizeTransaction(orderId, []);
-      console.log("newPayment", newPayment);
       const { status } = newPayment;
       if (status === "AUTHORIZED") {
         setLoadingSubmit(false);
@@ -138,7 +134,6 @@ const Checkout = () => {
 
     return acc;
   }, 0);
-  console.log("fee", fee);
 
   const total = items.reduce((acc: number, cur: any) => {
     if (cur.type === "ENTRANCE") {
@@ -189,7 +184,7 @@ const Checkout = () => {
             </View>
           </View>
 
-          {event.nominated ? (
+          {event.nominated && nominees.length > 0 ? (
             <View className="flex mt-4 bg-white p-4 rounded-xl">
               <View className="w-full pb-2">
                 <Text className="font-bold text-xl">Nominar entradas</Text>

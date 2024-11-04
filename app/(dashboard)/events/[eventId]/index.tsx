@@ -152,7 +152,7 @@ const TicketPage = () => {
                   });
 
                   const endHour = new Date(joinedEndAt).toLocaleString(
-                    "es-CL",
+                    "us-US",
                     {
                       minute: "2-digit",
                       hour: "2-digit",

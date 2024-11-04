@@ -9,10 +9,10 @@ import {
 } from "@react-native-google-signin/google-signin";
 import GoogleIcon from "./GoogleIcon";
 import Colors from "@/constants/Colors";
+import { router } from "expo-router";
 import useSession from "@/hooks/useSession";
 import useAuthStore from "@/stores/useAuth";
-import { router } from "expo-router";
-import useGetEventsFromUser from "@/hooks/useGetEventsFromUser.";
+import useGetEventsFromUser from "@/hooks/useGetEventsFromUser";
 
 const SignWithGoogle = ({ setUser, redirectTo }: any) => {
   const [isSubmitting, setSubmitting] = useState(false);
@@ -40,7 +40,6 @@ const SignWithGoogle = ({ setUser, redirectTo }: any) => {
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
-      console.log("userInfo", userInfo);
       const sessionResp = await createSession(
         userInfo?.user?.email,
         userInfo?.user?.id,
@@ -48,7 +47,6 @@ const SignWithGoogle = ({ setUser, redirectTo }: any) => {
       );
 
       if (!sessionResp && userInfo && userInfo.user) {
-        console.log("create new user");
         const sessionResp = await createUser(
           userInfo?.user?.givenName ?? "",
           userInfo?.user?.familyName ?? "",

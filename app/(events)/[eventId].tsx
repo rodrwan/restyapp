@@ -55,7 +55,6 @@ const EventPage = ({}) => {
   }, []);
 
   const { eventId }: any = useLocalSearchParams();
-  console.log("eventId", eventId);
   const {
     data: { event },
     loading,
@@ -93,6 +92,13 @@ const EventPage = ({}) => {
     hour: "2-digit",
   });
 
+  const splittedEndAt = event.end_at.split(" ");
+  const endHour = event.end_hour.split("T")[1];
+  const joinedEndAt = splittedEndAt[0] + " " + endHour.replace("Z", "");
+  const endAt = new Date(joinedEndAt).toLocaleString("us-US", {
+    minute: "2-digit",
+    hour: "2-digit",
+  });
   return (
     <>
       <ParallaxScrollView
@@ -149,13 +155,24 @@ const EventPage = ({}) => {
                           : "bg-secondary-600"
                       } p-4 mx-2 rounded-xl`}
                     >
-                      <View>
+                      <View className="flex flex-col">
                         <Text className="text-white text-base font-bold mb-2">
-                          {item?.name}
+                          {item?.name}{" "}
+                          {event.nominated && (
+                            <Text
+                              className="py-1.5 text-xs text-secondary-200"
+                              numberOfLines={1}
+                            >
+                              (Nominada)
+                            </Text>
+                          )}
                         </Text>
                         {event.nominated && (
-                          <Text className="py-1.5 text-secondary-200">
-                            Nominativa. Válido hasta las {event.end_hour}hrs
+                          <Text
+                            className="py-1.5 text-secondary-200"
+                            numberOfLines={1}
+                          >
+                            Válido hasta las {endAt}
                           </Text>
                         )}
                         <Text className="text-primary-500 text-base mb-2">

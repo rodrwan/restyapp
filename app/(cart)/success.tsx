@@ -6,7 +6,7 @@ import { router, useNavigation } from "expo-router";
 
 import CustomButton from "@/components/CustomButton";
 import Colors from "@/constants/Colors";
-import useGetEventsFromUser from "@/hooks/useGetEventsFromUser.";
+import useGetEventsFromUser from "@/hooks/useGetEventsFromUser";
 import useCartStore from "@/stores/useCart";
 
 const SuccessPage = () => {

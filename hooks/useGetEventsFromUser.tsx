@@ -74,7 +74,7 @@ const useGetEventsFromUser = () => {
           .flat()
           .filter(Boolean)
           .filter((ticket) => ticket.isValidated === false),
-        events: response.events,
+        events: response?.events,
       };
 
       setTickets(result.tickets);
@@ -107,11 +107,6 @@ const useGetEventsFromUser = () => {
       throw err;
     }
   };
-
-  // React.useEffect(() => {
-  //   getEvents();
-  //   getUserFirstUpcomingEvent();
-  // }, []);
 
   return { getEvents, getUserFirstUpcomingEvent };
 };

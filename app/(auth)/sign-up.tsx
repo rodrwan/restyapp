@@ -19,11 +19,22 @@ import Logo from "@/components/Logo";
 import Colors from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 
+import useSession from "@/hooks/useSession";
+import useAuthStore from "@/stores/useAuth";
+import useGetEventsFromUser from "@/hooks/useGetEventsFromUser";
+import useUserStore from "@/stores/useUser";
+
 const SignUp = () => {
+  const { createUser } = useSession();
+  const { getEvents, getUserFirstUpcomingEvent } = useGetEventsFromUser();
+  const { login, setAccessToken } = useAuthStore();
+  const { setUser } = useUserStore();
+
   const navigation = useNavigation();
   const [isSubmitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
-    username: "",
+    firstName: "",
+    lastName: "",
     email: "",
     password: "",
   });
@@ -37,7 +48,7 @@ const SignUp = () => {
         Platform.OS === "ios" ? (
           <TouchableOpacity
             onPress={() => router.push("/")}
-            className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2"
+            className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2 bg-secondary-500"
           >
             <Ionicons
               name="chevron-back-outline"
@@ -52,17 +63,39 @@ const SignUp = () => {
   }, []);
 
   const submit = async () => {
-    if (form.username === "" || form.email === "" || form.password === "") {
+    if (
+      form.firstName === "" ||
+      form.lastName === "" ||
+      form.email === "" ||
+      form.password === ""
+    ) {
       Alert.alert("Error", "Please fill in all fields");
       return;
     }
+    const sessionResp = await createUser(
+      form.firstName ?? "",
+      form.lastName ?? "",
+      form.email,
+      form.password,
+      "",
+      "mangoticket"
+    );
+
+    setUser({
+      ...sessionResp.user,
+    });
+    login();
+    setAccessToken(sessionResp.access_token);
+    getEvents();
+    getUserFirstUpcomingEvent();
+    router.replace("/(dashboard)");
   };
 
   return (
     <SafeAreaView className="bg-secondary-500 h-full">
-      <KeyboardAwareScrollView>
+      <KeyboardAwareScrollView className="bg-secondary-500">
         <View
-          className="w-full flex justify-center h-full px-4 my-6"
+          className="w-full flex justify-center h-full px-4 my-6 bg-secondary-500"
           style={{
             minHeight: Dimensions.get("window").height - 100,
           }}
@@ -74,9 +107,16 @@ const SignUp = () => {
           </Text>
 
           <FormField
-            title="Username"
-            value={form.username}
-            handleChangeText={(e: any) => setForm({ ...form, username: e })}
+            title="Nombre"
+            value={form.firstName}
+            handleChangeText={(e: any) => setForm({ ...form, firstName: e })}
+            otherStyles="mt-10"
+          />
+
+          <FormField
+            title="Apellido"
+            value={form.lastName}
+            handleChangeText={(e: any) => setForm({ ...form, lastName: e })}
             otherStyles="mt-10"
           />
 

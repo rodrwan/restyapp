@@ -165,7 +165,7 @@ const TicketsPage = () => {
                       </Text>
                       <Image
                         source={{
-                          uri: `data:image/png;base64,${item.base64}`,
+                          uri: item.base64,
                         }}
                         className="w-[200px] h-[200px] mb-8"
                       />
