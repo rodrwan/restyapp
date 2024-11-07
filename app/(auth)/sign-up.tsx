@@ -23,6 +23,7 @@ import useSession from "@/hooks/useSession";
 import useAuthStore from "@/stores/useAuth";
 import useGetEventsFromUser from "@/hooks/useGetEventsFromUser";
 import useUserStore from "@/stores/useUser";
+import Toast from "react-native-toast-message";
 
 const SignUp = () => {
   const { createUser } = useSession();
@@ -39,13 +40,15 @@ const SignUp = () => {
     password: "",
   });
 
+  const [scrollY, setScrollY] = useState(0);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTransparent: true,
       headerTitle: "",
       headerTintColor: Colors.primary[500],
       headerLeft: () =>
-        Platform.OS === "ios" ? (
+        Platform.OS === "ios" && scrollY <= 30 ? (
           <TouchableOpacity
             onPress={() => router.push("/")}
             className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2 bg-secondary-500"
@@ -60,40 +63,69 @@ const SignUp = () => {
           <View />
         ),
     });
-  }, []);
+  }, [scrollY]);
 
   const submit = async () => {
+    setSubmitting(true);
     if (
       form.firstName === "" ||
       form.lastName === "" ||
       form.email === "" ||
       form.password === ""
     ) {
-      Alert.alert("Error", "Please fill in all fields");
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Debes llenar todos los campos",
+        onHide: () => {
+          setSubmitting(false);
+        },
+      });
       return;
     }
-    const sessionResp = await createUser(
-      form.firstName ?? "",
-      form.lastName ?? "",
-      form.email,
-      form.password,
-      "",
-      "mangoticket"
-    );
 
-    setUser({
-      ...sessionResp.user,
-    });
-    login();
-    setAccessToken(sessionResp.access_token);
-    getEvents();
-    getUserFirstUpcomingEvent();
-    router.replace("/(dashboard)");
+    try {
+      const sessionResp = await createUser(
+        form.firstName ?? "",
+        form.lastName ?? "",
+        form.email,
+        form.password,
+        "",
+        "mangoticket"
+      );
+      if (!sessionResp) {
+        throw new Error("Error al iniciar sesión");
+      }
+
+      setUser({
+        ...sessionResp.user,
+      });
+      login();
+      setAccessToken(sessionResp.access_token);
+      getEvents();
+      getUserFirstUpcomingEvent();
+      router.replace("/(dashboard)");
+    } catch (err: any) {
+      console.log(err);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Error al iniciar sesión",
+        onHide: () => {
+          setSubmitting(false);
+        },
+      });
+    }
   };
 
   return (
     <SafeAreaView className="bg-secondary-500 h-full">
-      <KeyboardAwareScrollView className="bg-secondary-500">
+      <KeyboardAwareScrollView
+        className="bg-secondary-500"
+        onScroll={(event) => {
+          setScrollY(event.nativeEvent.contentOffset.y);
+        }}
+      >
         <View
           className="w-full flex justify-center h-full px-4 my-6 bg-secondary-500"
           style={{
@@ -111,6 +143,7 @@ const SignUp = () => {
             value={form.firstName}
             handleChangeText={(e: any) => setForm({ ...form, firstName: e })}
             otherStyles="mt-10"
+            autoComplete="name"
           />
 
           <FormField
@@ -118,6 +151,7 @@ const SignUp = () => {
             value={form.lastName}
             handleChangeText={(e: any) => setForm({ ...form, lastName: e })}
             otherStyles="mt-10"
+            autoComplete="name-family"
           />
 
           <FormField
@@ -126,6 +160,8 @@ const SignUp = () => {
             handleChangeText={(e: any) => setForm({ ...form, email: e })}
             otherStyles="mt-7"
             keyboardType="email-address"
+            autoComplete="email"
+            autoCapitalize="none"
           />
 
           <FormField
@@ -133,6 +169,7 @@ const SignUp = () => {
             value={form.password}
             handleChangeText={(e: any) => setForm({ ...form, password: e })}
             otherStyles="mt-7"
+            autoComplete="password"
           />
 
           <CustomButton
@@ -155,6 +192,7 @@ const SignUp = () => {
           </View>
         </View>
       </KeyboardAwareScrollView>
+      <Toast topOffset={100} />
     </SafeAreaView>
   );
 };

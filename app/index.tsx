@@ -61,27 +61,27 @@ const HomePage = () => {
             </TouchableOpacity>
           );
         }}
-        ListHeaderComponent={() => (
-          <View className="flex justify-center">
-            <View className="flex-row items-center bg-white border border-primary-100 rounded-md mb-4">
-              <Ionicons
-                name="search"
-                size={24}
-                color={Colors.secondary[300]}
-                style={{ marginLeft: 8 }}
-              />
-              <TextInput
-                placeholder="Buscar evento"
-                className="p-4 w-full bg-primary text-secondary-300"
-              />
-            </View>
-            {data?.length > 0 ? (
-              <Text className="text-white text-center text-xl font-bold pb-4">
-                Mas Eventos
-              </Text>
-            ) : null}
-          </View>
-        )}
+        // ListHeaderComponent={() => (
+        //   <View className="flex justify-center">
+        //     <View className="flex-row items-center bg-white border border-primary-100 rounded-md mb-4">
+        //       <Ionicons
+        //         name="search"
+        //         size={24}
+        //         color={Colors.secondary[300]}
+        //         style={{ marginLeft: 8 }}
+        //       />
+        //       <TextInput
+        //         placeholder="Buscar evento"
+        //         className="p-4 w-full bg-primary text-secondary-300"
+        //       />
+        //     </View>
+        //     {data?.length > 0 ? (
+        //       <Text className="text-white text-center text-xl font-bold pb-4">
+        //         Mas Eventos
+        //       </Text>
+        //     ) : null}
+        //   </View>
+        // )}
         ListEmptyComponent={() => (
           <EmptyState
             title="Aún no hay eventos"

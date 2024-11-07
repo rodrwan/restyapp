@@ -69,26 +69,19 @@ const HomePage = () => {
         <UserInfoSkeleton />
       ) : (
         <View className="flex flex-row bg-white rounded-xl mx-4 py-6 px-8 justify-between mb-4">
-          <View className="">
+          <View className="w-1/4">
             <Image
               source={{ uri: user?.picture }}
               className="w-[80px] h-[80px] rounded-full shadow-2xl"
               style={styles.elevationLow}
             />
           </View>
-          <View className="justify-center -ml-8">
-            <Text className="text-base ">
+          <View className="w-3/4 justify-center ml-4">
+            <Text className="text-base " numberOfLines={1}>
               {user?.firstname} {user?.lastname}
             </Text>
             <Text className="text-base ">{user?.dni}</Text>
             <Text className="text-xs text-secondary-200 ">{user?.email}</Text>
-          </View>
-          <View className="">
-            <Ionicons
-              name="settings-outline"
-              size={24}
-              color={Colors.primary[500]}
-            />
           </View>
         </View>
       )}

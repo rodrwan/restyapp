@@ -9,12 +9,10 @@ import { router } from "expo-router";
 
 const payments = () => {
   const { user }: any = useUserStore();
-  const [selected, setSelected] = React.useState(false);
   const { createInscription } = useCreateInscription();
 
   const onSubmitRegisterCard = async () => {
     try {
-      setSelected(true);
       const newPayment = await createInscription();
       const { url, token } = newPayment;
       console.log(`/(events)/inscription?url=${url}&token=${token}`);
@@ -35,27 +33,40 @@ const payments = () => {
         lastname={user?.lastname ?? ""}
       />
 
-      <View className="flex bg-secondary-50 p-4 my-8 mx-4 rounded-3xl justify-center items-end">
-        <View className="self-center w-[80%] justify-center justify-center ">
-          <Text className="text-lg text-black font-bold text-center">
-            Inscribir medio de pago
+      <View className="flex bg-secondary-50 p-4 my-8 mx-4 rounded-3xl justify-center items-center">
+        <Text className="text-lg text-black font-bold text-center mb-4">
+          Inscribir medio de pago
+        </Text>
+        <View>
+          <Text className="text-secondary-500 text-base font-regular text-justify">
+            ¡Vincula tu tarjeta y prepárate para tus próximas compras! Solo
+            necesitamos un cargo temporal de 50 pesos (que te devolveremos en
+            cuanto verifiquemos tu tarjeta). Esto es solo para asociarla a tu
+            cuenta, así que no te preocupes, no estás comprando nada ahora. Una
+            vez registrada, tendrás todo listo para usar tu tarjeta en la app
+            cuando quieras.
           </Text>
-          <View className="flex-row w-full h-[100px] items-center">
-            <RadioButton selected={selected} />
+        </View>
+
+        <View className="self-center w-full justify-center justify-center ">
+          <View className="flex-row w-full h-[120px] items-center m-auto  justify-center ">
             <TouchableOpacity
               onPress={() => onSubmitRegisterCard()}
               style={{
-                width: "100%",
+                marginTop: 8,
                 alignSelf: "center",
+                borderWidth: 1,
+                paddingVertical: 4,
+                paddingHorizontal: 8,
+                borderRadius: 16,
+                borderColor: "#9ba5aa",
               }}
             >
               <Image
                 source={require("../../../assets/images/transbank.png")}
                 style={{
                   marginTop: 8,
-                  width: "100%",
-                  height: 60,
-                  alignSelf: "center",
+                  height: 80,
                 }}
               />
             </TouchableOpacity>

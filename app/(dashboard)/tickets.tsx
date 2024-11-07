@@ -68,7 +68,16 @@ const TicketsPage = () => {
   }, []);
 
   if (!user?.tickets) {
-    return;
+    return (
+      <SafeAreaView className="flex h-full bg-secondary-500 ">
+        <ScrollView className="flex h-full mt-16">
+          <EmptyState
+            title="No tienes entradas"
+            subtitle="No has comprado entradas para algún evento."
+          />
+        </ScrollView>
+      </SafeAreaView>
+    );
   }
 
   const [activeItem, setActiveItem] = useState(user?.tickets[0]);

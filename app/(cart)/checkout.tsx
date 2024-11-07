@@ -8,6 +8,7 @@ import {
   Platform,
   ActivityIndicator,
   Image,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -18,6 +19,7 @@ import {
   useNavigation,
   useSegments,
 } from "expo-router";
+import * as WebBrowser from "expo-web-browser";
 
 import Colors from "@/constants/Colors";
 import FormField from "@/components/FormField";
@@ -38,11 +40,12 @@ const Checkout = () => {
 
   const { orderId } = params;
   const { user }: any = useUserStore();
-  const { items, nominees, assignTicket, clearCart } = useCartStore();
+  const { items, nominees, assignTicket, clearCart, clearTicketToNominate } =
+    useCartStore();
   const { event } = useEventStore();
   const [loadingSubmit, setLoadingSubmit] = useState(false);
-  const [selected, setSelected] = useState(false);
   const [termAndConditions, setTermAndConditions] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -50,9 +53,12 @@ const Checkout = () => {
       headerTitle: "",
       headerTintColor: Colors.primary[500],
       headerLeft: () =>
-        Platform.OS === "ios" ? (
+        Platform.OS === "ios" && scrollY <= 30 ? (
           <TouchableOpacity
-            onPress={() => navigation?.goBack()}
+            onPress={() => {
+              clearTicketToNominate();
+              navigation?.goBack();
+            }}
             className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2"
           >
             <Ionicons
@@ -64,24 +70,26 @@ const Checkout = () => {
         ) : (
           <View />
         ),
-      headerRight: () => (
-        <TouchableOpacity
-          onPress={() => {
-            clearCart();
-            if (params?.goBackTo) return router.replace(`/${params?.goBackTo}`);
-            return router.replace("/home");
-          }}
-          className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2"
-        >
-          <Ionicons
-            name="close-outline"
-            size={20}
-            color={Colors.primary[500]}
-          />
-        </TouchableOpacity>
-      ),
+      headerRight: () =>
+        scrollY <= 30 && (
+          <TouchableOpacity
+            onPress={() => {
+              clearCart();
+              if (params?.goBackTo)
+                return router.replace(`/${params?.goBackTo}`);
+              return router.replace("/home");
+            }}
+            className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2"
+          >
+            <Ionicons
+              name="close-outline"
+              size={20}
+              color={Colors.primary[500]}
+            />
+          </TouchableOpacity>
+        ),
     });
-  }, []);
+  }, [scrollY]);
 
   const { authorizeTransaction } = useAuthorizeTransaction();
   const { createInscription } = useCreateInscription();
@@ -113,7 +121,6 @@ const Checkout = () => {
 
   const onSubmitRegisterCard = async () => {
     try {
-      setSelected(true);
       const newPayment = await createInscription();
       const { url, token } = newPayment;
       console.log(`/(events)/inscription?url=${url}&token=${token}`);
@@ -149,7 +156,12 @@ const Checkout = () => {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={30}
       >
-        <ScrollView className="flex grow relative mb-16">
+        <ScrollView
+          className="flex grow relative mb-16"
+          onScroll={(event) => {
+            setScrollY(event.nativeEvent.contentOffset.y);
+          }}
+        >
           <Text className="self-center text-white font-bold text-xl">
             Checkout
           </Text>
@@ -212,19 +224,32 @@ const Checkout = () => {
 
           <View className="mt-6">
             {user?.tbk_card_number === "" ? (
-              <View className="flex bg-secondary-50 p-4 mx-2 rounded-3xl justify-center items-end">
-                <View className="self-center w-[80%] justify-center justify-center ">
-                  <Text className="text-lg text-black font-bold text-center">
-                    Inscribir medio de pago
+              <View className="flex bg-secondary-50 p-4 rounded-xl justify-center items-center">
+                <Text className="text-lg text-black font-bold text-center mb-4">
+                  Inscribir medio de pago
+                </Text>
+                <View>
+                  <Text className="text-secondary-500 text-base font-regular text-justify">
+                    ¡Vincula tu tarjeta y prepárate para tus próximas compras!
+                    Solo necesitamos un cargo temporal de 50 pesos (que te
+                    devolveremos en cuanto verifiquemos tu tarjeta). Esto es
+                    solo para asociarla a tu cuenta, así que no te preocupes, no
+                    estás comprando nada ahora. Una vez registrada, tendrás todo
+                    listo para usar tu tarjeta en la app cuando quieras.
                   </Text>
-                  <View className="flex-row w-full h-[120px] items-center">
-                    {/* <RadioButton selected={selected} /> */}
+                </View>
+                <View className="self-center w-full justify-center justify-center ">
+                  <View className="flex-row w-full h-[120px] items-center m-auto  justify-center ">
                     <TouchableOpacity
                       onPress={() => onSubmitRegisterCard()}
                       style={{
                         marginTop: 8,
-                        width: "100%",
                         alignSelf: "center",
+                        borderWidth: 1,
+                        paddingVertical: 4,
+                        paddingHorizontal: 8,
+                        borderRadius: 16,
+                        borderColor: "#9ba5aa",
                       }}
                     >
                       <Image
@@ -232,7 +257,6 @@ const Checkout = () => {
                         style={{
                           marginTop: 8,
                           height: 80,
-                          alignSelf: "center",
                         }}
                       />
                     </TouchableOpacity>
@@ -254,19 +278,32 @@ const Checkout = () => {
             )}
           </View>
           {user?.tbk_card_number !== "" && (
-            <View>
-              <TouchableOpacity
-                onPress={() => setTermAndConditions(!termAndConditions)}
-                className="flex flex-row items-center justify-center mt-4"
-              >
-                <RadioButton selected={termAndConditions} />
-                <Text className="text-white font-base text-base ml-4">
-                  Términos y condiciones
+            <View className="items-center mb-8">
+              <View className="flex-row mb-2">
+                <TouchableOpacity
+                  onPress={() => setTermAndConditions(!termAndConditions)}
+                  className="flex flex-row items-center justify-center mt-4"
+                >
+                  <RadioButton selected={termAndConditions} />
+                  <Text className="text-white font-base text-base ml-4">
+                    Términos y condiciones
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <View className="w-full flex-row mx-2 mb-2 items-center justify-center">
+                <Text className="text-center text-primary-500">
+                  Debes aceptar los términos y condiciones antes de continuar.
+                  <TouchableWithoutFeedback
+                    onPress={async () =>
+                      await WebBrowser.openBrowserAsync(
+                        "https://mangoticket-legal.nyc3.cdn.digitaloceanspaces.com/1.%20TERMINOS%20Y%20CONDICIONES%20(1).pdf"
+                      )
+                    }
+                  >
+                    <Text className="text-white"> Ver más</Text>
+                  </TouchableWithoutFeedback>
                 </Text>
-              </TouchableOpacity>
-              <Text className="text-center text-primary-500">
-                Debes aceptar los términos y condiciones antes de continuar
-              </Text>
+              </View>
             </View>
           )}
         </ScrollView>

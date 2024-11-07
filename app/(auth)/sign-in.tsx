@@ -21,6 +21,7 @@ import { Ionicons } from "@expo/vector-icons";
 import useSession from "@/hooks/useSession";
 import useAuthStore from "@/stores/useAuth";
 import useGetEventsFromUser from "@/hooks/useGetEventsFromUser";
+import Toast from "react-native-toast-message";
 
 const SignIn = () => {
   const { createSession, createUser } = useSession();
@@ -29,7 +30,6 @@ const SignIn = () => {
   const { login, setAccessToken } = useAuthStore();
   const navigation = useNavigation();
   const params: any = useLocalSearchParams();
-  console.log("params", params);
   const { setUser } = useUserStore();
 
   const [isSubmitting, setSubmitting] = useState(false);
@@ -37,6 +37,7 @@ const SignIn = () => {
     email: "",
     password: "",
   });
+  const [error, setError] = useState(null);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -62,24 +63,48 @@ const SignIn = () => {
   }, []);
 
   const submit = async () => {
+    setSubmitting(true);
     if (form.email === "" || form.password === "") {
-      Alert.alert("Error", "Please fill in all fields");
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Debes llenar todos los campos",
+        onHide: () => {
+          setSubmitting(false);
+        },
+      });
       return;
     }
 
-    const sessionResp = await createSession(
-      form.email,
-      form.password,
-      "mangoticket"
-    );
-    setUser({
-      ...sessionResp.user,
-    });
-    login();
-    setAccessToken(sessionResp.access_token);
-    getEvents();
-    getUserFirstUpcomingEvent();
-    router.replace(params?.redirectTo);
+    setError(null);
+    try {
+      const sessionResp = await createSession(
+        form.email,
+        form.password,
+        "mangoticket"
+      );
+      if (!sessionResp) {
+        throw new Error("Error al iniciar sesión");
+      }
+      setUser({
+        ...sessionResp.user,
+      });
+      login();
+      setAccessToken(sessionResp.access_token);
+      getEvents();
+      getUserFirstUpcomingEvent();
+      router.replace(params?.redirectTo);
+    } catch (err: any) {
+      console.log(err);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Error al iniciar sesión",
+        onHide: () => {
+          setSubmitting(false);
+        },
+      });
+    }
   };
 
   return (
@@ -101,12 +126,16 @@ const SignIn = () => {
             handleChangeText={(e: any) => setForm({ ...form, email: e })}
             otherStyles="mt-7"
             keyboardType="email-address"
+            autoComplete="email"
+            autoCapitalize="none"
           />
           <FormField
             title="Password"
             value={form.password}
             handleChangeText={(e: any) => setForm({ ...form, password: e })}
             otherStyles="mt-7"
+            autoComplete="password"
+            autoCapitalize="none"
           />
           <CustomButton
             title="Login"
@@ -130,6 +159,7 @@ const SignIn = () => {
           </View>
         </View>
       </KeyboardAwareScrollView>
+      <Toast topOffset={100} />
     </SafeAreaView>
   );
 };

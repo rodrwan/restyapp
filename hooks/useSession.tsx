@@ -15,7 +15,7 @@ const useLogin = () => {
         source,
       });
       if (errors?.length > 0) {
-        throw new Error(errors);
+        throw errors;
       }
 
       return response;
@@ -47,7 +47,7 @@ const useLogin = () => {
         reference_id: password,
       });
       if (errors?.length > 0) {
-        throw new Error(errors);
+        throw errors;
       }
 
       return response;

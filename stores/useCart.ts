@@ -25,6 +25,7 @@ interface Store {
   assignTicket: (orderId: string, ticket: Item, nominated: Nominated) => void;
   setTicketToNominate: (items: Item[]) => void;
   clearCart: () => void;
+  clearTicketToNominate: () => void;
 }
 
 const initialCart: Item[] = [];
@@ -101,15 +102,39 @@ const useCartStore = create<Store>((set) => ({
     });
   },
   setTicketToNominate: (items: Item[]) => {
-    const nominated: Nominated[] = items.map((item) => ({
-      id: item.id,
-      name: item.name,
-      type: item.type,
-    }));
     set((state) => {
+      console.log("state.nominees", state.nominees);
+      const nominated: Nominated[] = items.reduce((acc: any, item: any) => {
+        if (
+          state.nominees.find((nominated) => {
+            console.log("nominated.id, item.id", nominated.id, item.id);
+            return nominated.id === item.id;
+          })
+        ) {
+          return acc;
+        }
+
+        return [
+          ...acc,
+          {
+            id: item.id,
+            name: item.name,
+            type: item.type,
+          },
+        ];
+      }, []);
+
       return {
         ...state,
         nominees: [...state.nominees, ...nominated],
+      };
+    });
+  },
+  clearTicketToNominate: () => {
+    set((state) => {
+      return {
+        ...state,
+        nominees: initialNominees,
       };
     });
   },
