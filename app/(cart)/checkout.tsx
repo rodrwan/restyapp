@@ -150,6 +150,9 @@ const Checkout = () => {
     return acc + cur.price * cur.quantity;
   }, 0);
 
+  const allNomineesSetted = nominees.every((nominee) => {
+    return nominee?.dni && nominee?.email;
+  });
   return (
     <SafeAreaView className="flex h-full bg-secondary-500 p-2">
       <KeyboardAvoidingView
@@ -224,22 +227,12 @@ const Checkout = () => {
 
           <View className="mt-6">
             {user?.tbk_card_number === "" ? (
-              <View className="flex bg-secondary-50 p-4 rounded-xl justify-center items-center">
-                <Text className="text-lg text-black font-bold text-center mb-4">
+              <View className="flex bg-secondary-50 p-4 rounded-xl">
+                <Text className="text-lg text-black font-bold">
                   Inscribir medio de pago
                 </Text>
-                <View>
-                  <Text className="text-secondary-500 text-base font-regular text-justify">
-                    ¡Vincula tu tarjeta y prepárate para tus próximas compras!
-                    Solo necesitamos un cargo temporal de 50 pesos (que te
-                    devolveremos en cuanto verifiquemos tu tarjeta). Esto es
-                    solo para asociarla a tu cuenta, así que no te preocupes, no
-                    estás comprando nada ahora. Una vez registrada, tendrás todo
-                    listo para usar tu tarjeta en la app cuando quieras.
-                  </Text>
-                </View>
-                <View className="self-center w-full justify-center justify-center ">
-                  <View className="flex-row w-full h-[120px] items-center m-auto  justify-center ">
+                <View className="self-center justify-center justify-center ">
+                  <View className="flex-row w-full h-[140px] items-center m-auto justify-center ">
                     <TouchableOpacity
                       onPress={() => onSubmitRegisterCard()}
                       style={{
@@ -250,18 +243,25 @@ const Checkout = () => {
                         paddingHorizontal: 8,
                         borderRadius: 16,
                         borderColor: "#9ba5aa",
+                        width: "100%",
                       }}
                     >
                       <Image
                         source={require("../../assets/images/transbank.png")}
                         style={{
                           marginTop: 8,
-                          height: 80,
+                          height: 100,
                         }}
+                        resizeMode="contain"
                       />
                     </TouchableOpacity>
                   </View>
                 </View>
+                <Text className="text-secondary-500 text-md font-regular mt-4">
+                  Realizaremos un cargo de $50 pesos de forma temporal que te
+                  devolveremos al confirmar tu tarjeta. El proceso es seguro y
+                  se realizará una sola vez.
+                </Text>
               </View>
             ) : (
               <View className="flex items-center">
@@ -309,7 +309,37 @@ const Checkout = () => {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      {user?.tbk_card_number !== "" && (
+      {!event.nominated && user?.tbk_card_number !== "" && (
+        <View className="flex w-full absolute bottom-8 bg-transparent items-center justify-center">
+          <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={() => onSubmit()}
+            className={`flex-row w-[95%] ml-4 p-4 rounded-3xl items-center justify-center border border-primary-700 ${
+              user?.tbk_card_number === "" || !termAndConditions
+                ? "bg-primary-200"
+                : "bg-primary-400"
+            }`}
+            disabled={
+              user?.tbk_card_number === "" ||
+              loadingSubmit ||
+              !termAndConditions
+            }
+          >
+            <Text className="text-white font-bold">Pagar</Text>
+
+            {loadingSubmit && (
+              <ActivityIndicator
+                animating={loadingSubmit}
+                color="#fff"
+                size="small"
+                className="ml-2"
+              />
+            )}
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {event.nominated && user?.tbk_card_number !== "" && allNomineesSetted && (
         <View className="flex w-full absolute bottom-8 bg-transparent items-center justify-center">
           <TouchableOpacity
             activeOpacity={0.9}

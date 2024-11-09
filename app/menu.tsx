@@ -6,6 +6,7 @@ import Colors from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import useAuthStore from "@/stores/useAuth";
 import useUserStore from "@/stores/useUser";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const MenuPage = () => {
   const navigation = useNavigation<any>();
@@ -72,6 +73,7 @@ const MenuPage = () => {
               setUser(null);
               logout();
               setAccessToken("");
+              AsyncStorage.removeItem("accessToken");
               router.replace("/");
             }}
           >

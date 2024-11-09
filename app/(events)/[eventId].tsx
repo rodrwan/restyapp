@@ -119,7 +119,10 @@ const EventPage = ({}) => {
           />
         )}
         renderStickyHeader={() => (
-          <View key="sticky-header" className="ml-24 h-[90px] justify-end">
+          <View
+            key="sticky-header"
+            className="mx-auto h-[90px] w-full justify-end items-center"
+          >
             <Text className="text-white font-bold text-base">
               {event?.name}
             </Text>
@@ -153,7 +156,7 @@ const EventPage = ({}) => {
                         index % 2 === 0
                           ? "bg-secondary-500"
                           : "bg-secondary-600"
-                      } p-4 mx-2 rounded-xl`}
+                      } p-4 mx-2 rounded-xl mb-2`}
                     >
                       <View className="flex flex-col">
                         <Text className="text-white text-base font-bold mb-2">

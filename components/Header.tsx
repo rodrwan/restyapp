@@ -9,7 +9,7 @@ import Logo from "./Logo";
 
 const Header = (props: any) => {
   return (
-    <SafeAreaView className="flex bg-secondary-500 pt-2">
+    <SafeAreaView className="flex bg-secondary-500 pt-2 h-[110px]">
       <View className="flex flex-row w-full justify-between items-center px-2 pb-4 h-[40px] border-b border-secondary-700">
         {!props?.navigation ? (
           <View className="ml-2">

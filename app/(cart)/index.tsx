@@ -121,8 +121,8 @@ const Cart = () => {
               return (
                 <View
                   className={`flex flex-row justify-between ${
-                    index % 2 === 0 ? "bg-secondary-500" : "bg-secondary-300"
-                  } p-4 mx-2 rounded-xl`}
+                    index % 2 === 0 ? "bg-secondary-500" : "bg-secondary-600"
+                  } p-4 mx-2 rounded-xl mt-2`}
                 >
                   <View>
                     <Text className="text-white text-base font-bold mb-2">
@@ -199,7 +199,7 @@ const Cart = () => {
                 <View
                   className={`flex flex-row justify-between ${
                     index % 2 === 0 ? "bg-secondary-500" : "bg-secondary-600"
-                  } p-4 mx-2 rounded-xl`}
+                  } p-4 mx-2 rounded-xl mb-2`}
                 >
                   <View>
                     <Text className="text-white text-base font-bold mb-2">

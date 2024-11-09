@@ -1,8 +1,10 @@
 import HTTPClient from "@/lib/api";
+import useUserStore from "@/stores/useUser";
 
 const client = HTTPClient.getInstance();
 
 const useLogin = () => {
+  const { setUser } = useUserStore();
   const createSession = async (
     username: string,
     password: string,
@@ -18,6 +20,24 @@ const useLogin = () => {
         throw errors;
       }
 
+      return response;
+    } catch (err: any) {
+      if (err?.response?.errors[0]?.message === "session has expired") {
+        throw new Error("expired session");
+      } else {
+        return null;
+      }
+    }
+  };
+
+  const me = async () => {
+    try {
+      const [response, errors] = await client.me();
+      if (errors?.length > 0) {
+        throw errors;
+      }
+
+      setUser(response?.user);
       return response;
     } catch (err: any) {
       if (err?.response?.errors[0]?.message === "session has expired") {
@@ -60,7 +80,7 @@ const useLogin = () => {
     }
   };
 
-  return { createSession, createUser };
+  return { createSession, createUser, me };
 };
 
 export default useLogin;

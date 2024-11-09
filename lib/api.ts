@@ -1,4 +1,5 @@
 import * as graphql from "graphql-request/build/entrypoints/main";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { MANGO_API_URL } from "@/constants";
 
@@ -32,8 +33,16 @@ class Client {
     Client._instance = this;
   }
 
-  public getAccessToken(): string | null {
+  public async getAccessToken(): Promise<string | null> {
+    const accessToken = await AsyncStorage.getItem("accessToken");
+    if (accessToken) {
+      this.accessToken = accessToken;
+    }
     return this.accessToken;
+  }
+
+  public async setAccessToken(accessToken: string) {
+    this.accessToken = accessToken;
   }
 
   public static getInstance(): Client {
@@ -116,6 +125,7 @@ class Client {
 
       if (!resp.errors) {
         this.accessToken = resp?.data?.login.access_token;
+        AsyncStorage.setItem("accessToken", this.accessToken);
       }
 
       return [resp?.data?.login, resp?.errors];
@@ -190,6 +200,7 @@ mutation Register($input: RegisterData!) {
 
       if (!resp.errors) {
         this.accessToken = resp?.data?.register.access_token;
+        AsyncStorage.setItem("accessToken", this.accessToken);
       }
 
       return [resp?.data?.register, resp?.errors];
@@ -199,11 +210,11 @@ mutation Register($input: RegisterData!) {
     }
   }
 
-  async me(userId: string) {
+  async me() {
     try {
       const document = graphql.gql`
-    mutation Me {
-      me(userId: String!) {
+    query Me {
+      me {
         user {
           id
           firstname
@@ -234,12 +245,9 @@ mutation Register($input: RegisterData!) {
     }
       `;
 
-      const variables = {
-        userId,
-      };
-
       const requestHeaders = {
         "X-User-Roles": "system",
+        Authorization: `Bearer ${this.accessToken}`,
       };
 
       const response = await fetch(`${MANGO_API_URL}`, {
@@ -252,7 +260,7 @@ mutation Register($input: RegisterData!) {
         },
         body: JSON.stringify({
           query: document,
-          variables,
+          variables: {},
           operationName: "Me",
         }),
       });
@@ -1182,7 +1190,6 @@ query GetUserUpcomingEvents {
         id,
       };
 
-      console.log("variables", variables);
       const requestHeaders = {
         "X-User-Roles": "system",
         Authorization: `Bearer ${this.accessToken}`,

@@ -12,7 +12,7 @@ const useGetEventsFromUser = () => {
     try {
       const orders = await client.getOrderItemsByUser();
 
-      if (orders.length === 0) {
+      if (orders?.length === 0) {
         return {
           orders: [],
           tickets: [],
@@ -22,69 +22,69 @@ const useGetEventsFromUser = () => {
       }
 
       const events = orders
-        .map((order: any) => order.items.map((item: any) => item.event_id))
+        .map((order: any) => order?.items?.map((item: any) => item?.event_id))
         .flat()
         .filter((x: any, i: any, a: any) => a.indexOf(x) == i);
 
       const response = await client.getEventsByIds(events);
 
       const data = await Promise.all(
-        response.events.map(async (event: any) => {
+        response?.events?.map(async (event: any) => {
           return await client.getTicketsByUserAndEventID(event.id);
         })
       );
 
       const tickets = data.map((d) => {
-        return d.data.map((cur: any) => {
-          if (cur.event_item.type !== "ENTRANCE") {
+        return d?.data?.map((cur: any) => {
+          if (cur?.event_item?.type !== "ENTRANCE") {
             return;
           }
 
           return {
-            id: cur.ticket.id,
-            base64: cur.ticket.base64,
-            isValidated: cur.ticket.is_validated,
-            name: cur.event_item.name,
-            event: cur.event,
+            id: cur?.ticket?.id,
+            base64: cur?.ticket?.base64,
+            isValidated: cur?.ticket?.is_validated,
+            name: cur?.event_item?.name,
+            event: cur?.event,
           };
         }, {});
       });
 
       const drinks = data.map((d) => {
-        return d.data.map((cur: any) => {
-          if (cur.event_item.type !== "DRINK") {
+        return d?.data?.map((cur: any) => {
+          if (cur?.event_item?.type !== "DRINK") {
             return;
           }
 
           return {
-            id: cur.ticket.id,
-            base64: cur.ticket.base64,
-            isValidated: cur.ticket.is_validated,
-            name: cur.event_item.name,
-            event: cur.event,
+            id: cur?.ticket?.id,
+            base64: cur?.ticket?.base64,
+            isValidated: cur?.ticket?.is_validated,
+            name: cur?.event_item?.name,
+            event: cur?.event,
           };
         }, {});
       });
 
       const result = {
         orders,
-        tickets: tickets.flat().filter(Boolean),
+        tickets: tickets?.flat()?.filter(Boolean),
         // .filter((ticket) => ticket.isValidated === false),
         drinks: drinks
-          .flat()
-          .filter(Boolean)
-          .filter((ticket) => ticket.isValidated === false),
+          ?.flat()
+          ?.filter(Boolean)
+          ?.filter((ticket) => ticket.isValidated === false),
         events: response?.events,
       };
 
-      setTickets(result.tickets);
-      setDrinks(result.drinks);
-      setEvents(result.events);
+      setTickets(result?.tickets);
+      setDrinks(result?.drinks);
+      setEvents(result?.events);
       return result;
     } catch (error: any) {
-      console.log("error", error);
+      console.log(">>> getEvents error", error);
       if (String(error).includes("unauthorized")) {
-        console.log("getUserFirstUpcomingEvent error", error);
+        console.log("getEvents error", error);
         return router.push("/(auth)/sign-in?redirectTo=/(dashboard)");
       }
 
@@ -99,6 +99,7 @@ const useGetEventsFromUser = () => {
       setUpcomingEvent(result);
       return result;
     } catch (err: any) {
+      console.log(">>> getUserFirstUpcomingEvent error", err);
       if (String(err).includes("unauthorized")) {
         console.log("getUserFirstUpcomingEvent error", err);
         return router.push("/(auth)/sign-in?redirectTo=/(dashboard)");

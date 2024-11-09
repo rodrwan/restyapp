@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   RefreshControl,
   Image,
+  Dimensions,
 } from "react-native";
 import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
@@ -13,6 +14,22 @@ import Colors from "@/constants/Colors";
 import EmptyState from "@/components/EmptyState";
 import useGetEventsWithPagination from "@/hooks/useGetEvents";
 import { router } from "expo-router";
+
+const sortByStartAt = (a: any, b: any) => {
+  const AsplittedStartAt = a.start_at.split(" ");
+  const AstartHour = a.start_hour.split("T")[1];
+  const AjoinedStartAt =
+    AsplittedStartAt[0] + " " + AstartHour.replace("Z", "");
+
+  const BsplittedStartAt = b.start_at.split(" ");
+  const BstartHour = b.start_hour.split("T")[1];
+  const BjoinedStartAt =
+    BsplittedStartAt[0] + " " + BstartHour.replace("Z", "");
+
+  return (
+    new Date(BjoinedStartAt).getTime() - new Date(AjoinedStartAt).getTime()
+  );
+};
 
 const HomePage = () => {
   const { data, refetch } = useGetEventsWithPagination();
@@ -24,11 +41,13 @@ const HomePage = () => {
     setRefreshing(false);
   };
 
+  const height = Dimensions.get("window").width - 16;
+
   return (
     <View className="flex h-full bg-secondary-500">
       <FlatList
         className="p-2"
-        data={data}
+        data={data.sort(sortByStartAt)}
         keyExtractor={(item: any) => item.id}
         renderItem={({ item }: any) => {
           const splittedStartAt = item.start_at.split(" ");
@@ -38,12 +57,16 @@ const HomePage = () => {
             month: "long",
             day: "numeric",
           });
+
           return (
             <TouchableOpacity
               onPress={() => router.push(`/(events)/${item.id}`)}
               className="bg-white rounded-3xl mb-4"
             >
-              <View className="bg-white rounded-3xl h-[300px]">
+              <View
+                className="bg-white rounded-3xl"
+                style={{ height: height - 16 }}
+              >
                 <Image
                   source={{ uri: item?.image }}
                   className="w-full h-full rounded-3xl"

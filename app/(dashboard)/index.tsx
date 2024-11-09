@@ -20,19 +20,23 @@ import EmptyState from "@/components/EmptyState";
 import useUserStore from "@/stores/useUser";
 import useAuthStore from "@/stores/useAuth";
 import useGetEventsFromUser from "@/hooks/useGetEventsFromUser";
+import useSession from "@/hooks/useSession";
 
 const HomePage = () => {
   const { user, upcomingEvent, upcomingEventFetched } = useUserStore();
   const { auth } = useAuthStore();
   const { getEvents, getUserFirstUpcomingEvent } = useGetEventsFromUser();
+  const { me } = useSession();
 
   const isFocused = useIsFocused();
   React.useEffect(() => {
-    console.log("refresh", isFocused);
-    if (isFocused) {
-      getEvents() < getUserFirstUpcomingEvent();
+    if (isFocused && auth.isLogged) {
+      me();
+      getEvents();
+      getUserFirstUpcomingEvent();
     }
-  }, [isFocused]);
+  }, [isFocused, auth]);
+
   if (!auth.isLogged) {
     return (
       <View className="bg-secondary-500 h-full items-center justify-center">
@@ -63,18 +67,20 @@ const HomePage = () => {
   const nextEventUrl: string = `/(dashboard)/events/${upcomingEvent?.event?.id}`;
 
   return (
-    <ScrollView className="flex h-full bg-secondary-500 ">
+    <ScrollView className="flex h-full bg-secondary-500 pt-4">
       {/* Profile view */}
       {!Boolean(user) ? (
         <UserInfoSkeleton />
       ) : (
         <View className="flex flex-row bg-white rounded-xl mx-4 py-6 px-8 justify-between mb-4">
           <View className="w-1/4">
-            <Image
-              source={{ uri: user?.picture }}
-              className="w-[80px] h-[80px] rounded-full shadow-2xl"
-              style={styles.elevationLow}
-            />
+            {user && (
+              <Image
+                source={{ uri: user?.picture }}
+                className="w-[80px] h-[80px] rounded-full shadow-2xl"
+                style={styles.elevationLow}
+              />
+            )}
           </View>
           <View className="w-3/4 justify-center ml-4">
             <Text className="text-base " numberOfLines={1}>
@@ -101,14 +107,15 @@ const HomePage = () => {
             </Text>
           </View>
           <View className="bg-white rounded-xl mx-2 mb-4">
-            <View className="flex p-4 pb-0 flex-row bg-white rounded-xl">
-              <View className="flex w-1/4">
+            <View className="flex p-4 pb-0 flex-col bg-white rounded-xl">
+              <View className="flex w-full">
                 <Image
                   source={{ uri: upcomingEvent.event?.image }}
-                  className="rounded-lg w-[90px] h-[100px]"
+                  className="rounded-lg w-full h-[160px]"
+                  resizeMode="cover"
                 />
               </View>
-              <View className="flex flex-col w-3/4 ml-4">
+              <View className="flex flex-col w-3/4 mt-2">
                 <Text
                   numberOfLines={1}
                   className="overflow-hidden font-bold text-lg "
@@ -142,10 +149,9 @@ const HomePage = () => {
                 className="flex bg-white rounded-xl grow p-4 justify-between"
               >
                 <View className="flex items-center bg-secondary-100 p-8 rounded-xl mb-2">
-                  <Ionicons
-                    name="ticket-outline"
-                    size={64}
-                    color={Colors.primary[500]}
+                  <Image
+                    source={require("../../assets/images/ticket.png")}
+                    style={{ width: 50, height: 50 }}
                   />
                 </View>
                 <View className="ml-2">
@@ -169,10 +175,9 @@ const HomePage = () => {
                 className="flex bg-white rounded-xl grow p-4 justify-between"
               >
                 <View className="flex items-center bg-secondary-100 p-8 rounded-xl mb-2">
-                  <Ionicons
-                    name="wine-outline"
-                    size={64}
-                    color={Colors.primary[500]}
+                  <Image
+                    source={require("../../assets/images/glass.png")}
+                    style={{ width: 50, height: 50 }}
                   />
                 </View>
                 <View className="ml-2">
