@@ -167,7 +167,7 @@ const TicketPage = () => {
                       }
                       duration={500}
                     >
-                      <View className="flex flex-row bg-white rounded-xl mb-4">
+                      <View className="flex flex-row bg-white rounded-xl mb-2">
                         <View className="flex">
                           <Image
                             source={{ uri: item.event.image }}
@@ -179,20 +179,25 @@ const TicketPage = () => {
                           <View className="flex flex-row">
                             <View className="flex flex-wrap grow">
                               <Text className="font-bold text-lg">
-                                {item.event.name}
+                                {item?.event?.name}
                               </Text>
                               <Text className="text-primary-500 text-base">
                                 {startAt}
                               </Text>
-                              <Text className="text-secondary-300 text-sm">
-                                {item.event.description}
+                              <Text
+                                numberOfLines={1}
+                                className="text-secondary-300 text-sm"
+                              >
+                                {[item?.event?.address, item?.event?.place]
+                                  .join(" ")
+                                  .trim()}
                               </Text>
                             </View>
                           </View>
                         </View>
                       </View>
                       <View className="flex p-2 flex-col bg-white rounded-xl items-center justify-center">
-                        <Text className="font-bold mb-8 text-base">
+                        <Text className="font-bold mb-4 text-base">
                           {item.name}
                         </Text>
                         {item.isValidated ? (
@@ -204,7 +209,7 @@ const TicketPage = () => {
                             source={{
                               uri: `data:image/png;base64,${item.base64}`,
                             }}
-                            className="w-[200px] h-[200px] mb-8"
+                            className="w-[200px] h-[200px] mb-4"
                           />
                         )}
                       </View>

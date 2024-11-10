@@ -52,6 +52,14 @@ function RootLayoutNav() {
       <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       <Stack.Screen name="(dashboard)" options={{ headerShown: false }} />
       <Stack.Screen name="menu" />
+
+      <Stack.Screen
+        name="(modal)/payments"
+        options={{
+          title: "Medios de pago",
+          presentation: "modal",
+        }}
+      />
     </Stack>
   );
 }

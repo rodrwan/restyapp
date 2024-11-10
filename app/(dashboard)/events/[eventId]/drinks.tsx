@@ -8,7 +8,7 @@ import {
   Image,
   Dimensions,
 } from "react-native";
-import React, { useEffect } from "react";
+import React from "react";
 import { router, useNavigation, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -102,16 +102,19 @@ const drinks = () => {
     }
   };
 
+  const validatedDrinks = user?.drinks
+    ?.filter((drink) => drink?.event?.id === eventId)
+    .filter((drink) => {
+      return drink?.isValidated;
+    });
+
+  console.log("validatedDrinks", validatedDrinks);
   return (
     <SafeAreaView className="flex h-full bg-secondary-500 ">
       <ScrollView className="flex h-full mt-16">
         {/* next events */}
         <View className="flex mx-2">
-          <View>
-            <Text className="text-white font-bold text-xl mx-2">
-              Tus Tragos
-            </Text>
-          </View>
+          <Text className="text-white font-bold text-xl mx-2">Tus Tragos</Text>
           <View className="rounded-xl">
             <FlatList
               horizontal={true}
@@ -181,7 +184,9 @@ const drinks = () => {
                       </View>
                     </View>
                     <View className="flex p-2 flex-col bg-white rounded-xl items-center justify-center mb-4">
-                      <Text className="font-bold text-base">{item.name}</Text>
+                      <Text className="font-bold text-base mb-4 ">
+                        {item.name}
+                      </Text>
                       {item.isValidated ? (
                         <View className="w-full py-2 bg-primary-400 justify-center items-center rounded-xl mb-4">
                           <Text className="font-bold">Validado</Text>
@@ -191,7 +196,7 @@ const drinks = () => {
                           source={{
                             uri: `data:image/png;base64,${item.base64}`,
                           }}
-                          className="w-[200px] h-[200px] mb-8"
+                          className="w-[200px] h-[200px] mb-4"
                         />
                       )}
                     </View>
@@ -217,7 +222,7 @@ const drinks = () => {
             activeDotColor={Colors.secondary[500]}
           />
         </View>
-        <View className="flex flex-row justify-between mt-4 mx-2">
+        <View className="flex flex-row justify-between mt-4 mx-4">
           <TouchableOpacity
             onPress={() => router.push(`/(dashboard)/events/${eventId}/buy`)}
             className="py-4 bg-success-100 justify-center items-center my-4 rounded-xl w-full"
@@ -225,6 +230,69 @@ const drinks = () => {
             <Text className="font-bold text-secondary-500">Comprar tragos</Text>
           </TouchableOpacity>
         </View>
+
+        {validatedDrinks?.length > 0 && (
+          <View className="mt-4 mx-4">
+            <Text className="text-white font-bold text-xl">
+              Tus compras validadas
+            </Text>
+            <View className="bg-white rounded-xl mt-2">
+              <FlatList
+                scrollEnabled={false}
+                data={validatedDrinks}
+                keyExtractor={(item: any) => item.id}
+                renderItem={({ item }: any) => {
+                  return (
+                    <View className="flex flex-row bg-white rounded-xl p-2">
+                      <View className="flex w-1/4 justify-center items-start">
+                        <Image
+                          source={{ uri: item.event.image }}
+                          className="rounded-lg w-[60px] h-[60px]"
+                        />
+                      </View>
+                      <View className="w-1/2 -ml-4">
+                        <View className="flex flex-col justify-center items-center align-center h-[60px]">
+                          <Text
+                            numberOfLines={1}
+                            className="overflow-hidden font-bold text-md "
+                          >
+                            {item.name}
+                          </Text>
+                          {item?.description && (
+                            <Text
+                              numberOfLines={2}
+                              className="text-secondary-300 text-sm"
+                            >
+                              {item.description}
+                            </Text>
+                          )}
+                        </View>
+                      </View>
+                      <View className="w-1/4 ml-4">
+                        <TouchableOpacity
+                          onPress={() =>
+                            router.push(`/(dashboard)/events/${eventId}/buy`)
+                          }
+                          className="flex bg-primary-500 w-full h-[70px] items-center justify-center rounded-lg p-1"
+                        >
+                          <Text className="text-white font-semibold text-center">
+                            Volver a comprar
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  );
+                }}
+                ListEmptyComponent={() => (
+                  <EmptyState
+                    title="No tienes eventos"
+                    subtitle="No tienes próximos eventos"
+                  />
+                )}
+              />
+            </View>
+          </View>
+        )}
       </ScrollView>
       <Toast topOffset={100} />
     </SafeAreaView>

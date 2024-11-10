@@ -55,14 +55,14 @@ const MenuPage = () => {
         </TouchableOpacity>
         <TouchableOpacity onPress={() => router.replace("/(dashboard)")}>
           <Text className="self-center text-white font-bold text-xl">
-            Mi Cuenta
+            Mis Eventos
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => router.replace("/(dashboard)/tickets")}
+          onPress={() => router.replace("/(dashboard)/profile")}
         >
           <Text className="self-center text-white font-bold text-xl">
-            Mis Tickets
+            Perfil
           </Text>
         </TouchableOpacity>
       </View>

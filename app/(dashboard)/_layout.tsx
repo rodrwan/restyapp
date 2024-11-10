@@ -11,6 +11,7 @@ const AuthLayout = () => {
         <Stack.Screen name="index" options={{ header: () => <Header /> }} />
         <Stack.Screen name="tickets" />
         <Stack.Screen name="drinks" />
+        <Stack.Screen name="profile" options={{ header: () => <Header /> }} />
       </Stack>
       <StatusBar backgroundColor="#16162" style="light" />
     </CheckAuth>

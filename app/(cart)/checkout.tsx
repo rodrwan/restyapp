@@ -158,6 +158,7 @@ const Checkout = () => {
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={30}
+        style={{ flex: 1 }}
       >
         <ScrollView
           className="flex grow relative mb-16"
@@ -307,67 +308,68 @@ const Checkout = () => {
             </View>
           )}
         </ScrollView>
+        {!event.nominated && user?.tbk_card_number !== "" && (
+          <View className="flex w-full absolute bottom-8 items-center justify-center">
+            <TouchableOpacity
+              activeOpacity={0.9}
+              onPress={() => onSubmit()}
+              className={`flex-row w-[95%] ml-4 p-4 rounded-3xl items-center justify-center border border-primary-700 ${
+                user?.tbk_card_number === "" || !termAndConditions
+                  ? "bg-primary-200"
+                  : "bg-primary-400"
+              }`}
+              disabled={
+                user?.tbk_card_number === "" ||
+                loadingSubmit ||
+                !termAndConditions
+              }
+            >
+              <Text className="text-white font-bold">Pagar</Text>
+
+              {loadingSubmit && (
+                <ActivityIndicator
+                  animating={loadingSubmit}
+                  color="#fff"
+                  size="small"
+                  className="ml-2"
+                />
+              )}
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {event.nominated &&
+          user?.tbk_card_number !== "" &&
+          allNomineesSetted && (
+            <View className="flex w-full absolute bottom-8 items-center justify-center">
+              <TouchableOpacity
+                activeOpacity={0.9}
+                onPress={() => onSubmit()}
+                className={`flex-row w-[95%] ml-4 p-4 rounded-3xl items-center justify-center border border-primary-700 ${
+                  user?.tbk_card_number === "" || !termAndConditions
+                    ? "bg-primary-200"
+                    : "bg-primary-400"
+                }`}
+                disabled={
+                  user?.tbk_card_number === "" ||
+                  loadingSubmit ||
+                  !termAndConditions
+                }
+              >
+                <Text className="text-white font-bold">Pagar</Text>
+
+                {loadingSubmit && (
+                  <ActivityIndicator
+                    animating={loadingSubmit}
+                    color="#fff"
+                    size="small"
+                    className="ml-2"
+                  />
+                )}
+              </TouchableOpacity>
+            </View>
+          )}
       </KeyboardAvoidingView>
-
-      {!event.nominated && user?.tbk_card_number !== "" && (
-        <View className="flex w-full absolute bottom-8 bg-transparent items-center justify-center">
-          <TouchableOpacity
-            activeOpacity={0.9}
-            onPress={() => onSubmit()}
-            className={`flex-row w-[95%] ml-4 p-4 rounded-3xl items-center justify-center border border-primary-700 ${
-              user?.tbk_card_number === "" || !termAndConditions
-                ? "bg-primary-200"
-                : "bg-primary-400"
-            }`}
-            disabled={
-              user?.tbk_card_number === "" ||
-              loadingSubmit ||
-              !termAndConditions
-            }
-          >
-            <Text className="text-white font-bold">Pagar</Text>
-
-            {loadingSubmit && (
-              <ActivityIndicator
-                animating={loadingSubmit}
-                color="#fff"
-                size="small"
-                className="ml-2"
-              />
-            )}
-          </TouchableOpacity>
-        </View>
-      )}
-
-      {event.nominated && user?.tbk_card_number !== "" && allNomineesSetted && (
-        <View className="flex w-full absolute bottom-8 bg-transparent items-center justify-center">
-          <TouchableOpacity
-            activeOpacity={0.9}
-            onPress={() => onSubmit()}
-            className={`flex-row w-[95%] ml-4 p-4 rounded-3xl items-center justify-center border border-primary-700 ${
-              user?.tbk_card_number === "" || !termAndConditions
-                ? "bg-primary-200"
-                : "bg-primary-400"
-            }`}
-            disabled={
-              user?.tbk_card_number === "" ||
-              loadingSubmit ||
-              !termAndConditions
-            }
-          >
-            <Text className="text-white font-bold">Pagar</Text>
-
-            {loadingSubmit && (
-              <ActivityIndicator
-                animating={loadingSubmit}
-                color="#fff"
-                size="small"
-                className="ml-2"
-              />
-            )}
-          </TouchableOpacity>
-        </View>
-      )}
     </SafeAreaView>
   );
 };

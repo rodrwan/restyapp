@@ -3,7 +3,6 @@ import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import useUserStore from "@/stores/useUser";
 import CreditCard from "@/components/CreditCars";
-import RadioButton from "@/components/RadioButton";
 import useCreateInscription from "@/hooks/useCreateInscription";
 import { router } from "expo-router";
 
@@ -23,7 +22,7 @@ const payments = () => {
   };
 
   return (
-    <SafeAreaView className="flex h-full bg-secondary-500 p-2">
+    <SafeAreaView className="flex h-full bg-secondary-500">
       <Text className="text-lg text-white font-bold text-center">
         Tus métodos de pago
       </Text>
@@ -39,41 +38,36 @@ const payments = () => {
         </Text>
         <View>
           <Text className="text-secondary-500 text-base font-regular text-justify">
-            ¡Vincula tu tarjeta y prepárate para tus próximas compras! Solo
-            necesitamos un cargo temporal de 50 pesos (que te devolveremos en
-            cuanto verifiquemos tu tarjeta). Esto es solo para asociarla a tu
-            cuenta, así que no te preocupes, no estás comprando nada ahora. Una
-            vez registrada, tendrás todo listo para usar tu tarjeta en la app
-            cuando quieras.
+            Realizaremos un cargo de $50 pesos de forma temporal que te
+            devolveremos al confirmar tu tarjeta. El proceso es seguro y se
+            realizará una sola vez.
           </Text>
         </View>
 
-        <View className="self-center w-full justify-center justify-center ">
-          <View className="flex-row w-full h-[120px] items-center m-auto  justify-center ">
-            <TouchableOpacity
-              onPress={() => onSubmitRegisterCard()}
+        <View className="flex-row w-full h-[120px] items-center m-auto justify-center self-center">
+          <TouchableOpacity
+            onPress={() => onSubmitRegisterCard()}
+            style={{
+              marginTop: 8,
+              alignSelf: "center",
+              borderWidth: 1,
+              paddingVertical: 4,
+              paddingHorizontal: 8,
+              borderRadius: 16,
+              borderColor: "#9ba5aa",
+            }}
+          >
+            <Image
+              source={require("../../assets/images/transbank.png")}
               style={{
                 marginTop: 8,
-                alignSelf: "center",
-                borderWidth: 1,
-                paddingVertical: 4,
-                paddingHorizontal: 8,
-                borderRadius: 16,
-                borderColor: "#9ba5aa",
+                height: 80,
               }}
-            >
-              <Image
-                source={require("../../../assets/images/transbank.png")}
-                style={{
-                  marginTop: 8,
-                  height: 80,
-                }}
-              />
-            </TouchableOpacity>
-          </View>
+            />
+          </TouchableOpacity>
         </View>
       </View>
-      <View className="flex p-4 mt-16 mx-4 justify-center items-start">
+      <View className="flex p-4 mt-8 mx-4 justify-center items-center">
         <Text className="text-error-400">Eliminar tarjeta</Text>
       </View>
     </SafeAreaView>

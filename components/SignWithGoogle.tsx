@@ -17,7 +17,7 @@ const SignWithGoogle = ({ setUser, redirectTo }: any) => {
   const [isSubmitting, setSubmitting] = useState(false);
   const { createSession, createUser } = useSession();
   const { login, setAccessToken } = useAuthStore();
-  const { getEvents, getUserFirstUpcomingEvent } = useGetEventsFromUser();
+  const { getEvents } = useGetEventsFromUser();
 
   useEffect(() => {
     GoogleSignin.configure({
@@ -62,7 +62,7 @@ const SignWithGoogle = ({ setUser, redirectTo }: any) => {
         login();
         setAccessToken(sessionResp.access_token);
         getEvents();
-        getUserFirstUpcomingEvent();
+
         router.replace(redirectTo);
       } else {
         setUser({
@@ -72,7 +72,7 @@ const SignWithGoogle = ({ setUser, redirectTo }: any) => {
         login();
         setAccessToken(sessionResp.access_token);
         getEvents();
-        getUserFirstUpcomingEvent();
+
         router.replace(redirectTo);
       }
     } catch (error) {

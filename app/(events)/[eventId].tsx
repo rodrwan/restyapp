@@ -114,8 +114,8 @@ const EventPage = ({}) => {
         renderBackground={() => (
           <Image
             source={{ uri: event?.image }}
-            resizeMode="cover"
-            style={{ width: "100%", height: undefined, aspectRatio: 4 / 5 }}
+            resizeMode="stretch"
+            style={{ width: "100%", height: undefined, aspectRatio: 4 / 4 }}
           />
         )}
         renderStickyHeader={() => (
@@ -130,7 +130,7 @@ const EventPage = ({}) => {
         )}
         className="flex bg-secondary-500"
       >
-        <View className="mt-4">
+        <View className="-mt-4">
           {/* Tickets */}
           {tickets.length ? (
             <View className="bg-secondary-700 py-8 mb-8 mx-1 rounded-3xl">
@@ -364,7 +364,7 @@ const EventPage = ({}) => {
                   color={Colors.primary[500]}
                 />
                 <Text className="text-secondary-300 text-base">
-                  {event?.place}
+                  {event?.address} {event?.place}
                 </Text>
               </View>
             </View>

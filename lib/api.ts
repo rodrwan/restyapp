@@ -391,6 +391,7 @@ mutation Register($input: RegisterData!) {
           start_hour
           end_hour
           out_of_stock
+          address
           items {
             id
             type

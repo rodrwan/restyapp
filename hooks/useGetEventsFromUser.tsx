@@ -3,12 +3,15 @@ import { router } from "expo-router";
 
 import HTTPClient from "@/lib/api";
 import useUserStore from "@/stores/useUser";
+import React from "react";
 
 const client = HTTPClient.getInstance();
 
 const useGetEventsFromUser = () => {
-  const { setTickets, setDrinks, setEvents, setUpcomingEvent } = useUserStore();
+  const [loadingGetEvents, setLoadingGetEvents] = React.useState(false);
+  const { setTickets, setDrinks, setEvents } = useUserStore();
   const getEvents = async () => {
+    setLoadingGetEvents(true);
     try {
       const orders = await client.getOrderItemsByUser();
 
@@ -27,6 +30,14 @@ const useGetEventsFromUser = () => {
         .filter((x: any, i: any, a: any) => a.indexOf(x) == i);
 
       const response = await client.getEventsByIds(events);
+      if (!response) {
+        return {
+          orders: [],
+          tickets: [],
+          drinks: [],
+          events: [],
+        };
+      }
 
       const data = await Promise.all(
         response?.events?.map(async (event: any) => {
@@ -69,17 +80,17 @@ const useGetEventsFromUser = () => {
       const result = {
         orders,
         tickets: tickets?.flat()?.filter(Boolean),
-        // .filter((ticket) => ticket.isValidated === false),
-        drinks: drinks
-          ?.flat()
-          ?.filter(Boolean)
-          ?.filter((ticket) => ticket.isValidated === false),
+        drinks: drinks?.flat()?.filter(Boolean),
         events: response?.events,
       };
+      // .filter((ticket) => !ticket?.isValidated),
+      // .filter((ticket) => !ticket?.isValidated),
 
       setTickets(result?.tickets);
       setDrinks(result?.drinks);
       setEvents(result?.events);
+
+      setLoadingGetEvents(false);
       return result;
     } catch (error: any) {
       console.log(">>> getEvents error", error);
@@ -87,29 +98,13 @@ const useGetEventsFromUser = () => {
         console.log("getEvents error", error);
         return router.push("/(auth)/sign-in?redirectTo=/(dashboard)");
       }
-
+      setLoadingGetEvents(false);
       Alert.alert(">> Error", error.message);
       throw new Error(error);
     }
   };
 
-  const getUserFirstUpcomingEvent = async () => {
-    try {
-      const result = await client.getUserFirstUpcomingEvent();
-      setUpcomingEvent(result);
-      return result;
-    } catch (err: any) {
-      console.log(">>> getUserFirstUpcomingEvent error", err);
-      if (String(err).includes("unauthorized")) {
-        console.log("getUserFirstUpcomingEvent error", err);
-        return router.push("/(auth)/sign-in?redirectTo=/(dashboard)");
-      }
-
-      throw err;
-    }
-  };
-
-  return { getEvents, getUserFirstUpcomingEvent };
+  return { getEvents, loadingGetEvents };
 };
 
 export default useGetEventsFromUser;
