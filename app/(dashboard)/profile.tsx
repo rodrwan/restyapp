@@ -12,7 +12,7 @@ import {
 import { router, Href } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 
-import { UserInfoSkeleton } from "./skeletons/home";
+import { UserInfoSkeleton } from "@/components/skeletons/home";
 import Colors from "@/constants/Colors";
 import useUserStore from "@/stores/useUser";
 import CreditCard from "@/components/CreditCars";
@@ -55,93 +55,103 @@ const ProfilePage = () => {
   };
 
   return (
-    <ScrollView className="flex h-full bg-secondary-500 pt-4">
-      {/* Profile view */}
-      {!Boolean(user) ? (
-        <UserInfoSkeleton />
-      ) : (
-        <View className="flex flex-row bg-white rounded-xl mx-4 py-6 px-8 justify-between mb-4">
-          <View className="w-1/4">
-            {user && (
-              <Image
-                source={{ uri: user?.picture }}
-                className="w-[80px] h-[80px] rounded-full shadow-2xl"
-                style={styles.elevationLow}
-              />
-            )}
-          </View>
-          <View className="w-3/4 justify-center ml-4">
-            <Text className="text-base " numberOfLines={1}>
-              {user?.firstname} {user?.lastname}
-            </Text>
-            <Text className="text-base ">{user?.dni}</Text>
-            <Text className="text-xs text-secondary-200 ">{user?.email}</Text>
-          </View>
-        </View>
-      )}
-
-      <View className="flex flex-row mx-4 py-6 justify-between mb-4">
-        {user?.tbk_card_number === "" ? (
-          <View className="flex bg-secondary-50 p-4 rounded-xl w-full">
-            <Text className="text-lg text-black font-bold">
-              Inscribir medio de pago
-            </Text>
-            <View className="self-center justify-center justify-center">
-              <View className="flex-row w-full h-[140px] items-center m-auto justify-center ">
-                <TouchableOpacity
-                  onPress={() => onSubmitRegisterCard()}
-                  style={{
-                    marginTop: 8,
-                    alignSelf: "center",
-                    borderWidth: 1,
-                    paddingVertical: 4,
-                    paddingHorizontal: 8,
-                    borderRadius: 16,
-                    borderColor: "#9ba5aa",
-                    width: "100%",
-                  }}
-                >
-                  <Image
-                    source={require("../../assets/images/transbank.png")}
-                    style={{
-                      marginTop: 8,
-                      height: 100,
-                    }}
-                    resizeMode="contain"
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
-            <Text className="text-secondary-500 text-md font-regular mt-4">
-              Realizaremos un cargo de $50 pesos de forma temporal que te
-              devolveremos al confirmar tu tarjeta. El proceso es seguro y se
-              realizará una sola vez.
-            </Text>
-          </View>
+    <LinearGradient
+      // Background Linear Gradient
+      colors={["#04121A", "#092838"]}
+      className="flex h-full"
+    >
+      <ScrollView className="flex h-full pt-4">
+        {/* Profile view */}
+        {!Boolean(user) ? (
+          <UserInfoSkeleton />
         ) : (
-          <View className="w-full px-8">
-            <Text className="text-lg text-white font-bold">Medios de pago</Text>
-            <View className="flex items-center rounded-3xl mt-4 mb-2">
-              <TouchableOpacity
-                onPress={() => router.push("/(modal)/payments")}
-                className="border border-secondary-100 rounded-lg"
-              >
-                <CreditCard
-                  cardNumber={user?.tbk_card_number ?? ""}
-                  firstname={user?.firstname ?? ""}
-                  lastname={user?.lastname ?? ""}
+          <View className="flex flex-row bg-white rounded-xl mx-4 py-6 px-8 justify-between mb-4">
+            <View className="w-1/4">
+              {user && (
+                <Image
+                  source={{ uri: user?.picture }}
+                  className="w-[80px] h-[80px] rounded-full shadow-2xl"
+                  style={styles.elevationLow}
                 />
-              </TouchableOpacity>
+              )}
             </View>
-            <Text className="text-xs text-white">
-              Precionando el recuadro podrás cambiar o eliminar tu tarjeta.
-            </Text>
+            <View className="w-3/4 justify-center ml-4">
+              <Text className="text-base " numberOfLines={1}>
+                {user?.firstname} {user?.lastname}
+              </Text>
+              <Text className="text-base ">{user?.dni}</Text>
+              <Text className="text-xs text-secondary-200 ">{user?.email}</Text>
+            </View>
           </View>
         )}
-      </View>
-    </ScrollView>
+
+        <View className="flex flex-row mx-4 py-6 justify-between mb-4">
+          {user?.tbk_card_number === "" ? (
+            <View className="flex bg-secondary-50 p-4 rounded-xl w-full">
+              <Text className="text-lg text-black font-bold">
+                Inscribir medio de pago
+              </Text>
+              <View className="self-center justify-center justify-center">
+                <View className="flex-row w-full h-[140px] items-center m-auto justify-center ">
+                  <TouchableOpacity
+                    onPress={() => onSubmitRegisterCard()}
+                    style={{
+                      marginTop: 8,
+                      alignSelf: "center",
+                      borderWidth: 1,
+                      paddingVertical: 4,
+                      paddingHorizontal: 8,
+                      borderRadius: 16,
+                      borderColor: "#9ba5aa",
+                      width: "100%",
+                    }}
+                  >
+                    <Image
+                      source={require("../../assets/images/transbank.png")}
+                      style={{
+                        marginTop: 8,
+                        height: 100,
+                      }}
+                      resizeMode="contain"
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <Text className="text-secondary-500 text-md font-regular mt-4">
+                Realizaremos un cargo de $50 pesos de forma temporal que te
+                devolveremos al confirmar tu tarjeta. El proceso es seguro y se
+                realizará una sola vez.
+              </Text>
+            </View>
+          ) : (
+            <MemoizedPaymentSection user={user} />
+          )}
+        </View>
+      </ScrollView>
+    </LinearGradient>
   );
 };
+
+const MemoizedPaymentSection = React.memo(({ user }: { user: any }) => (
+  <View className="flex w-full">
+    <Text className="text-lg text-white font-bold">Medios de pago</Text>
+    <View className="flex items-center rounded-3xl mt-4 mb-2">
+      <TouchableOpacity
+        onPress={() => router.push("/(modal)/payments")}
+        className="border border-secondary-100 rounded-lg w-full"
+      >
+        <CreditCard
+          cardNumber={user?.tbk_card_number ?? ""}
+          firstname={user?.firstname ?? ""}
+          lastname={user?.lastname ?? ""}
+        />
+      </TouchableOpacity>
+    </View>
+    <Text className="text-xs text-white">
+      Precionando el recuadro podrás cambiar o eliminar tu tarjeta.
+    </Text>
+  </View>
+));
 
 export default ProfilePage;
 

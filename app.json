@@ -28,7 +28,9 @@
         ],
         "NSFaceIDUsageDescription": "Autorizar Face ID."
       },
-      "associatedDomains": ["applinks:spotlight.mangoticket.com"]
+      "associatedDomains": [
+        "applinks:spotlight.mangoticket.com"
+      ]
     },
     "android": {
       "adaptiveIcon": {
@@ -67,7 +69,8 @@
         {
           "launchMode": "most-recent"
         }
-      ]
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true

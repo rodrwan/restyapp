@@ -77,8 +77,10 @@ const Checkout = () => {
           <TouchableOpacity
             onPress={() => {
               clearCart();
-              if (params?.goBackTo)
+              if (params?.goBackTo) {
                 return router.replace(`/${params?.goBackTo}`);
+              }
+
               return router.replace("/(home)");
             }}
             className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2"
