@@ -33,6 +33,8 @@ import useAuthorizeTransaction from "@/hooks/useAuthorizeTransaction";
 import CreditCard from "@/components/CreditCars";
 import RadioButton from "@/components/RadioButton";
 import useCreateInscription from "@/hooks/useCreateInscription";
+import { LinearGradient } from "expo-linear-gradient";
+import * as LocalAuthentication from "expo-local-authentication";
 
 const Checkout = () => {
   const navigation = useNavigation();
@@ -77,7 +79,7 @@ const Checkout = () => {
               clearCart();
               if (params?.goBackTo)
                 return router.replace(`/${params?.goBackTo}`);
-              return router.replace("/home");
+              return router.replace("/(home)");
             }}
             className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2"
           >
@@ -90,6 +92,31 @@ const Checkout = () => {
         ),
     });
   }, [scrollY]);
+
+  React.useEffect(() => {
+    (async () => {
+      const hasHardware = await LocalAuthentication.hasHardwareAsync();
+      if (!hasHardware) {
+        return;
+      }
+      const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+      if (!isEnrolled) {
+        return;
+      }
+    })();
+  });
+
+  const onAuthenticate = async () => {
+    const result = await LocalAuthentication.authenticateAsync({
+      promptMessage: "Confirma tu compra",
+      fallbackLabel: "Usar contraseña",
+    });
+    if (result.success) {
+      onSubmit();
+    } else {
+      console.log("Failed to authenticate");
+    }
+  };
 
   const { authorizeTransaction } = useAuthorizeTransaction();
   const { createInscription } = useCreateInscription();
@@ -154,197 +181,173 @@ const Checkout = () => {
     return nominee?.dni && nominee?.email;
   });
   return (
-    <SafeAreaView className="flex h-full bg-secondary-500 p-2">
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={30}
-        style={{ flex: 1 }}
-      >
-        <ScrollView
-          className="flex grow relative mb-16"
-          onScroll={(event) => {
-            setScrollY(event.nativeEvent.contentOffset.y);
-          }}
+    <LinearGradient
+      // Background Linear Gradient
+      colors={["#04121A", "#092838"]}
+      style={{ flex: 1, height: "100%" }}
+    >
+      <SafeAreaView className="flex h-full p-2">
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={30}
+          style={{ flex: 1 }}
         >
-          <Text className="self-center text-white font-bold text-xl">
-            Checkout
-          </Text>
+          <ScrollView
+            className="flex grow relative mb-16"
+            onScroll={(event) => {
+              setScrollY(event.nativeEvent.contentOffset.y);
+            }}
+          >
+            <Text className="self-center text-white font-bold text-xl">
+              Checkout
+            </Text>
 
-          <View className="flex flex-col w-full bg-secondary-700 mt-4 p-4 rounded-xl">
-            <View className="w-full border-b border-secondary-200 pb-2">
-              <Text className="text-white font-bold text-xl">Facturación</Text>
-            </View>
-            <View className="flex flex-row justify-between py-4">
-              <Text className="text-secondary-200 font-semibold text-base">
-                Subtotal
-              </Text>
-              <Text className="text-secondary-200 font-semibold text-base">
-                ${Number(subTotal).toLocaleString("es-CL")}
-              </Text>
-            </View>
-            <View className="flex flex-row justify-between py-2 pb-4">
-              <Text className="text-secondary-200 font-semibold text-base">
-                Cargo por servicio
-              </Text>
-              <Text className="text-secondary-200 font-semibold text-base">
-                ${Number(fee).toLocaleString("es-CL")}
-              </Text>
-            </View>
-            <View className="flex flex-row justify-between py-2">
-              <Text className="text-white font-semibold text-base">
-                Total a pagar
-              </Text>
-              <Text className="text-primary-500 font-semibold text-base">
-                ${Number(total).toLocaleString("es-CL")}
-              </Text>
-            </View>
-          </View>
-
-          {event.nominated && nominees.length > 0 ? (
-            <View className="flex mt-4 bg-white p-4 rounded-xl">
-              <View className="w-full pb-2">
-                <Text className="font-bold text-xl">Nominar entradas</Text>
+            <View className="flex flex-col w-full bg-secondary-700 mt-4 p-4 rounded-xl">
+              <View className="w-full border-b border-secondary-200 pb-2">
+                <Text className="text-white font-bold text-xl">
+                  Facturación
+                </Text>
               </View>
-              <View className="w-full py-2 border-b border-secondary-100 pb-4">
-                <Text className="text-secondary-300 text-base">
-                  Las entradas de este evento son nominativas, por lo que
-                  <Text className="text-secondary-300 font-bold text-base">
-                    {" "}
-                    solo podrá ser validad junto a tu cédula de identidad
-                    asociada a estos datos.
+              <View className="flex flex-row justify-between py-4">
+                <Text className="text-secondary-200 font-semibold text-base">
+                  Subtotal
+                </Text>
+                <Text className="text-secondary-200 font-semibold text-base">
+                  ${Number(subTotal).toLocaleString("es-CL")}
+                </Text>
+              </View>
+              <View className="flex flex-row justify-between py-2 pb-4">
+                <Text className="text-secondary-200 font-semibold text-base">
+                  Cargo por servicio
+                </Text>
+                <Text className="text-secondary-200 font-semibold text-base">
+                  ${Number(fee).toLocaleString("es-CL")}
+                </Text>
+              </View>
+              <View className="flex flex-row justify-between py-2">
+                <Text className="text-white font-semibold text-base">
+                  Total a pagar
+                </Text>
+                <Text className="text-primary-500 font-semibold text-base">
+                  ${Number(total).toLocaleString("es-CL")}
+                </Text>
+              </View>
+            </View>
+
+            {event.nominated && nominees.length > 0 ? (
+              <View className="flex mt-4 bg-white p-4 rounded-xl">
+                <View className="w-full pb-2">
+                  <Text className="font-bold text-xl">Nominar entradas</Text>
+                </View>
+                <View className="w-full py-2 border-b border-secondary-100 pb-4">
+                  <Text className="text-secondary-300 text-base">
+                    Las entradas de este evento son nominativas, por lo que
+                    <Text className="text-secondary-300 font-bold text-base">
+                      {" "}
+                      solo podrá ser validad junto a tu cédula de identidad
+                      asociada a estos datos.
+                    </Text>
                   </Text>
-                </Text>
-              </View>
+                </View>
 
-              <View className="pt-4 pb-8">
-                <AccordionView
-                  orderId={orderId}
-                  tickets={nominees}
-                  assignTicket={assignTicket}
-                />
+                <View className="pt-4 pb-8">
+                  <AccordionView
+                    orderId={orderId}
+                    tickets={nominees}
+                    assignTicket={assignTicket}
+                  />
+                </View>
               </View>
-            </View>
-          ) : null}
+            ) : null}
 
-          <View className="mt-6">
-            {user?.tbk_card_number === "" ? (
-              <View className="flex bg-secondary-50 p-4 rounded-xl">
-                <Text className="text-lg text-black font-bold">
-                  Inscribir medio de pago
-                </Text>
-                <View className="self-center justify-center justify-center ">
-                  <View className="flex-row w-full h-[140px] items-center m-auto justify-center ">
-                    <TouchableOpacity
-                      onPress={() => onSubmitRegisterCard()}
-                      style={{
-                        marginTop: 8,
-                        alignSelf: "center",
-                        borderWidth: 1,
-                        paddingVertical: 4,
-                        paddingHorizontal: 8,
-                        borderRadius: 16,
-                        borderColor: "#9ba5aa",
-                        width: "100%",
-                      }}
-                    >
-                      <Image
-                        source={require("../../assets/images/transbank.png")}
+            <View className="mt-6 border border-secondary-300 rounded-lg">
+              {user?.tbk_card_number === "" ? (
+                <View className="flex bg-secondary-50 p-4 rounded-lg">
+                  <Text className="text-lg text-black font-bold">
+                    Inscribir medio de pago
+                  </Text>
+                  <View className="self-center justify-center justify-center ">
+                    <View className="flex-row w-full h-[140px] items-center m-auto justify-center ">
+                      <TouchableOpacity
+                        onPress={() => onSubmitRegisterCard()}
                         style={{
                           marginTop: 8,
-                          height: 100,
+                          alignSelf: "center",
+                          borderWidth: 1,
+                          paddingVertical: 4,
+                          paddingHorizontal: 8,
+                          borderRadius: 16,
+                          borderColor: "#9ba5aa",
+                          width: "100%",
                         }}
-                        resizeMode="contain"
-                      />
-                    </TouchableOpacity>
+                      >
+                        <Image
+                          source={require("../../assets/images/transbank.png")}
+                          style={{
+                            marginTop: 8,
+                            height: 100,
+                          }}
+                          resizeMode="contain"
+                        />
+                      </TouchableOpacity>
+                    </View>
                   </View>
+                  <Text className="text-secondary-500 text-md font-regular mt-4">
+                    Realizaremos un cargo de $50 pesos de forma temporal que te
+                    devolveremos al confirmar tu tarjeta. El proceso es seguro y
+                    se realizará una sola vez.
+                  </Text>
                 </View>
-                <Text className="text-secondary-500 text-md font-regular mt-4">
-                  Realizaremos un cargo de $50 pesos de forma temporal que te
-                  devolveremos al confirmar tu tarjeta. El proceso es seguro y
-                  se realizará una sola vez.
-                </Text>
-              </View>
-            ) : (
-              <View className="flex items-center">
-                <TouchableOpacity
-                  onPress={() => router.push("/(modal)/payments")}
-                >
-                  <CreditCard
-                    cardNumber={user?.tbk_card_number ?? ""}
-                    firstname={user?.firstname ?? ""}
-                    lastname={user?.lastname ?? ""}
-                  />
-                </TouchableOpacity>
+              ) : (
+                <View className="flex items-center ">
+                  <TouchableOpacity
+                    onPress={() => router.push("/(modal)/payments")}
+                    className="w-full"
+                  >
+                    <CreditCard
+                      cardNumber={user?.tbk_card_number ?? ""}
+                      firstname={user?.firstname ?? ""}
+                      lastname={user?.lastname ?? ""}
+                    />
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
+            {user?.tbk_card_number !== "" && (
+              <View className="items-center mb-8">
+                <View className="flex-row mb-2">
+                  <TouchableOpacity
+                    onPress={() => setTermAndConditions(!termAndConditions)}
+                    className="flex flex-row items-center justify-center mt-4"
+                  >
+                    <RadioButton selected={termAndConditions} />
+                    <Text className="text-white font-base text-base ml-4">
+                      Términos y condiciones
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                <View className="w-full flex-row mx-2 mb-2 items-center justify-center">
+                  <Text className="text-center text-primary-500">
+                    Debes aceptar los términos y condiciones antes de continuar.
+                    <TouchableWithoutFeedback
+                      onPress={async () =>
+                        await WebBrowser.openBrowserAsync(
+                          "https://mangoticket-legal.nyc3.cdn.digitaloceanspaces.com/1.%20TERMINOS%20Y%20CONDICIONES%20(1).pdf"
+                        )
+                      }
+                    >
+                      <Text className="text-white"> Ver más</Text>
+                    </TouchableWithoutFeedback>
+                  </Text>
+                </View>
               </View>
             )}
-          </View>
-          {user?.tbk_card_number !== "" && (
-            <View className="items-center mb-8">
-              <View className="flex-row mb-2">
-                <TouchableOpacity
-                  onPress={() => setTermAndConditions(!termAndConditions)}
-                  className="flex flex-row items-center justify-center mt-4"
-                >
-                  <RadioButton selected={termAndConditions} />
-                  <Text className="text-white font-base text-base ml-4">
-                    Términos y condiciones
-                  </Text>
-                </TouchableOpacity>
-              </View>
-              <View className="w-full flex-row mx-2 mb-2 items-center justify-center">
-                <Text className="text-center text-primary-500">
-                  Debes aceptar los términos y condiciones antes de continuar.
-                  <TouchableWithoutFeedback
-                    onPress={async () =>
-                      await WebBrowser.openBrowserAsync(
-                        "https://mangoticket-legal.nyc3.cdn.digitaloceanspaces.com/1.%20TERMINOS%20Y%20CONDICIONES%20(1).pdf"
-                      )
-                    }
-                  >
-                    <Text className="text-white"> Ver más</Text>
-                  </TouchableWithoutFeedback>
-                </Text>
-              </View>
-            </View>
-          )}
-        </ScrollView>
-        {!event.nominated && user?.tbk_card_number !== "" && (
-          <View className="flex w-full absolute bottom-8 items-center justify-center">
-            <TouchableOpacity
-              activeOpacity={0.9}
-              onPress={() => onSubmit()}
-              className={`flex-row w-[95%] ml-4 p-4 rounded-3xl items-center justify-center border border-primary-700 ${
-                user?.tbk_card_number === "" || !termAndConditions
-                  ? "bg-primary-200"
-                  : "bg-primary-400"
-              }`}
-              disabled={
-                user?.tbk_card_number === "" ||
-                loadingSubmit ||
-                !termAndConditions
-              }
-            >
-              <Text className="text-white font-bold">Pagar</Text>
-
-              {loadingSubmit && (
-                <ActivityIndicator
-                  animating={loadingSubmit}
-                  color="#fff"
-                  size="small"
-                  className="ml-2"
-                />
-              )}
-            </TouchableOpacity>
-          </View>
-        )}
-
-        {event.nominated &&
-          user?.tbk_card_number !== "" &&
-          allNomineesSetted && (
+          </ScrollView>
+          {!event.nominated && user?.tbk_card_number !== "" && (
             <View className="flex w-full absolute bottom-8 items-center justify-center">
               <TouchableOpacity
                 activeOpacity={0.9}
-                onPress={() => onSubmit()}
+                onPress={() => onAuthenticate()}
                 className={`flex-row w-[95%] ml-4 p-4 rounded-3xl items-center justify-center border border-primary-700 ${
                   user?.tbk_card_number === "" || !termAndConditions
                     ? "bg-primary-200"
@@ -369,8 +372,41 @@ const Checkout = () => {
               </TouchableOpacity>
             </View>
           )}
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+
+          {event.nominated &&
+            user?.tbk_card_number !== "" &&
+            allNomineesSetted && (
+              <View className="flex w-full absolute bottom-8 items-center justify-center">
+                <TouchableOpacity
+                  activeOpacity={0.9}
+                  onPress={() => onAuthenticate()}
+                  className={`flex-row w-[95%] ml-4 p-4 rounded-3xl items-center justify-center border border-primary-700 ${
+                    user?.tbk_card_number === "" || !termAndConditions
+                      ? "bg-primary-200"
+                      : "bg-primary-400"
+                  }`}
+                  disabled={
+                    user?.tbk_card_number === "" ||
+                    loadingSubmit ||
+                    !termAndConditions
+                  }
+                >
+                  <Text className="text-white font-bold">Pagar</Text>
+
+                  {loadingSubmit && (
+                    <ActivityIndicator
+                      animating={loadingSubmit}
+                      color="#fff"
+                      size="small"
+                      className="ml-2"
+                    />
+                  )}
+                </TouchableOpacity>
+              </View>
+            )}
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 

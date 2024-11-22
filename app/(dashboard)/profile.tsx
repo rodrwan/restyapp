@@ -18,6 +18,7 @@ import useUserStore from "@/stores/useUser";
 import CreditCard from "@/components/CreditCars";
 import useCreateInscription from "@/hooks/useCreateInscription";
 import useMe from "@/hooks/useMe";
+import { LinearGradient } from "expo-linear-gradient";
 
 const ProfilePage = () => {
   const { user } = useUserStore();
@@ -30,9 +31,15 @@ const ProfilePage = () => {
 
   if (loadingUserData) {
     return (
-      <View className="bg-secondary-500 h-full items-center justify-center">
-        <ActivityIndicator size={"small"} />
-      </View>
+      <LinearGradient
+        // Background Linear Gradient
+        colors={["#04121A", "#092838"]}
+        className="flex h-full"
+      >
+        <View className="h-full items-center justify-center">
+          <ActivityIndicator size={"small"} />
+        </View>
+      </LinearGradient>
     );
   }
 

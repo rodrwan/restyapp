@@ -22,7 +22,7 @@ const getUserFirstUpcomingEvent = () => {
       console.log(">>> getUserFirstUpcomingEvent error", err);
       if (String(err).includes("unauthorized")) {
         console.log("getUserFirstUpcomingEvent error", err);
-        return router.push("/(auth)/sign-in?redirectTo=/(dashboard)");
+        return router.replace("/(auth)/sign-in?redirectTo=/(dashboard)");
       }
 
       setLoadingUpcomingEvent(false);

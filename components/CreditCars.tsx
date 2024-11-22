@@ -7,7 +7,7 @@ type CreditCardType = {
 };
 const CreditCard = ({ cardNumber, firstname, lastname }: CreditCardType) => {
   return (
-    <View className="bg-secondary-700 self-center p-8 rounded-lg shadow-lg w-80">
+    <View className="bg-secondary-700 self-center p-8 rounded-lg shadow-lg w-full">
       <Text className="flex-row text-white text-lg font-bold mb-2">
         Medio de pago
       </Text>

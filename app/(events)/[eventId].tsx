@@ -17,6 +17,7 @@ import ParallaxScrollView from "@/components/ParallaxScrollView";
 import Colors from "@/constants/Colors";
 import useCartStore from "@/stores/useCart";
 import useEventStore from "@/stores/useEvent";
+import { LinearGradient } from "expo-linear-gradient";
 
 const EventPage = ({}) => {
   const navigation = useNavigation<any>();
@@ -26,7 +27,7 @@ const EventPage = ({}) => {
     removeFromCart,
     clearCart,
   } = useCartStore();
-  const { setEvent } = useEventStore();
+  // const { setEvent } = useEventStore();
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -38,7 +39,7 @@ const EventPage = ({}) => {
           <TouchableOpacity
             onPress={() => {
               clearCart();
-              navigation?.goBack();
+              router.replace("/");
             }}
             className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2"
           >
@@ -54,31 +55,39 @@ const EventPage = ({}) => {
     });
   }, []);
 
+  console.log(useLocalSearchParams());
   const { eventId }: any = useLocalSearchParams();
+  console.log("eventId", eventId);
   const {
     data: { event },
     loading,
   }: any = useGetEventById(eventId);
 
-  useEffect(() => {
-    setEvent(event);
-  }, [event]);
+  // useEffect(() => {
+  //   setEvent(event);
+  // }, [event]);
 
-  if (loading) {
+  if (!Boolean(eventId) || loading) {
     // Show loader when fetching first page data.
     return (
-      <View className="bg-secondary-500 h-full items-center justify-center">
-        <ActivityIndicator size={"small"} />
-      </View>
+      <LinearGradient
+        // Background Linear Gradient
+        colors={["#04121A", "#092838"]}
+        style={{ flex: 1, height: "100%" }}
+      >
+        <View className="h-full items-center justify-center">
+          <ActivityIndicator size={"small"} />
+        </View>
+      </LinearGradient>
     );
   }
 
-  const tickets = event.items.filter((elem: any) => elem.type === "ENTRANCE");
-  const drinks = event.items.filter((elem: any) => elem.type === "DRINK");
+  const tickets = event?.items.filter((elem: any) => elem.type === "ENTRANCE");
+  const drinks = event?.items.filter((elem: any) => elem.type === "DRINK");
 
-  const splittedStartAt = event.start_at.split(" ");
-  const hour = event.start_hour.split("T")[1];
-  const joinedStartAt = splittedStartAt[0] + " " + hour.replace("Z", "");
+  const splittedStartAt = event?.start_at.split(" ");
+  const hour = event?.start_hour.split("T")?.[1] || "";
+  const joinedStartAt = splittedStartAt?.[0] + " " + hour?.replace("Z", "");
 
   const startAt = new Date(joinedStartAt).toLocaleString("es-CL", {
     weekday: "long",
@@ -92,9 +101,9 @@ const EventPage = ({}) => {
     hour: "2-digit",
   });
 
-  const splittedEndAt = event.end_at.split(" ");
-  const endHour = event.end_hour.split("T")[1];
-  const joinedEndAt = splittedEndAt[0] + " " + endHour.replace("Z", "");
+  const splittedEndAt = event?.end_at.split(" ");
+  const endHour = event?.end_hour.split("T")?.[1] || "";
+  const joinedEndAt = splittedEndAt?.[0] + " " + endHour.replace("Z", "");
   const endAt = new Date(joinedEndAt).toLocaleString("us-US", {
     minute: "2-digit",
     hour: "2-digit",
@@ -128,11 +137,11 @@ const EventPage = ({}) => {
             </Text>
           </View>
         )}
-        className="flex bg-secondary-500"
+        className="flex"
       >
         <View className="-mt-4">
           {/* Tickets */}
-          {tickets.length ? (
+          {tickets?.length ? (
             <View className="bg-secondary-700 py-8 mb-8 mx-1 rounded-3xl">
               <FlatList
                 scrollEnabled={false}
@@ -161,7 +170,7 @@ const EventPage = ({}) => {
                       <View className="flex flex-col">
                         <Text className="text-white text-base font-bold mb-2">
                           {item?.name}{" "}
-                          {event.nominated && (
+                          {event?.nominated && (
                             <Text
                               className="py-1.5 text-xs text-secondary-200"
                               numberOfLines={1}
@@ -170,7 +179,7 @@ const EventPage = ({}) => {
                             </Text>
                           )}
                         </Text>
-                        {event.nominated && (
+                        {event?.nominated && (
                           <Text
                             className="py-1.5 text-secondary-200"
                             numberOfLines={1}
@@ -244,7 +253,7 @@ const EventPage = ({}) => {
             </View>
           ) : null}
           {/* Drinks */}
-          {drinks.length ? (
+          {drinks?.length ? (
             <View className="bg-secondary-700 py-8 mb-8 mx-1 rounded-3xl">
               <FlatList
                 scrollEnabled={false}

@@ -5,7 +5,7 @@ import "expo-dev-client";
 import { useEffect } from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { Slot, Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { NativeWindStyleSheet } from "nativewind";
 
@@ -36,7 +36,7 @@ export default function RootLayout() {
   }, [loaded]);
 
   if (!loaded) {
-    return null;
+    return <Slot />;
   }
 
   return <RootLayoutNav />;
@@ -44,12 +44,11 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   return (
-    <Stack initialRouteName="index">
-      <Stack.Screen name="index" options={{ header: () => <Header /> }} />
-      <Stack.Screen name="home" options={{ header: () => <Header /> }} />
-      <Stack.Screen name="(cart)" options={{ headerShown: false }} />
-      <Stack.Screen name="(events)" options={{ headerShown: false }} />
+    <Stack>
+      <Stack.Screen name="(home)" options={{ header: () => <Header /> }} />
       <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+      <Stack.Screen name="(events)" options={{ headerShown: false }} />
+      <Stack.Screen name="(cart)" options={{ headerShown: false }} />
       <Stack.Screen name="(dashboard)" options={{ headerShown: false }} />
       <Stack.Screen name="menu" />
 

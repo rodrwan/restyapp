@@ -4,7 +4,7 @@ import { StatusBar } from "expo-status-bar";
 import Header from "@/components/Header";
 import CheckAuth from "@/components/CheckAuth";
 
-const AuthLayout = () => {
+const DashboardLayoutNav = () => {
   return (
     <CheckAuth redirectTo="/(dashboard)">
       <Stack>
@@ -18,4 +18,4 @@ const AuthLayout = () => {
   );
 };
 
-export default AuthLayout;
+export default DashboardLayoutNav;

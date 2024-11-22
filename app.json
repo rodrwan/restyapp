@@ -4,8 +4,8 @@
     "slug": "mangoticket",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
     "scheme": "mangoticket",
+    "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash.png",
@@ -13,17 +13,22 @@
       "backgroundColor": "#041e2b"
     },
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
+      "userInterfaceStyle": "automatic",
       "bundleIdentifier": "com.rodrwan.mangoticket",
       "infoPlist": {
         "CFBundleURLTypes": [
           {
             "CFBundleURLSchemes": [
-              "com.googleusercontent.apps.769679276829-og604t40g8f121sikec8vtpogmkq6iie"
+              "com.googleusercontent.apps.769679276829-og604t40g8f121sikec8vtpogmkq6iie",
+              "mangoticket",
+              "com.rodrwan.mangoticket"
             ]
           }
-        ]
-      }
+        ],
+        "NSFaceIDUsageDescription": "Autorizar Face ID."
+      },
+      "associatedDomains": ["applinks:spotlight.mangoticket.com"]
     },
     "android": {
       "adaptiveIcon": {
@@ -50,7 +55,19 @@
           }
         }
       ],
-      "expo-build-properties"
+      "expo-build-properties",
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allow Mangoticket to use Face ID."
+        }
+      ],
+      [
+        "expo-dev-launcher",
+        {
+          "launchMode": "most-recent"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

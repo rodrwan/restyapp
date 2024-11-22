@@ -19,6 +19,7 @@ import EmptyState from "@/components/EmptyState";
 import useUserStore from "@/stores/useUser";
 import useGetEventsFromUser from "@/hooks/useGetEventsFromUser";
 import useGetUserFirstUpcomingEvent from "@/hooks/useGetUserFirstUpcomingEvent";
+import { LinearGradient } from "expo-linear-gradient";
 
 const HomePage = () => {
   const { loadingUpcomingEvent, getUserFirstUpcomingEvent } =
@@ -44,9 +45,15 @@ const HomePage = () => {
 
   if (loadingGetEvents && loadingUpcomingEvent) {
     return (
-      <View className="bg-secondary-500 h-full items-center justify-center">
-        <ActivityIndicator size={"small"} />
-      </View>
+      <LinearGradient
+        // Background Linear Gradient
+        colors={["#04121A", "#092838"]}
+        className="flex h-full"
+      >
+        <View className="h-full items-center justify-center">
+          <ActivityIndicator size={"small"} />
+        </View>
+      </LinearGradient>
     );
   }
 
@@ -69,117 +76,122 @@ const HomePage = () => {
   const nextEventUrl: string = `/(dashboard)/events/${upcomingEvent?.event?.id}`;
 
   return (
-    <ScrollView
-      className="flex h-full bg-secondary-500 pt-4"
-      refreshControl={
-        <RefreshControl
-          refreshing={loadingUpcomingEvent}
-          onRefresh={onRefreshUserFirstUpcomingEvent}
-        />
-      }
+    <LinearGradient
+      // Background Linear Gradient
+      colors={["#04121A", "#092838"]}
     >
-      {!user?.events?.length && (
-        <EmptyState
-          title="No tienes eventos"
-          subtitle="No tienes próximos eventos"
-        />
-      )}
+      <ScrollView
+        className="flex h-full pt-4"
+        refreshControl={
+          <RefreshControl
+            refreshing={loadingUpcomingEvent}
+            onRefresh={onRefreshUserFirstUpcomingEvent}
+          />
+        }
+      >
+        {!user?.events?.length && (
+          <EmptyState
+            title="No tienes eventos"
+            subtitle="No tienes próximos eventos"
+          />
+        )}
 
-      {/* next event */}
-      {upcomingEvent?.event?.id && (
-        <UpcomingEventMemo
-          upcomingEvent={upcomingEvent}
-          user={user}
-          nextEventUrl={nextEventUrl}
-          startAt={startAt}
-        />
-      )}
-      {/* tickets and drinks */}
-      {/* next events */}
-      {nextEvents && nextEvents!.length > 0 && (
-        <View className="flex mx-2">
-          <View className="mb-4">
-            <Text className="text-white font-bold text-xl mx-2">
-              Próximamente
-            </Text>
-          </View>
-          <View className="bg-white rounded-xl mx-2">
-            <FlatList
-              scrollEnabled={false}
-              className="p-2"
-              data={nextEvents}
-              keyExtractor={(item: any) => item.id}
-              renderItem={({ item, index }: any) => {
-                const splittedStartAt = item.start_at.split(" ");
-                const joinedStartAt =
-                  splittedStartAt[0] + " " + splittedStartAt[1];
-                const startAt = new Date(joinedStartAt).toLocaleString(
-                  "es-CL",
-                  {
-                    weekday: "short",
-                    month: "long",
-                    day: "numeric",
-                  }
-                );
-                const url: string = `/(dashboard)/events/${item.id}`;
-                return (
-                  <View
-                    className={`flex p-2 flex-row bg-white rounded-xl ${
-                      index % 2 === 0 ? "border-b border-b-secondary-100" : ""
-                    }`}
-                  >
-                    <View className="flex w-1/4">
-                      <Image
-                        source={{ uri: item.image }}
-                        className="rounded-lg w-[80px] h-[80px]"
-                      />
-                    </View>
-                    <View className="flex flex-col w-2/4 pl-2 -ml-1 mr-2">
-                      <View className="">
-                        <Text
-                          numberOfLines={1}
-                          className="overflow-hidden font-bold text-lg "
+        {/* next event */}
+        {upcomingEvent?.event?.id && (
+          <UpcomingEventMemo
+            upcomingEvent={upcomingEvent}
+            user={user}
+            nextEventUrl={nextEventUrl}
+            startAt={startAt}
+          />
+        )}
+        {/* tickets and drinks */}
+        {/* next events */}
+        {nextEvents && nextEvents!.length > 0 && (
+          <View className="flex mx-2">
+            <View className="mb-4">
+              <Text className="text-white font-bold text-xl mx-2">
+                Próximamente
+              </Text>
+            </View>
+            <View className="bg-white rounded-xl mx-2">
+              <FlatList
+                scrollEnabled={false}
+                className="p-2"
+                data={nextEvents}
+                keyExtractor={(item: any) => item.id}
+                renderItem={({ item, index }: any) => {
+                  const splittedStartAt = item.start_at.split(" ");
+                  const joinedStartAt =
+                    splittedStartAt[0] + " " + splittedStartAt[1];
+                  const startAt = new Date(joinedStartAt).toLocaleString(
+                    "es-CL",
+                    {
+                      weekday: "short",
+                      month: "long",
+                      day: "numeric",
+                    }
+                  );
+                  const url: string = `/(dashboard)/events/${item.id}`;
+                  return (
+                    <View
+                      className={`flex p-2 flex-row bg-white rounded-xl ${
+                        index % 2 === 0 ? "border-b border-b-secondary-100" : ""
+                      }`}
+                    >
+                      <View className="flex w-1/4">
+                        <Image
+                          source={{ uri: item.image }}
+                          className="rounded-lg w-[80px] h-[80px]"
+                        />
+                      </View>
+                      <View className="flex flex-col w-2/4 pl-2 -ml-1 mr-2">
+                        <View className="">
+                          <Text
+                            numberOfLines={1}
+                            className="overflow-hidden font-bold text-lg "
+                          >
+                            {item.name}
+                          </Text>
+                          <Text className="text-primary-500 text-base">
+                            {startAt}
+                          </Text>
+                          <Text
+                            numberOfLines={2}
+                            className="text-secondary-300 text-sm"
+                          >
+                            {item.description}
+                          </Text>
+                        </View>
+                      </View>
+                      <View className="w-1/4">
+                        <TouchableOpacity
+                          onPress={() => router.push(url as Href)}
+                          className="flex bg-primary-500 w-[80px] h-[80px] items-center justify-center rounded-lg"
                         >
-                          {item.name}
-                        </Text>
-                        <Text className="text-primary-500 text-base">
-                          {startAt}
-                        </Text>
-                        <Text
-                          numberOfLines={2}
-                          className="text-secondary-300 text-sm"
-                        >
-                          {item.description}
-                        </Text>
+                          <Text className="text-white font-semibold mb-4">
+                            Ver
+                          </Text>
+                          <Text className="text-white font-semibold ">
+                            Evento
+                          </Text>
+                        </TouchableOpacity>
                       </View>
                     </View>
-                    <View className="w-1/4">
-                      <TouchableOpacity
-                        onPress={() => router.push(url as Href)}
-                        className="flex bg-primary-500 w-[80px] h-[80px] items-center justify-center rounded-lg"
-                      >
-                        <Text className="text-white font-semibold mb-4">
-                          Ver
-                        </Text>
-                        <Text className="text-white font-semibold ">
-                          Evento
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                );
-              }}
-              ListEmptyComponent={() => (
-                <EmptyState
-                  title="No tienes eventos"
-                  subtitle="No tienes próximos eventos"
-                />
-              )}
-            />
+                  );
+                }}
+                ListEmptyComponent={() => (
+                  <EmptyState
+                    title="No tienes eventos"
+                    subtitle="No tienes próximos eventos"
+                  />
+                )}
+              />
+            </View>
           </View>
-        </View>
-      )}
-    </ScrollView>
+        )}
+      </ScrollView>
+    </LinearGradient>
   );
 };
 
@@ -234,16 +246,10 @@ const UpcomingEventMemo = ({
               >
                 {upcomingEvent.event?.name}
               </Text>
-              <Text className="text-primary-500 text-base">{startAt}</Text>
-              <Text numberOfLines={1} className="text-secondary-300 text-sm">
-                {upcomingEvent.event?.description}
+              <Text className="text-primary-500 text-base font-semibold">
+                {startAt}
               </Text>
               <View className="flex flex-row items-center gap-2">
-                <Ionicons
-                  name="location-outline"
-                  size={20}
-                  color={Colors.primary[500]}
-                />
                 <Text numberOfLines={1} className="text-secondary-300 text-sm">
                   {[upcomingEvent?.event?.address, upcomingEvent?.event?.place]
                     .join(" ")
@@ -276,7 +282,7 @@ const UpcomingEventMemo = ({
                     0}{" "}
                   Disponibles
                 </Text>
-                <Text className="font-bold">Tickets</Text>
+                <Text className="font-bold">Entradas</Text>
               </View>
             </TouchableOpacity>
             <TouchableOpacity
@@ -305,7 +311,7 @@ const UpcomingEventMemo = ({
                     0}{" "}
                   Disponibles
                 </Text>
-                <Text className="font-bold">Tragos</Text>
+                <Text className="font-bold">Consumo</Text>
               </View>
             </TouchableOpacity>
           </View>

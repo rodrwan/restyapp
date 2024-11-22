@@ -1,5 +1,5 @@
 import { View, Text, FlatList, TouchableOpacity, Platform } from "react-native";
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
@@ -8,6 +8,7 @@ import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import useCreateOrder from "@/hooks/useCreateOrder";
 import useAuthStore from "@/stores/useAuth";
 import useCartStore from "@/stores/useCart";
+import { LinearGradient } from "expo-linear-gradient";
 
 const Cart = () => {
   const navigation = useNavigation();
@@ -22,7 +23,7 @@ const Cart = () => {
   const params: any = useLocalSearchParams();
   console.log("params", params);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!auth.isLogged) {
       return router.push("/(auth)/sign-in?redirectTo=/(cart)");
     }
@@ -30,7 +31,7 @@ const Cart = () => {
 
   const { create } = useCreateOrder();
 
-  useLayoutEffect(() => {
+  React.useLayoutEffect(() => {
     navigation.setOptions({
       headerTransparent: true,
       headerTitle: "",
@@ -54,8 +55,9 @@ const Cart = () => {
         <TouchableOpacity
           onPress={() => {
             clearCart();
+            console.log("params?.goBackTo", params?.goBackTo);
             if (params?.goBackTo) return router.replace(`/${params?.goBackTo}`);
-            return router.replace("/home");
+            return router.replace(`/(home)`);
           }}
           className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2"
         >
@@ -93,189 +95,196 @@ const Cart = () => {
   const drinks = itemsInCart.filter((item: any) => item.type === "DRINK");
 
   return (
-    <SafeAreaView className="flex h-full bg-secondary-500">
-      <Text className="self-center text-white font-bold text-xl mb-8">
-        Carro de compras
-      </Text>
-
-      {/* Tickets */}
-      {tickets.length ? (
-        <View className="bg-secondary-700 py-8 mb-8 mx-1 rounded-3xl">
-          <FlatList
-            scrollEnabled={false}
-            data={tickets}
-            keyExtractor={(item: any) => item.id}
-            renderItem={({ item, index }: any) => {
-              const quantity =
-                itemsInCart?.find(
-                  (iic: any) => iic?.type === "ENTRANCE" && iic?.id === item?.id
-                )?.quantity ?? 0;
-
-              const maxPerSale =
-                item?.max_per_sale < item?.stock
-                  ? item?.max_per_sale
-                  : item?.stock;
-
-              const disabledAdd = maxPerSale <= quantity;
-
-              return (
-                <View
-                  className={`flex flex-row justify-between ${
-                    index % 2 === 0 ? "bg-secondary-500" : "bg-secondary-600"
-                  } p-4 mx-2 rounded-xl mt-2`}
-                >
-                  <View>
-                    <Text className="text-white text-base font-bold mb-2">
-                      {item?.name}
-                    </Text>
-                    <Text className="text-primary-500 text-base mb-2">
-                      ${Number(item?.price).toLocaleString("es-CL")} c/u
-                    </Text>
-                  </View>
-                  <View className="flex flex-row gap-2 items-center">
-                    <TouchableOpacity onPress={() => removeFromCart(item)}>
-                      <Ionicons
-                        name="remove-circle-outline"
-                        color={Colors.white}
-                        size={32}
-                      />
-                    </TouchableOpacity>
-                    <Text className="text-white text-xl">
-                      {(itemsInCart?.length &&
-                        itemsInCart.filter(
-                          (item: any) => item.type === "ENTRANCE"
-                        )[index]?.quantity) ??
-                        0}
-                    </Text>
-                    <TouchableOpacity
-                      disabled={disabledAdd}
-                      onPress={() => addToCart(item)}
-                    >
-                      <Ionicons
-                        name="add-circle-outline"
-                        color={
-                          disabledAdd
-                            ? Colors.secondary[300]
-                            : Colors.primary[500]
-                        }
-                        size={32}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              );
-            }}
-            ListHeaderComponent={() => (
-              <View className="flex justify-center p-4">
-                <Text className="text-white text-left text-xl font-bold">
-                  Tickets
-                </Text>
-              </View>
-            )}
-          />
-        </View>
-      ) : null}
-
-      {/* Drinks */}
-      {drinks.length ? (
-        <View className="bg-secondary-700 py-8 mb-8 mx-1 rounded-3xl">
-          <FlatList
-            scrollEnabled={false}
-            data={drinks}
-            keyExtractor={(item: any) => item.id}
-            renderItem={({ item, index }: any) => {
-              const quantity =
-                itemsInCart?.find(
-                  (iic: any) => iic?.type === "DRINK" && iic?.id === item?.id
-                )?.quantity ?? 0;
-
-              const maxPerSale =
-                item?.max_per_sale < item?.stock
-                  ? item?.max_per_sale
-                  : item?.stock;
-              const disabledAdd = maxPerSale <= quantity;
-
-              return (
-                <View
-                  className={`flex flex-row justify-between ${
-                    index % 2 === 0 ? "bg-secondary-500" : "bg-secondary-600"
-                  } p-4 mx-2 rounded-xl mb-2`}
-                >
-                  <View>
-                    <Text className="text-white text-base font-bold mb-2">
-                      {item?.name}
-                    </Text>
-                    <Text className="text-primary-500 text-base mb-2">
-                      ${Number(item?.price).toLocaleString("es-CL")} c/u
-                    </Text>
-                  </View>
-                  <View className="flex flex-row gap-2 items-center">
-                    <TouchableOpacity onPress={() => removeFromCart(item)}>
-                      <Ionicons
-                        name="remove-circle-outline"
-                        color={Colors.white}
-                        size={32}
-                      />
-                    </TouchableOpacity>
-                    <Text className="text-white text-xl">
-                      {(itemsInCart?.length &&
-                        itemsInCart.filter(
-                          (item: any) => item.type === "DRINK"
-                        )[index]?.quantity) ??
-                        0}
-                    </Text>
-                    <TouchableOpacity
-                      disabled={disabledAdd}
-                      onPress={() => addToCart(item)}
-                    >
-                      <Ionicons
-                        name="add-circle-outline"
-                        color={
-                          disabledAdd
-                            ? Colors.secondary[300]
-                            : Colors.primary[500]
-                        }
-                        size={32}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              );
-            }}
-            ListHeaderComponent={() => (
-              <View className="flex justify-center p-4">
-                <Text className="text-white text-left text-xl font-bold">
-                  Tragos
-                </Text>
-              </View>
-            )}
-          />
-        </View>
-      ) : null}
-
-      <View className="flex items-end pr-4 mb-8">
-        <Text className="text-lg text-white font-bold">
-          Subtotal: $
-          {Number(
-            itemsInCart.reduce((acc: number, cur: any) => {
-              return acc + cur.price * cur.quantity;
-            }, 0)
-          ).toLocaleString("es-CL")}
+    <LinearGradient
+      // Background Linear Gradient
+      colors={["#04121A", "#092838"]}
+      style={{ flex: 1, height: "100%" }}
+    >
+      <SafeAreaView className="flex h-full">
+        <Text className="self-center text-white font-bold text-xl mb-8">
+          Carro de compras
         </Text>
-      </View>
 
-      {itemsInCart?.length > 0 ? (
-        <View className="flex w-full absolute bottom-12 bg-transparent justify-center">
-          <TouchableOpacity
-            activeOpacity={0.9}
-            onPress={() => onSubmit()}
-            className="bg-primary-400 w-[90%] mx-auto left-0 right-0 p-4 rounded-3xl items-center justify-center border border-primary-700 content-center"
-          >
-            <Text className="text-white font-bold">Ir a Pagar</Text>
-          </TouchableOpacity>
+        {/* Tickets */}
+        {tickets.length ? (
+          <View className="bg-secondary-700 py-8 mb-8 mx-1 rounded-3xl">
+            <FlatList
+              scrollEnabled={false}
+              data={tickets}
+              keyExtractor={(item: any) => item.id}
+              renderItem={({ item, index }: any) => {
+                const quantity =
+                  itemsInCart?.find(
+                    (iic: any) =>
+                      iic?.type === "ENTRANCE" && iic?.id === item?.id
+                  )?.quantity ?? 0;
+
+                const maxPerSale =
+                  item?.max_per_sale < item?.stock
+                    ? item?.max_per_sale
+                    : item?.stock;
+
+                const disabledAdd = maxPerSale <= quantity;
+
+                return (
+                  <View
+                    className={`flex flex-row justify-between ${
+                      index % 2 === 0 ? "bg-secondary-500" : "bg-secondary-600"
+                    } p-4 mx-2 rounded-xl mt-2`}
+                  >
+                    <View>
+                      <Text className="text-white text-base font-bold mb-2">
+                        {item?.name}
+                      </Text>
+                      <Text className="text-primary-500 text-base mb-2">
+                        ${Number(item?.price).toLocaleString("es-CL")} c/u
+                      </Text>
+                    </View>
+                    <View className="flex flex-row gap-2 items-center">
+                      <TouchableOpacity onPress={() => removeFromCart(item)}>
+                        <Ionicons
+                          name="remove-circle-outline"
+                          color={Colors.white}
+                          size={32}
+                        />
+                      </TouchableOpacity>
+                      <Text className="text-white text-xl">
+                        {(itemsInCart?.length &&
+                          itemsInCart.filter(
+                            (item: any) => item.type === "ENTRANCE"
+                          )[index]?.quantity) ??
+                          0}
+                      </Text>
+                      <TouchableOpacity
+                        disabled={disabledAdd}
+                        onPress={() => addToCart(item)}
+                      >
+                        <Ionicons
+                          name="add-circle-outline"
+                          color={
+                            disabledAdd
+                              ? Colors.secondary[300]
+                              : Colors.primary[500]
+                          }
+                          size={32}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                );
+              }}
+              ListHeaderComponent={() => (
+                <View className="flex justify-center p-4">
+                  <Text className="text-white text-left text-xl font-bold">
+                    Tickets
+                  </Text>
+                </View>
+              )}
+            />
+          </View>
+        ) : null}
+
+        {/* Drinks */}
+        {drinks.length ? (
+          <View className="bg-secondary-700 py-8 mb-8 mx-1 rounded-3xl">
+            <FlatList
+              scrollEnabled={false}
+              data={drinks}
+              keyExtractor={(item: any) => item.id}
+              renderItem={({ item, index }: any) => {
+                const quantity =
+                  itemsInCart?.find(
+                    (iic: any) => iic?.type === "DRINK" && iic?.id === item?.id
+                  )?.quantity ?? 0;
+
+                const maxPerSale =
+                  item?.max_per_sale < item?.stock
+                    ? item?.max_per_sale
+                    : item?.stock;
+                const disabledAdd = maxPerSale <= quantity;
+
+                return (
+                  <View
+                    className={`flex flex-row justify-between ${
+                      index % 2 === 0 ? "bg-secondary-500" : "bg-secondary-600"
+                    } p-4 mx-2 rounded-xl mb-2`}
+                  >
+                    <View>
+                      <Text className="text-white text-base font-bold mb-2">
+                        {item?.name}
+                      </Text>
+                      <Text className="text-primary-500 text-base mb-2">
+                        ${Number(item?.price).toLocaleString("es-CL")} c/u
+                      </Text>
+                    </View>
+                    <View className="flex flex-row gap-2 items-center">
+                      <TouchableOpacity onPress={() => removeFromCart(item)}>
+                        <Ionicons
+                          name="remove-circle-outline"
+                          color={Colors.white}
+                          size={32}
+                        />
+                      </TouchableOpacity>
+                      <Text className="text-white text-xl">
+                        {(itemsInCart?.length &&
+                          itemsInCart.filter(
+                            (item: any) => item.type === "DRINK"
+                          )[index]?.quantity) ??
+                          0}
+                      </Text>
+                      <TouchableOpacity
+                        disabled={disabledAdd}
+                        onPress={() => addToCart(item)}
+                      >
+                        <Ionicons
+                          name="add-circle-outline"
+                          color={
+                            disabledAdd
+                              ? Colors.secondary[300]
+                              : Colors.primary[500]
+                          }
+                          size={32}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                );
+              }}
+              ListHeaderComponent={() => (
+                <View className="flex justify-center p-4">
+                  <Text className="text-white text-left text-xl font-bold">
+                    Tragos
+                  </Text>
+                </View>
+              )}
+            />
+          </View>
+        ) : null}
+
+        <View className="flex items-end pr-4 mb-8">
+          <Text className="text-lg text-white font-bold">
+            Subtotal: $
+            {Number(
+              itemsInCart.reduce((acc: number, cur: any) => {
+                return acc + cur.price * cur.quantity;
+              }, 0)
+            ).toLocaleString("es-CL")}
+          </Text>
         </View>
-      ) : null}
-    </SafeAreaView>
+
+        {itemsInCart?.length > 0 ? (
+          <View className="flex w-full absolute bottom-12 bg-transparent justify-center">
+            <TouchableOpacity
+              activeOpacity={0.9}
+              onPress={() => onSubmit()}
+              className="bg-primary-400 w-[90%] mx-auto left-0 right-0 p-4 rounded-3xl items-center justify-center border border-primary-700 content-center"
+            >
+              <Text className="text-white font-bold">Ir a Pagar</Text>
+            </TouchableOpacity>
+          </View>
+        ) : null}
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
