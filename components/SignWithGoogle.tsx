@@ -63,7 +63,7 @@ const SignWithGoogle = ({ setUser, redirectTo }: any) => {
         setAccessToken(sessionResp.access_token);
         getEvents();
 
-        router.replace(redirectTo);
+        router.replace(`/${redirectTo}`);
       } else {
         setUser({
           ...userInfo?.user,

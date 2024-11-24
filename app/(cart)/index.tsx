@@ -25,7 +25,7 @@ const Cart = () => {
 
   React.useEffect(() => {
     if (!auth.isLogged) {
-      return router.push("/(auth)/sign-in?redirectTo=/(cart)");
+      return router.push("/(auth)/sign-in?redirectTo=(cart)");
     }
   }, [auth.isLogged]);
 

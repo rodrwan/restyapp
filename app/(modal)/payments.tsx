@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity, Image } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import useUserStore from "@/stores/useUser";
-import CreditCard from "@/components/CreditCars";
+import { CreditCard } from "@/components/CreditCard";
 import useCreateInscription from "@/hooks/useCreateInscription";
 import { router } from "expo-router";
 
@@ -28,8 +28,8 @@ const payments = () => {
       </Text>
       <CreditCard
         cardNumber={user?.tbk_card_number ?? ""}
-        firstname={user?.firstname ?? ""}
-        lastname={user?.lastname ?? ""}
+        cardHolder={`${user?.firstname} ${user?.lastname}`}
+        expiryDate="XX/XX"
       />
 
       <View className="flex bg-secondary-50 p-4 my-8 mx-4 rounded-3xl justify-center items-center">
@@ -53,7 +53,7 @@ const payments = () => {
               borderWidth: 1,
               paddingVertical: 4,
               paddingHorizontal: 8,
-              borderRadius: 16,
+              borderRadius: 8,
               borderColor: "#9ba5aa",
             }}
           >

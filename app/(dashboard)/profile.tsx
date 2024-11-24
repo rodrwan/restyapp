@@ -15,7 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { UserInfoSkeleton } from "@/components/skeletons/home";
 import Colors from "@/constants/Colors";
 import useUserStore from "@/stores/useUser";
-import CreditCard from "@/components/CreditCars";
+import { CreditCard } from "@/components/CreditCard";
 import useCreateInscription from "@/hooks/useCreateInscription";
 import useMe from "@/hooks/useMe";
 import { LinearGradient } from "expo-linear-gradient";
@@ -101,7 +101,7 @@ const ProfilePage = () => {
                       borderWidth: 1,
                       paddingVertical: 4,
                       paddingHorizontal: 8,
-                      borderRadius: 16,
+                      borderRadius: 8,
                       borderColor: "#9ba5aa",
                       width: "100%",
                     }}
@@ -138,12 +138,17 @@ const MemoizedPaymentSection = React.memo(({ user }: { user: any }) => (
     <View className="flex items-center rounded-3xl mt-4 mb-2">
       <TouchableOpacity
         onPress={() => router.push("/(modal)/payments")}
-        className="border border-secondary-100 rounded-lg w-full"
+        className="w-full backdrop-blur-lg bg-white/10 rounded-2xl p-3"
       >
-        <CreditCard
+        {/* <CreditCard
           cardNumber={user?.tbk_card_number ?? ""}
           firstname={user?.firstname ?? ""}
           lastname={user?.lastname ?? ""}
+        /> */}
+        <CreditCard
+          cardNumber={user?.tbk_card_number ?? ""}
+          cardHolder={`${user?.firstname} ${user?.lastname}`}
+          expiryDate="XX/XX"
         />
       </TouchableOpacity>
     </View>

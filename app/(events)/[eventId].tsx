@@ -150,7 +150,7 @@ export default function EventPage() {
               navigation.replace("(cart)", {
                 screen: "index",
                 initial: false,
-                params: { goBackTo: `/(events)/${eventId}` },
+                params: { goBackTo: `(events)/${eventId}` },
               });
             }}
             className="bg-primary-400 w-[90%] mx-auto left-0 right-0 p-4 rounded-3xl items-center justify-center border border-primary-700 content-center"

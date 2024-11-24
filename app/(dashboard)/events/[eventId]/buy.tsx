@@ -165,7 +165,7 @@ const drinks = () => {
                     initial: false,
                     params: {
                       eventId,
-                      goBackTo: `/(dashboard)/events/${eventId}`,
+                      goBackTo: `(dashboard)/events/${eventId}`,
                     },
                   });
                 }}

@@ -22,10 +22,12 @@ import useSession from "@/hooks/useSession";
 import useAuthStore from "@/stores/useAuth";
 import useGetEventsFromUser from "@/hooks/useGetEventsFromUser";
 import Toast from "react-native-toast-message";
+import useGetUserFirstUpcomingEvent from "@/hooks/useGetUserFirstUpcomingEvent";
 
 const SignIn = () => {
-  const { createSession, createUser } = useSession();
-  const { getEvents, getUserFirstUpcomingEvent } = useGetEventsFromUser();
+  const { createSession } = useSession();
+  const { getEvents } = useGetEventsFromUser();
+  const { getUserFirstUpcomingEvent } = useGetUserFirstUpcomingEvent();
 
   const { login, setAccessToken } = useAuthStore();
   const navigation = useNavigation();
@@ -93,7 +95,7 @@ const SignIn = () => {
       setAccessToken(sessionResp.access_token);
       getEvents();
       getUserFirstUpcomingEvent();
-      router.replace(params?.redirectTo);
+      router.replace(`/${params?.redirectTo}`);
     } catch (err: any) {
       console.log(err);
       Toast.show({

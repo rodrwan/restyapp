@@ -30,7 +30,7 @@ import useUserStore from "@/stores/useUser";
 import useCartStore from "@/stores/useCart";
 import useEventStore from "@/stores/useEvent";
 import useAuthorizeTransaction from "@/hooks/useAuthorizeTransaction";
-import CreditCard from "@/components/CreditCars";
+import { CreditCard } from "@/components/CreditCard";
 import RadioButton from "@/components/RadioButton";
 import useCreateInscription from "@/hooks/useCreateInscription";
 import { LinearGradient } from "expo-linear-gradient";
@@ -262,7 +262,7 @@ const Checkout = () => {
               </View>
             ) : null}
 
-            <View className="mt-6 border border-secondary-300 rounded-lg">
+            <View className="mt-6 rounded-lg">
               {user?.tbk_card_number === "" ? (
                 <View className="flex bg-secondary-50 p-4 rounded-lg">
                   <Text className="text-lg text-black font-bold">
@@ -278,7 +278,7 @@ const Checkout = () => {
                           borderWidth: 1,
                           paddingVertical: 4,
                           paddingHorizontal: 8,
-                          borderRadius: 16,
+                          borderRadius: 8,
                           borderColor: "#9ba5aa",
                           width: "100%",
                         }}
@@ -294,22 +294,31 @@ const Checkout = () => {
                       </TouchableOpacity>
                     </View>
                   </View>
-                  <Text className="text-secondary-500 text-md font-regular mt-4">
+                  <Text className="text-secondary-500 text-md font-regular mt-2">
                     Realizaremos un cargo de $50 pesos de forma temporal que te
                     devolveremos al confirmar tu tarjeta. El proceso es seguro y
                     se realizará una sola vez.
                   </Text>
+
+                  <TouchableOpacity
+                    onPress={() => onSubmitRegisterCard()}
+                    className="bg-primary-400 rounded-full p-4 rounded-3xl items-center justify-center border border-primary-700 mt-4"
+                  >
+                    <Text className="text-white font-bold text-center">
+                      Inscribir tarjeta
+                    </Text>
+                  </TouchableOpacity>
                 </View>
               ) : (
                 <View className="flex items-center ">
                   <TouchableOpacity
                     onPress={() => router.push("/(modal)/payments")}
-                    className="w-full"
+                    className="w-full backdrop-blur-lg bg-white/10 rounded-2xl p-3"
                   >
                     <CreditCard
                       cardNumber={user?.tbk_card_number ?? ""}
-                      firstname={user?.firstname ?? ""}
-                      lastname={user?.lastname ?? ""}
+                      cardHolder={`${user?.firstname} ${user?.lastname}`}
+                      expiryDate="XX/XX"
                     />
                   </TouchableOpacity>
                 </View>
