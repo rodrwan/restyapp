@@ -10,13 +10,13 @@ import GoogleIcon from "./GoogleIcon";
 import Colors from "@/constants/Colors";
 import { router } from "expo-router";
 import useSession from "@/hooks/useSession";
-import useAuthStore from "@/stores/useAuth";
 import useGetEventsFromUser from "@/hooks/useGetEventsFromUser";
+import { useSession as useSessionContext } from "@/context/AuthProvider";
 
 const SignWithGoogle = ({ setUser, redirectTo }: any) => {
   const [isSubmitting, setSubmitting] = useState(false);
   const { createSession, createUser } = useSession();
-  const { login, setAccessToken } = useAuthStore();
+  const { signIn } = useSessionContext();
   const { getEvents } = useGetEventsFromUser();
 
   useEffect(() => {
@@ -45,6 +45,8 @@ const SignWithGoogle = ({ setUser, redirectTo }: any) => {
         "google"
       );
 
+      // Create user if not exists
+      // TODO: this logic need to be moved to other view to ask for privacy policy acceptance.
       if (!sessionResp && userInfo && userInfo.user) {
         const sessionResp = await createUser(
           userInfo?.user?.givenName ?? "",
@@ -59,20 +61,22 @@ const SignWithGoogle = ({ setUser, redirectTo }: any) => {
           ...userInfo?.user,
           ...sessionResp.user,
         });
-        login();
-        setAccessToken(sessionResp.access_token);
+
+        signIn(sessionResp?.access_token);
         getEvents();
 
+        console.log("redirectTo", redirectTo);
         router.replace(`/${redirectTo}`);
       } else {
         setUser({
           ...userInfo?.user,
           ...sessionResp.user,
         });
-        login();
-        setAccessToken(sessionResp.access_token);
+
+        signIn(sessionResp?.access_token);
         getEvents();
 
+        console.log("redirectTo", redirectTo);
         router.replace(redirectTo);
       }
     } catch (error) {

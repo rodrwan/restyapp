@@ -59,7 +59,8 @@
     "websocket-polyfill": "^1.0.0",
     "zustand": "^4.5.4",
     "expo-local-authentication": "~15.0.1",
-    "expo-blur": "~14.0.1"
+    "expo-blur": "~14.0.1",
+    "expo-secure-store": "~14.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

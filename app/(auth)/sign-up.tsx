@@ -1,5 +1,5 @@
 import { useLayoutEffect, useState } from "react";
-import { Link, router, useNavigation } from "expo-router";
+import { Link, router, useLocalSearchParams, useNavigation } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   View,
@@ -20,19 +20,21 @@ import Colors from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 
 import useSession from "@/hooks/useSession";
-import useAuthStore from "@/stores/useAuth";
 import useGetEventsFromUser from "@/hooks/useGetEventsFromUser";
 import useUserStore from "@/stores/useUser";
 import Toast from "react-native-toast-message";
 import { LinearGradient } from "expo-linear-gradient";
 import useGetUserFirstUpcomingEvent from "@/hooks/useGetUserFirstUpcomingEvent";
+import { useSession as useSessionContext } from "@/context/AuthProvider";
 
 const SignUp = () => {
   const { createUser } = useSession();
   const { getEvents } = useGetEventsFromUser();
-  const { login, setAccessToken } = useAuthStore();
+  const { signIn } = useSessionContext();
   const { setUser } = useUserStore();
   const { getUserFirstUpcomingEvent } = useGetUserFirstUpcomingEvent();
+  const params: any = useLocalSearchParams();
+  console.log("params", params);
 
   const navigation = useNavigation();
   const [isSubmitting, setSubmitting] = useState(false);
@@ -41,6 +43,7 @@ const SignUp = () => {
     lastName: "",
     email: "",
     password: "",
+    acceptedTerms: false,
   });
 
   const [scrollY, setScrollY] = useState(0);
@@ -53,7 +56,7 @@ const SignUp = () => {
       headerLeft: () =>
         Platform.OS === "ios" && scrollY <= 30 ? (
           <TouchableOpacity
-            onPress={() => router.push("/")}
+            onPress={() => router.push("../")}
             className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2 bg-secondary-500"
           >
             <Ionicons
@@ -74,12 +77,14 @@ const SignUp = () => {
       form.firstName === "" ||
       form.lastName === "" ||
       form.email === "" ||
-      form.password === ""
+      form.password === "" ||
+      !form.acceptedTerms
     ) {
       Toast.show({
         type: "error",
         text1: "Error",
-        text2: "Debes llenar todos los campos",
+        text2:
+          "Debes llenar todos los campos y aceptar las políticas de privacidad",
         onHide: () => {
           setSubmitting(false);
         },
@@ -103,8 +108,8 @@ const SignUp = () => {
       setUser({
         ...sessionResp.user,
       });
-      login();
-      setAccessToken(sessionResp.access_token);
+
+      signIn(sessionResp?.access_token);
       getEvents();
       getUserFirstUpcomingEvent();
       router.replace("/(dashboard)");
@@ -130,7 +135,7 @@ const SignUp = () => {
           }}
         >
           <View
-            className="w-full flex justify-center h-full px-4 my-6"
+            className="w-full flex justify-center h-full px-4"
             style={{
               minHeight: Dimensions.get("window").height - 100,
             }}
@@ -145,7 +150,7 @@ const SignUp = () => {
               title="Nombre"
               value={form.firstName}
               handleChangeText={(e: any) => setForm({ ...form, firstName: e })}
-              otherStyles="mt-10"
+              otherStyles="mt-7"
               autoComplete="name"
             />
 
@@ -153,7 +158,7 @@ const SignUp = () => {
               title="Apellido"
               value={form.lastName}
               handleChangeText={(e: any) => setForm({ ...form, lastName: e })}
-              otherStyles="mt-10"
+              otherStyles="mt-4"
               autoComplete="name-family"
             />
 
@@ -161,7 +166,7 @@ const SignUp = () => {
               title="Email"
               value={form.email}
               handleChangeText={(e: any) => setForm({ ...form, email: e })}
-              otherStyles="mt-7"
+              otherStyles="mt-4"
               keyboardType="email-address"
               autoComplete="email"
               autoCapitalize="none"
@@ -171,9 +176,34 @@ const SignUp = () => {
               title="Password"
               value={form.password}
               handleChangeText={(e: any) => setForm({ ...form, password: e })}
-              otherStyles="mt-7"
+              otherStyles="mt-4 mb-7"
               autoComplete="password"
             />
+
+            <TouchableOpacity
+              className="w-full self-center justify-center flex-row items-center gap-2"
+              onPress={() =>
+                setForm({ ...form, acceptedTerms: !form.acceptedTerms })
+              }
+            >
+              <View
+                className={`w-5 h-5 border rounded ${
+                  form.acceptedTerms
+                    ? "bg-primary-500 border-primary-500"
+                    : "border-gray-400"
+                } justify-center items-center`}
+              >
+                {form.acceptedTerms && (
+                  <Ionicons name="checkmark" size={16} color="white" />
+                )}
+              </View>
+              <View className="flex-row flex-wrap">
+                <Text className="text-gray-100">Acepto las </Text>
+                <Link href="/privacy-policy" className="text-primary-500">
+                  políticas de privacidad
+                </Link>
+              </View>
+            </TouchableOpacity>
 
             <CustomButton
               title="Registrarse"
@@ -187,7 +217,7 @@ const SignUp = () => {
                 Ya tienes cuenta?
               </Text>
               <Link
-                href="/sign-in"
+                href={`/sign-in?redirectTo=${params.redirectTo}`}
                 className="text-lg font-psemibold text-primary-500"
               >
                 Login

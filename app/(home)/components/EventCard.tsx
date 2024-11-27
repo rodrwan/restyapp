@@ -16,7 +16,10 @@ export function EventCard({ event, imageHeight }: EventCardProps) {
       onPress={() => router.push(`/(events)/${event.id}`)}
       className="bg-white rounded-3xl mb-4"
     >
-      <View className="bg-white rounded-3xl" style={{ height: imageHeight }}>
+      <View
+        className="bg-white rounded-3xl"
+        style={{ height: imageHeight * 0.9 }}
+      >
         <Image
           source={{ uri: event.image }}
           className="w-full h-full rounded-3xl"

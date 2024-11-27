@@ -19,20 +19,21 @@ import useUserStore from "@/stores/useUser";
 import Colors from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import useSession from "@/hooks/useSession";
-import useAuthStore from "@/stores/useAuth";
 import useGetEventsFromUser from "@/hooks/useGetEventsFromUser";
 import Toast from "react-native-toast-message";
 import useGetUserFirstUpcomingEvent from "@/hooks/useGetUserFirstUpcomingEvent";
 import { LinearGradient } from "expo-linear-gradient";
+import { useSession as useSessionContext } from "@/context/AuthProvider";
 
 const SignIn = () => {
   const { createSession } = useSession();
+  const { signIn } = useSessionContext();
   const { getEvents } = useGetEventsFromUser();
   const { getUserFirstUpcomingEvent } = useGetUserFirstUpcomingEvent();
 
-  const { login, setAccessToken } = useAuthStore();
   const navigation = useNavigation();
   const params: any = useLocalSearchParams();
+  console.log("params", params);
   const { setUser } = useUserStore();
 
   const [isSubmitting, setSubmitting] = useState(false);
@@ -50,7 +51,7 @@ const SignIn = () => {
       headerLeft: () =>
         Platform.OS === "ios" ? (
           <TouchableOpacity
-            onPress={() => router.push("/")}
+            onPress={() => router.push("../")}
             className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2 bg-secondary-500"
           >
             <Ionicons
@@ -92,8 +93,8 @@ const SignIn = () => {
       setUser({
         ...sessionResp.user,
       });
-      login();
-      setAccessToken(sessionResp.access_token);
+
+      signIn(sessionResp.access_token);
       getEvents();
       getUserFirstUpcomingEvent();
       console.log(params?.redirectTo);
@@ -150,17 +151,31 @@ const SignIn = () => {
               isLoading={isSubmitting}
             />
 
-            <SignWithGoogle setUser={setUser} redirectTo={params.redirectTo} />
+            <SignWithGoogle
+              setUser={setUser}
+              redirectTo={params?.redirectTo ?? "(dashboard)"}
+            />
 
             <View className="flex justify-center pt-5 flex-row gap-2">
               <Text className="text-lg text-gray-100 font-pregular">
                 No tienes cuenta?
               </Text>
               <Link
-                href="/sign-up"
+                href={`/sign-up?redirectTo=${
+                  params?.redirectTo ?? "(dashboard)"
+                }`}
                 className="text-lg font-psemibold text-primary-500"
               >
                 Registrate
+              </Link>
+            </View>
+
+            <View className="flex justify-center pt-4 flex-row gap-2">
+              <Link
+                href="/forgot-password"
+                className="text-base font-psemibold text-primary-500"
+              >
+                ¿Olvidaste tu contraseña?
               </Link>
             </View>
           </View>

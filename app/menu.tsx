@@ -4,11 +4,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useNavigation } from "expo-router";
 import Colors from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
-import useAuthStore from "@/stores/useAuth";
-import useUserStore from "@/stores/useUser";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import * as WebBrowser from "expo-web-browser";
 import { LinearGradient } from "expo-linear-gradient";
+import { useSession } from "@/context/AuthProvider";
 
 // Tipos
 interface MenuItemProps {
@@ -73,18 +72,10 @@ function useHeaderConfiguration() {
 }
 
 function useAuthActions() {
-  const { setAccessToken, logout } = useAuthStore();
-  const { setUser, setTickets, setDrinks, setEvents } = useUserStore();
+  const { signOut } = useSession();
 
   const handleLogout = async () => {
-    setUser(null);
-    setTickets([]);
-    setDrinks([]);
-    setEvents([]);
-    logout();
-    setAccessToken("");
-    await AsyncStorage.multiRemove(["accessToken", "refreshToken"]);
-    router.replace("/(home)");
+    signOut();
   };
 
   return { handleLogout };
@@ -93,8 +84,7 @@ function useAuthActions() {
 const MenuPage = () => {
   const { configureHeader } = useHeaderConfiguration();
   const { handleLogout } = useAuthActions();
-  const { auth } = useAuthStore();
-
+  const { session } = useSession();
   React.useLayoutEffect(() => {
     configureHeader();
   }, []);
@@ -130,7 +120,7 @@ const MenuPage = () => {
           ))}
         </View>
 
-        {auth.isLogged && (
+        {session && (
           <View>
             <LogoutButton onPress={handleLogout} />
           </View>

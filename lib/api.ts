@@ -1226,6 +1226,22 @@ query GetUserUpcomingEvents {
       throw new Error(error);
     }
   }
+
+  async requestPasswordReset(email: string): Promise<any> {
+    try {
+      throw new Error("not implemented");
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async resetPassword(code: string, newPassword: string): Promise<any> {
+    try {
+      throw new Error("not implemented");
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 export default Client;

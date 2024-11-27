@@ -6,9 +6,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams, useNavigation } from "expo-router";
 
 import useCreateOrder from "@/hooks/useCreateOrder";
-import useAuthStore from "@/stores/useAuth";
 import useCartStore from "@/stores/useCart";
 import { LinearGradient } from "expo-linear-gradient";
+import { useSession } from "@/context/AuthProvider";
 
 const Cart = () => {
   const navigation = useNavigation();
@@ -19,15 +19,15 @@ const Cart = () => {
     setTicketToNominate,
     clearCart,
   } = useCartStore();
-  const { auth }: any = useAuthStore();
+  const { session } = useSession();
   const params: any = useLocalSearchParams();
   console.log("params", params);
 
   React.useEffect(() => {
-    if (!auth.isLogged) {
+    if (!session) {
       return router.push("/(auth)/sign-in?redirectTo=(cart)");
     }
-  }, [auth.isLogged]);
+  }, [session]);
 
   const { create } = useCreateOrder();
 
@@ -73,6 +73,12 @@ const Cart = () => {
 
   const onSubmit = async () => {
     try {
+      if (!session) {
+        return router.push(
+          `/(auth)/sign-in?redirectTo=/(cart)?goBackTo=${params?.goBackTo}`
+        );
+      }
+
       const newOrder = await create(itemsInCart);
       console.log("newOrder", newOrder);
       if (newOrder?.length === 0) {

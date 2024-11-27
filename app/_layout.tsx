@@ -10,6 +10,8 @@ import * as SplashScreen from "expo-splash-screen";
 import { NativeWindStyleSheet } from "nativewind";
 
 import Header from "@/components/Header";
+import { SessionProvider } from "@/context/AuthProvider";
+import { LinearGradient } from "expo-linear-gradient";
 
 NativeWindStyleSheet.setOutput({
   default: "native",
@@ -39,26 +41,35 @@ export default function RootLayout() {
     return <Slot />;
   }
 
-  return <RootLayoutNav />;
+  return (
+    <SessionProvider>
+      <RootLayoutNav />
+    </SessionProvider>
+  );
 }
 
 function RootLayoutNav() {
   return (
-    <Stack>
-      <Stack.Screen name="(home)" options={{ header: () => <Header /> }} />
-      <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-      <Stack.Screen name="(events)" options={{ headerShown: false }} />
-      <Stack.Screen name="(cart)" options={{ headerShown: false }} />
-      <Stack.Screen name="(dashboard)" options={{ headerShown: false }} />
-      <Stack.Screen name="menu" />
+    <LinearGradient colors={["#04121A", "#092838"]} className="flex-1">
+      <Stack>
+        <Stack.Screen name="(home)" options={{ header: () => <Header /> }} />
+        <Stack.Screen
+          name="(auth)"
+          options={{ headerShown: false, presentation: "modal" }}
+        />
+        <Stack.Screen name="(events)" options={{ headerShown: false }} />
+        <Stack.Screen name="(cart)" options={{ headerShown: false }} />
+        <Stack.Screen name="(dashboard)" options={{ headerShown: false }} />
+        <Stack.Screen name="menu" />
 
-      <Stack.Screen
-        name="(modal)/payments"
-        options={{
-          title: "Medios de pago",
-          presentation: "modal",
-        }}
-      />
-    </Stack>
+        <Stack.Screen
+          name="(modal)/payments"
+          options={{
+            title: "Medios de pago",
+            presentation: "modal",
+          }}
+        />
+      </Stack>
+    </LinearGradient>
   );
 }

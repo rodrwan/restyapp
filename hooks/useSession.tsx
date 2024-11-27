@@ -80,7 +80,25 @@ const useLogin = () => {
     }
   };
 
-  return { createSession, createUser, me };
+  const requestPasswordReset = async (email: string) => {
+    try {
+      const response = await client.requestPasswordReset(email);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const resetPassword = async (code: string, newPassword: string) => {
+    try {
+      const response = await client.resetPassword(code, newPassword);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  return { createSession, createUser, me, resetPassword, requestPasswordReset };
 };
 
 export default useLogin;
