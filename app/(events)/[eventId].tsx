@@ -5,7 +5,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
-import { useLayoutEffect } from "react";
+import React, { useLayoutEffect } from "react";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { LinearGradient } from "expo-linear-gradient";
@@ -17,8 +17,10 @@ import useCartStore from "@/stores/useCart";
 import { EventHeader } from "@/components/events/EventHeader";
 import { TicketsList } from "@/components/events/TicketsList";
 import { formatEventDates } from "./utils";
+import useEventStore from "@/stores/useEvent";
 
 export default function EventPage() {
+  const { setEvent } = useEventStore();
   const navigation = useNavigation<any>();
   const {
     items: itemsInCart,
@@ -42,6 +44,9 @@ export default function EventPage() {
     loading,
   }: any = useGetEventById(eventId);
 
+  React.useEffect(() => {
+    setEvent(event);
+  }, [event]);
   if (!Boolean(eventId) || loading) {
     return (
       <LinearGradient

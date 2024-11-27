@@ -1,7 +1,8 @@
 import { Event } from "./types";
 
 export function formatEventDate(startAt: string): string {
-  return new Date(startAt).toLocaleString("es-CL", {
+  const cleanDate = startAt.replace(" UTC", "").replace(" +0000", "");
+  return new Date(cleanDate).toLocaleString("es-CL", {
     weekday: "long",
     month: "long",
     day: "numeric",

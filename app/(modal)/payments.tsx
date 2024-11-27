@@ -26,13 +26,15 @@ const payments = () => {
       <Text className="text-lg text-white font-bold text-center">
         Tus métodos de pago
       </Text>
-      <CreditCard
-        cardNumber={user?.tbk_card_number ?? ""}
-        cardHolder={`${user?.firstname} ${user?.lastname}`}
-        expiryDate="XX/XX"
-      />
+      <View className="flex backdrop-blur-lg bg-white/10 rounded-lg p-1  mx-2">
+        <CreditCard
+          cardNumber={user?.tbk_card_number ?? ""}
+          cardHolder={`${user?.firstname} ${user?.lastname}`}
+          expiryDate="XX/XX"
+        />
+      </View>
 
-      <View className="flex bg-secondary-50 p-4 my-8 mx-4 rounded-3xl justify-center items-center">
+      <View className="flex bg-secondary-50 p-4 my-8 mx-2 rounded-3xl justify-center items-center">
         <Text className="text-lg text-black font-bold text-center mb-4">
           Inscribir medio de pago
         </Text>

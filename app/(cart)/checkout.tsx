@@ -42,9 +42,12 @@ const Checkout = () => {
 
   const { orderId } = params;
   const { user }: any = useUserStore();
+
   const { items, nominees, assignTicket, clearCart, clearTicketToNominate } =
     useCartStore();
   const { event } = useEventStore();
+
+  console.log("event", event);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [termAndConditions, setTermAndConditions] = useState(false);
   const [scrollY, setScrollY] = useState(0);
@@ -182,6 +185,12 @@ const Checkout = () => {
   const allNomineesSetted = nominees.every((nominee) => {
     return nominee?.dni && nominee?.email;
   });
+
+  console.log(
+    event.nominated,
+    nominees?.length,
+    event.nominated && nominees?.length > 0
+  );
   return (
     <LinearGradient
       // Background Linear Gradient
@@ -236,7 +245,7 @@ const Checkout = () => {
               </View>
             </View>
 
-            {event.nominated && nominees.length > 0 ? (
+            {event.nominated && nominees?.length > 0 ? (
               <View className="flex mt-4 bg-white p-4 rounded-xl">
                 <View className="w-full pb-2">
                   <Text className="font-bold text-xl">Nominar entradas</Text>
@@ -313,7 +322,7 @@ const Checkout = () => {
                 <View className="flex items-center ">
                   <TouchableOpacity
                     onPress={() => router.push("/(modal)/payments")}
-                    className="w-full backdrop-blur-lg bg-white/10 rounded-2xl p-3"
+                    className="w-full backdrop-blur-lg bg-white/10 rounded-lg p-1"
                   >
                     <CreditCard
                       cardNumber={user?.tbk_card_number ?? ""}

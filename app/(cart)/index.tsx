@@ -74,9 +74,10 @@ const Cart = () => {
   const onSubmit = async () => {
     try {
       const newOrder = await create(itemsInCart);
+      console.log("newOrder", newOrder);
       if (newOrder?.length === 0) {
         return router.push(
-          `/(auth)/sign-in?redirectTo=/(cart)/checkout?orderId=${newOrder.id}&goBackTo=${params?.goBackTo}`
+          `/(auth)/sign-in?redirectTo=/(cart)?goBackTo=${params?.goBackTo}`
         );
       }
 

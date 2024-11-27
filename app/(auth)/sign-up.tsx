@@ -24,12 +24,15 @@ import useAuthStore from "@/stores/useAuth";
 import useGetEventsFromUser from "@/hooks/useGetEventsFromUser";
 import useUserStore from "@/stores/useUser";
 import Toast from "react-native-toast-message";
+import { LinearGradient } from "expo-linear-gradient";
+import useGetUserFirstUpcomingEvent from "@/hooks/useGetUserFirstUpcomingEvent";
 
 const SignUp = () => {
   const { createUser } = useSession();
-  const { getEvents, getUserFirstUpcomingEvent } = useGetEventsFromUser();
+  const { getEvents } = useGetEventsFromUser();
   const { login, setAccessToken } = useAuthStore();
   const { setUser } = useUserStore();
+  const { getUserFirstUpcomingEvent } = useGetUserFirstUpcomingEvent();
 
   const navigation = useNavigation();
   const [isSubmitting, setSubmitting] = useState(false);
@@ -119,81 +122,82 @@ const SignUp = () => {
   };
 
   return (
-    <SafeAreaView className="bg-secondary-500 h-full">
-      <KeyboardAwareScrollView
-        className="bg-secondary-500"
-        onScroll={(event) => {
-          setScrollY(event.nativeEvent.contentOffset.y);
-        }}
-      >
-        <View
-          className="w-full flex justify-center h-full px-4 my-6 bg-secondary-500"
-          style={{
-            minHeight: Dimensions.get("window").height - 100,
+    <LinearGradient colors={["#04121A", "#092838"]} className="flex-1">
+      <SafeAreaView className="h-full">
+        <KeyboardAwareScrollView
+          onScroll={(event) => {
+            setScrollY(event.nativeEvent.contentOffset.y);
           }}
         >
-          <Logo />
+          <View
+            className="w-full flex justify-center h-full px-4 my-6"
+            style={{
+              minHeight: Dimensions.get("window").height - 100,
+            }}
+          >
+            <Logo />
 
-          <Text className="text-2xl font-semibold text-white mt-10 font-psemibold">
-            Registro
-          </Text>
-
-          <FormField
-            title="Nombre"
-            value={form.firstName}
-            handleChangeText={(e: any) => setForm({ ...form, firstName: e })}
-            otherStyles="mt-10"
-            autoComplete="name"
-          />
-
-          <FormField
-            title="Apellido"
-            value={form.lastName}
-            handleChangeText={(e: any) => setForm({ ...form, lastName: e })}
-            otherStyles="mt-10"
-            autoComplete="name-family"
-          />
-
-          <FormField
-            title="Email"
-            value={form.email}
-            handleChangeText={(e: any) => setForm({ ...form, email: e })}
-            otherStyles="mt-7"
-            keyboardType="email-address"
-            autoComplete="email"
-            autoCapitalize="none"
-          />
-
-          <FormField
-            title="Password"
-            value={form.password}
-            handleChangeText={(e: any) => setForm({ ...form, password: e })}
-            otherStyles="mt-7"
-            autoComplete="password"
-          />
-
-          <CustomButton
-            title="Registrarse"
-            handlePress={submit}
-            containerStyles="mt-7"
-            isLoading={isSubmitting}
-          />
-
-          <View className="flex justify-center pt-5 flex-row gap-2">
-            <Text className="text-lg text-gray-100 font-pregular">
-              Ya tienes cuenta?
+            <Text className="text-2xl font-semibold text-white mt-10 font-psemibold">
+              Registro
             </Text>
-            <Link
-              href="/sign-in"
-              className="text-lg font-psemibold text-primary-500"
-            >
-              Login
-            </Link>
+
+            <FormField
+              title="Nombre"
+              value={form.firstName}
+              handleChangeText={(e: any) => setForm({ ...form, firstName: e })}
+              otherStyles="mt-10"
+              autoComplete="name"
+            />
+
+            <FormField
+              title="Apellido"
+              value={form.lastName}
+              handleChangeText={(e: any) => setForm({ ...form, lastName: e })}
+              otherStyles="mt-10"
+              autoComplete="name-family"
+            />
+
+            <FormField
+              title="Email"
+              value={form.email}
+              handleChangeText={(e: any) => setForm({ ...form, email: e })}
+              otherStyles="mt-7"
+              keyboardType="email-address"
+              autoComplete="email"
+              autoCapitalize="none"
+            />
+
+            <FormField
+              title="Password"
+              value={form.password}
+              handleChangeText={(e: any) => setForm({ ...form, password: e })}
+              otherStyles="mt-7"
+              autoComplete="password"
+            />
+
+            <CustomButton
+              title="Registrarse"
+              handlePress={submit}
+              containerStyles="mt-7"
+              isLoading={isSubmitting}
+            />
+
+            <View className="flex justify-center pt-5 flex-row gap-2">
+              <Text className="text-lg text-gray-100 font-pregular">
+                Ya tienes cuenta?
+              </Text>
+              <Link
+                href="/sign-in"
+                className="text-lg font-psemibold text-primary-500"
+              >
+                Login
+              </Link>
+            </View>
           </View>
-        </View>
-      </KeyboardAwareScrollView>
-      <Toast topOffset={100} />
-    </SafeAreaView>
+        </KeyboardAwareScrollView>
+        <Toast topOffset={100} />
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 

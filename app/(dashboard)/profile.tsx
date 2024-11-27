@@ -138,7 +138,7 @@ const MemoizedPaymentSection = React.memo(({ user }: { user: any }) => (
     <View className="flex items-center rounded-3xl mt-4 mb-2">
       <TouchableOpacity
         onPress={() => router.push("/(modal)/payments")}
-        className="w-full backdrop-blur-lg bg-white/10 rounded-2xl p-3"
+        className="w-full backdrop-blur-lg bg-white/10 rounded-2xl p-1"
       >
         {/* <CreditCard
           cardNumber={user?.tbk_card_number ?? ""}

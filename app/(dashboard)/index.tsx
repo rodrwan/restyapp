@@ -70,7 +70,7 @@ const HomePage = () => {
     ?.filter((event: any) => {
       const splittedStartAt = event?.start_at.split(" ");
       const joinedStartAt = splittedStartAt?.[0] + " " + splittedStartAt?.[1];
-      return new Date(joinedStartAt) > new Date();
+      return new Date(joinedStartAt).getTime() < new Date().getTime();
     });
 
   const nextEventUrl: string = `/(dashboard)/events/${upcomingEvent?.event?.id}`;

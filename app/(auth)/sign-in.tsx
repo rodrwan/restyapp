@@ -23,6 +23,7 @@ import useAuthStore from "@/stores/useAuth";
 import useGetEventsFromUser from "@/hooks/useGetEventsFromUser";
 import Toast from "react-native-toast-message";
 import useGetUserFirstUpcomingEvent from "@/hooks/useGetUserFirstUpcomingEvent";
+import { LinearGradient } from "expo-linear-gradient";
 
 const SignIn = () => {
   const { createSession } = useSession();
@@ -95,7 +96,9 @@ const SignIn = () => {
       setAccessToken(sessionResp.access_token);
       getEvents();
       getUserFirstUpcomingEvent();
-      router.replace(`/${params?.redirectTo}`);
+      console.log(params?.redirectTo);
+
+      router.replace(params?.redirectTo || "/");
     } catch (err: any) {
       console.log(err);
       Toast.show({
@@ -110,59 +113,61 @@ const SignIn = () => {
   };
 
   return (
-    <SafeAreaView className="bg-secondary-500 h-full">
-      <KeyboardAwareScrollView>
-        <View
-          className="w-full flex justify-center h-full px-4"
-          style={{
-            minHeight: Dimensions.get("window").height - 100,
-          }}
-        >
-          <Logo />
-          <Text className="text-2xl font-semibold text-white mt-16 font-psemibold">
-            Inicia Sesión
-          </Text>
-          <FormField
-            title="Email"
-            value={form.email}
-            handleChangeText={(e: any) => setForm({ ...form, email: e })}
-            otherStyles="mt-7"
-            keyboardType="email-address"
-            autoComplete="email"
-            autoCapitalize="none"
-          />
-          <FormField
-            title="Password"
-            value={form.password}
-            handleChangeText={(e: any) => setForm({ ...form, password: e })}
-            otherStyles="mt-7"
-            autoComplete="password"
-            autoCapitalize="none"
-          />
-          <CustomButton
-            title="Login"
-            handlePress={submit}
-            containerStyles="mt-7"
-            isLoading={isSubmitting}
-          />
-
-          <SignWithGoogle setUser={setUser} redirectTo={params.redirectTo} />
-
-          <View className="flex justify-center pt-5 flex-row gap-2">
-            <Text className="text-lg text-gray-100 font-pregular">
-              No tienes cuenta?
+    <LinearGradient colors={["#04121A", "#092838"]} className="flex-1">
+      <SafeAreaView className="h-full">
+        <KeyboardAwareScrollView>
+          <View
+            className="w-full flex justify-center h-full px-4"
+            style={{
+              minHeight: Dimensions.get("window").height - 100,
+            }}
+          >
+            <Logo />
+            <Text className="text-2xl font-semibold text-white mt-16 font-psemibold">
+              Inicia Sesión
             </Text>
-            <Link
-              href="/sign-up"
-              className="text-lg font-psemibold text-primary-500"
-            >
-              Registrate
-            </Link>
+            <FormField
+              title="Email"
+              value={form.email}
+              handleChangeText={(e: any) => setForm({ ...form, email: e })}
+              otherStyles="mt-7"
+              keyboardType="email-address"
+              autoComplete="email"
+              autoCapitalize="none"
+            />
+            <FormField
+              title="Password"
+              value={form.password}
+              handleChangeText={(e: any) => setForm({ ...form, password: e })}
+              otherStyles="mt-7"
+              autoComplete="password"
+              autoCapitalize="none"
+            />
+            <CustomButton
+              title="Login"
+              handlePress={submit}
+              containerStyles="mt-7"
+              isLoading={isSubmitting}
+            />
+
+            <SignWithGoogle setUser={setUser} redirectTo={params.redirectTo} />
+
+            <View className="flex justify-center pt-5 flex-row gap-2">
+              <Text className="text-lg text-gray-100 font-pregular">
+                No tienes cuenta?
+              </Text>
+              <Link
+                href="/sign-up"
+                className="text-lg font-psemibold text-primary-500"
+              >
+                Registrate
+              </Link>
+            </View>
           </View>
-        </View>
-      </KeyboardAwareScrollView>
-      <Toast topOffset={100} />
-    </SafeAreaView>
+        </KeyboardAwareScrollView>
+        <Toast topOffset={100} />
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
