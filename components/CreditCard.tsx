@@ -16,7 +16,7 @@ export function CreditCard({
 }: CreditCardProps) {
   // Función para formatear el número de tarjeta en grupos de 4
   const formatCardNumber = (number: string) => {
-    return number.replace(/(.{4})/g, "$1  ").trim();
+    return number?.replace(/(.{4})/g, "$1  ").trim();
   };
 
   return (

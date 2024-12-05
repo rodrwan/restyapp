@@ -115,7 +115,7 @@ const MenuPage = () => {
     <LinearGradient colors={["#04121A", "#092838"]} className="flex-1">
       <SafeAreaView className="flex h-full p-2 justify-between">
         <View className="flex grow flex-col mt-12 border-b border-primary-400 rounded-lg pt-4 mb-8">
-          {menuItems.map((item, index) => (
+          {menuItems?.map((item, index) => (
             <MenuItem key={index} {...item} />
           ))}
         </View>

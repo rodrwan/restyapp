@@ -98,7 +98,7 @@ export default function ResetPassword() {
       <SafeAreaView className="h-full">
         <KeyboardAwareScrollView>
           <View
-            className="w-full flex justify-center h-full px-4"
+            className="w-full flex justify-start h-full px-4"
             style={{
               minHeight: Dimensions.get("window").height - 100,
             }}
@@ -107,7 +107,7 @@ export default function ResetPassword() {
             <Text className="text-2xl font-semibold text-white mt-16 font-psemibold">
               Cambiar Contraseña
             </Text>
-            <Text className="text-secondary-300 mt-4">
+            <Text className="text-base text-secondary-50 mt-4">
               Ingresa el código que recibiste por email y tu nueva contraseña
             </Text>
 

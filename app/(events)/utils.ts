@@ -15,10 +15,10 @@ export function formatEventDates(event: any) {
     hour: "2-digit",
   });
 
-  const splittedEndAt = event?.end_at.split(" ");
-  const endHour = event?.end_hour.split("T")?.[1] || "";
-  const joinedEndAt = splittedEndAt?.[0] + " " + endHour.replace("Z", "");
-  const endAt = new Date(joinedEndAt).toLocaleString("us-US", {
+  const splittedEndAt = event?.end_at?.split(" ");
+  const endHour = event?.end_hour?.split("T")?.[1] || "";
+  const joinedEndAt = splittedEndAt?.[0] + " " + endHour?.replace("Z", "");
+  const endAt = new Date(joinedEndAt)?.toLocaleString("us-US", {
     minute: "2-digit",
     hour: "2-digit",
   });

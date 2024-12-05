@@ -8,7 +8,7 @@ interface EventCardProps {
   imageHeight: number;
 }
 
-export function EventCard({ event, imageHeight }: EventCardProps) {
+export default function EventCard({ event, imageHeight }: EventCardProps) {
   const startAt = formatEventDate(event.start_at);
 
   return (

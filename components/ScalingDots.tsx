@@ -39,7 +39,7 @@ const ScalingDots = ({
 
   return (
     <View style={[styles.containerStyle, containerStyle]}>
-      {data.map((_, index) => {
+      {data?.map((_, index) => {
         const inputRange = [
           (index - 1) * width,
           index * width,

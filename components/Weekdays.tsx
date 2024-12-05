@@ -74,7 +74,7 @@ const Weekdays = ({ onCategoryChanged }: Props) => {
         paddingHorizontal: 16,
       }}
     >
-      {categories.map((item, index) => (
+      {categories?.map((item, index) => (
         <TouchableOpacity
           ref={(el) => (itemsRef.current[index] = el)}
           key={index}

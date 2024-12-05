@@ -9,7 +9,7 @@ const useAuthorizeTransaction = () => {
         order_id: orderId,
         terms_and_conditions_signed: true,
         alcohol_signed: true,
-        nominated_items: nominees.map((nominated: any) => {
+        nominated_items: nominees?.map((nominated: any) => {
           return {
             order_id: nominated.orderId,
             order_item_id: nominated.id,

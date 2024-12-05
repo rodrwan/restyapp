@@ -135,7 +135,7 @@ const TicketPage = () => {
                   }}
                   keyExtractor={(item: any) => item.id}
                   renderItem={({ item }: any) => {
-                    const splittedStartAt = item.event.start_at.split(" ");
+                    const splittedStartAt = item?.event?.start_at.split(" ");
                     const joinedStartAt =
                       splittedStartAt[0] + " " + splittedStartAt[1];
                     const startAt = new Date(joinedStartAt).toLocaleString(
@@ -146,10 +146,10 @@ const TicketPage = () => {
                         day: "numeric",
                       }
                     );
-                    const splittedEndAt = item.event.end_at.split(" ");
-                    const hour = item.event.end_hour.split("T")[1];
+                    const splittedEndAt = item?.event?.end_at.split(" ");
+                    const hour = item?.event?.end_hour?.split("T")[1];
                     const joinedEndAt =
-                      splittedEndAt[0] + " " + hour.replace("Z", "");
+                      splittedEndAt[0] + " " + hour?.replace("Z", "");
                     const endAt = new Date(joinedEndAt).toLocaleString(
                       "es-CL",
                       {

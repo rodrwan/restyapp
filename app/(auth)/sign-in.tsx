@@ -87,6 +87,7 @@ const SignIn = () => {
         form.password,
         "mangoticket"
       );
+      console.log("sessionResp", sessionResp);
       if (!sessionResp) {
         throw new Error("Error al iniciar sesión");
       }
@@ -118,7 +119,7 @@ const SignIn = () => {
       <SafeAreaView className="h-full">
         <KeyboardAwareScrollView>
           <View
-            className="w-full flex justify-center h-full px-4"
+            className="w-full flex justify-start h-full px-4"
             style={{
               minHeight: Dimensions.get("window").height - 100,
             }}

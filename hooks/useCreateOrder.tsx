@@ -5,7 +5,7 @@ const client = HTTPClient.getInstance();
 const useCreateOrder = () => {
   const create = async (cartList: any[]) => {
     const items: any = cartList
-      .map((item: any) => {
+      ?.map((item: any) => {
         const elements = [];
         for (let idx = 0; idx < item.quantity; idx++) {
           elements.push({

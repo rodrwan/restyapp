@@ -15,7 +15,7 @@ const useGetEventsFromUser = () => {
     try {
       const orders = await client.getOrderItemsByUser();
 
-      if (orders?.length === 0) {
+      if ((orders?.length ?? 0) === 0) {
         return {
           orders: [],
           tickets: [],
@@ -25,8 +25,8 @@ const useGetEventsFromUser = () => {
       }
 
       const events = orders
-        .map((order: any) => order?.items?.map((item: any) => item?.event_id))
-        .flat()
+        ?.map((order: any) => order?.items?.map((item: any) => item?.event_id))
+        ?.flat()
         .filter((x: any, i: any, a: any) => a.indexOf(x) == i);
 
       const response = await client.getEventsByIds(events);
@@ -45,7 +45,7 @@ const useGetEventsFromUser = () => {
         })
       );
 
-      const tickets = data.map((d) => {
+      const tickets = data?.map((d) => {
         return d?.data?.map((cur: any) => {
           if (cur?.event_item?.type !== "ENTRANCE") {
             return;
@@ -61,7 +61,7 @@ const useGetEventsFromUser = () => {
         }, {});
       });
 
-      const drinks = data.map((d) => {
+      const drinks = data?.map((d) => {
         return d?.data?.map((cur: any) => {
           if (cur?.event_item?.type !== "DRINK") {
             return;
@@ -85,7 +85,6 @@ const useGetEventsFromUser = () => {
       };
       // .filter((ticket) => !ticket?.isValidated),
       // .filter((ticket) => !ticket?.isValidated),
-
       setTickets(result?.tickets);
       setDrinks(result?.drinks);
       setEvents(result?.events);

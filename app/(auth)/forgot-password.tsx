@@ -63,11 +63,6 @@ export default function ForgotPassword() {
     setSubmitting(true);
     try {
       await requestPasswordReset(email);
-      Toast.show({
-        type: "success",
-        text1: "¡Éxito!",
-        text2: "Se ha enviado un código de recuperación a tu email",
-      });
       router.push("/reset-password");
     } catch (error) {
       Toast.show({
@@ -85,7 +80,7 @@ export default function ForgotPassword() {
       <SafeAreaView className="h-full">
         <KeyboardAwareScrollView>
           <View
-            className="w-full flex justify-center h-full px-4"
+            className="w-full flex justify-start h-full px-4"
             style={{
               minHeight: Dimensions.get("window").height - 100,
             }}
@@ -94,9 +89,13 @@ export default function ForgotPassword() {
             <Text className="text-2xl font-semibold text-white mt-16 font-psemibold">
               Recuperar Contraseña
             </Text>
-            <Text className="text-secondary-300 mt-4">
+            <Text className="text-base text-secondary-50 mt-4">
               Ingresa el correo electrónico asociado a tu cuenta y te enviaremos
-              las instrucciones para restablecer tu contraseña
+              las instrucciones para restablecer tu contraseña.
+            </Text>
+            <Text className="text-base text-secondary-50 mt-4 mb-7">
+              Si iniciaste sesión con Google, no podrás restablecer tu
+              contraseña con este método.
             </Text>
 
             <FormField

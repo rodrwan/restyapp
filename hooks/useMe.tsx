@@ -12,10 +12,13 @@ const useMe = () => {
     setLoadingUserData(true);
     try {
       const [response, errors] = await client.me();
+      console.log("errors", errors);
+      console.log("response", response);
       if (errors?.length > 0) {
         throw errors;
       }
 
+      console.log("response", response);
       setUser(response?.user);
       setLoadingUserData(false);
       return response;

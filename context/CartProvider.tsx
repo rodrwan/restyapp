@@ -14,7 +14,7 @@ const CartProvider = ({ children }: any) => {
 
     if (isItemInCart) {
       setCartItems(
-        cartItems.map((cartItem: any) =>
+        cartItems?.map((cartItem: any) =>
           cartItem.id === item.id
             ? { ...cartItem, quantity: cartItem?.quantity + 1 }
             : cartItem
@@ -32,11 +32,11 @@ const CartProvider = ({ children }: any) => {
 
     if (isItemInCart?.quantity === 1) {
       setCartItems(
-        cartItems.filter((cartItem: any) => cartItem.id !== item.id)
+        cartItems?.filter((cartItem: any) => cartItem.id !== item.id)
       );
     } else {
       setCartItems(
-        cartItems.map((cartItem: any) =>
+        cartItems?.map((cartItem: any) =>
           cartItem.id === item.id
             ? { ...cartItem, quantity: cartItem?.quantity - 1 }
             : cartItem
@@ -47,7 +47,7 @@ const CartProvider = ({ children }: any) => {
 
   const assignTicket = (orderId: string, ticket: any, nominate: any) => {
     setNominees(
-      nominees.map((nominated: any) =>
+      nominees?.map((nominated: any) =>
         nominated.id === ticket.id
           ? { ...nominated, orderId, email: nominate.email, dni: nominate.dni }
           : nominated

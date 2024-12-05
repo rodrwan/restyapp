@@ -10,9 +10,9 @@ export function formatEventDate(startAt: string): string {
 }
 
 export function parseEventDateTime(event: Event): string {
-  const splittedStartAt = event.start_at.split(" ");
-  const startHour = event.start_hour.split("T")[1];
-  return `${splittedStartAt[0]} ${startHour.replace("Z", "")}`;
+  const splittedStartAt = event?.start_at?.split(" ");
+  const startHour = event?.start_hour?.split("T")[1];
+  return `${splittedStartAt?.[0]} ${startHour?.replace("Z", "")}`;
 }
 
 export function sortByStartAt(a: Event, b: Event): number {

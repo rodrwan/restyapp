@@ -135,7 +135,7 @@ const SignUp = () => {
           }}
         >
           <View
-            className="w-full flex justify-center h-full px-4"
+            className="w-full flex justify-start h-full px-4"
             style={{
               minHeight: Dimensions.get("window").height - 100,
             }}

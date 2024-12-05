@@ -37,14 +37,14 @@ const useCartStore = create<Store>((set) => ({
 
   addToCart: (item: Item) => {
     set((state) => {
-      const isItemInCart = state.items.find(
+      const isItemInCart = state?.items?.find(
         (cartItem: any) => cartItem.id === item.id
       );
 
       if (isItemInCart) {
         return {
           ...state,
-          items: state.items.map((cartItem: any) =>
+          items: state?.items?.map((cartItem: any) =>
             cartItem.id === item.id
               ? { ...cartItem, quantity: cartItem?.quantity + 1 }
               : cartItem
@@ -64,7 +64,7 @@ const useCartStore = create<Store>((set) => ({
       );
 
       if (isItemInCart?.quantity === 1) {
-        const newItems = state.items.filter(
+        const newItems = state?.items?.filter(
           (cartItem: any) => cartItem.id !== item.id
         );
         return {
@@ -72,7 +72,7 @@ const useCartStore = create<Store>((set) => ({
           items: newItems,
         };
       } else {
-        const newItems = state.items.map((cartItem: any) =>
+        const newItems = state?.items?.map((cartItem: any) =>
           cartItem.id === item.id
             ? { ...cartItem, quantity: cartItem?.quantity - 1 }
             : cartItem
@@ -88,7 +88,7 @@ const useCartStore = create<Store>((set) => ({
     set((state) => {
       return {
         ...state,
-        nominees: state.nominees.map((nominated: any) =>
+        nominees: state?.nominees?.map((nominated: any) =>
           nominated.id === ticket.id
             ? {
                 ...nominated,
