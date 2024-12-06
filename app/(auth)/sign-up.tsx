@@ -112,7 +112,7 @@ const SignUp = () => {
       signIn(sessionResp?.access_token);
       getEvents();
       getUserFirstUpcomingEvent();
-      router.replace("/(dashboard)");
+      return router.replace(`/${params?.redirectTo}`);
     } catch (err: any) {
       console.log(err);
       Toast.show({

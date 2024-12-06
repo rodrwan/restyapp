@@ -26,7 +26,8 @@
             ]
           }
         ],
-        "NSFaceIDUsageDescription": "Autorizar Face ID."
+        "NSFaceIDUsageDescription": "Autorizar Face ID.",
+        "NSAppTransportSecurity": { "NSAllowsArbitraryLoads": true }
       },
       "associatedDomains": [
         "applinks:spotlight.mangoticket.com"

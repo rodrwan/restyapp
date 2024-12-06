@@ -48,7 +48,9 @@ const ProfilePage = () => {
       const newPayment = await createInscription();
       const { url, token } = newPayment;
       console.log(`/(events)/inscription?url=${url}&token=${token}`);
-      return router.push(`/(cart)/inscription?url=${url}&token=${token}`);
+      return router.push(
+        `/(cart)/inscription?url=${url}&token=${token}&redirectTo=(dashboard)/profile`
+      );
     } catch (error) {
       console.log(error);
     }
