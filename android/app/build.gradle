@@ -86,9 +86,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.rodrwan.mangoticket'
+    namespace 'com.mangoticket.mangoticketapp'
     defaultConfig {
-        applicationId 'com.rodrwan.mangoticket'
+        applicationId 'com.mangoticket.mangoticketapp'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

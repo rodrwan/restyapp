@@ -1,4 +1,4 @@
-package com.rodrwan.mangoticket
+package com.mangoticket.mangoticketapp
 
 import android.app.Application
 import android.content.res.Configuration
