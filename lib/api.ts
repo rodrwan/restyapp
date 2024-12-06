@@ -402,6 +402,7 @@ mutation Register($input: RegisterData!) {
             priority
             end_at
             end_hour
+            out_of_stock
           }
         }
       }

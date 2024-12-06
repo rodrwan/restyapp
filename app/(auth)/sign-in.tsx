@@ -8,6 +8,7 @@ import {
   Alert,
   TouchableOpacity,
   Platform,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
@@ -24,6 +25,9 @@ import Toast from "react-native-toast-message";
 import useGetUserFirstUpcomingEvent from "@/hooks/useGetUserFirstUpcomingEvent";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSession as useSessionContext } from "@/context/AuthProvider";
+import SignWithApple from "@/components/SignWithApple";
+import * as WebBrowser from "expo-web-browser";
+import { POLICY_URL, TERMS_URL } from "@/constants";
 
 const SignIn = () => {
   const { createSession } = useSession();
@@ -125,7 +129,7 @@ const SignIn = () => {
             }}
           >
             <Logo />
-            <Text className="text-2xl font-semibold text-white mt-16 font-psemibold">
+            <Text className="text-2xl font-semibold text-white mt-12 font-psemibold">
               Inicia Sesión
             </Text>
             <FormField
@@ -141,7 +145,7 @@ const SignIn = () => {
               title="Password"
               value={form.password}
               handleChangeText={(e: any) => setForm({ ...form, password: e })}
-              otherStyles="mt-7"
+              otherStyles="mt-3"
               autoComplete="password"
               autoCapitalize="none"
             />
@@ -151,13 +155,50 @@ const SignIn = () => {
               containerStyles="mt-7"
               isLoading={isSubmitting}
             />
+            <View className="flex flex-row items-center justify-center mt-6">
+              <Text className="text-base text-gray-100 font-pregular ">
+                ¡Ingresa con!
+              </Text>
+            </View>
 
-            <SignWithGoogle
-              setUser={setUser}
-              redirectTo={params?.redirectTo ?? "(dashboard)"}
-            />
+            <View className="flex flex-row items-center justify-between mt-6 rounded-xl">
+              <SignWithGoogle
+                setUser={setUser}
+                redirectTo={params?.redirectTo ?? "(dashboard)"}
+              />
 
-            <View className="flex justify-center pt-5 flex-row gap-2">
+              <SignWithApple
+                setUser={setUser}
+                redirectTo={params?.redirectTo ?? "(dashboard)"}
+              />
+            </View>
+
+            <View className="flex flex-row items-center justify-center mt-6">
+              <Text className="text-sm text-gray-100 font-pregular text-center">
+                Al iniciar sesión con Google o Apple, aceptas nuestras{" "}
+                <TouchableWithoutFeedback
+                  onPress={async () => {
+                    await WebBrowser.openBrowserAsync(TERMS_URL);
+                  }}
+                >
+                  <Text className="text-primary-500 font-psemibold">
+                    Condiciones de uso
+                  </Text>
+                </TouchableWithoutFeedback>{" "}
+                y nuestra{" "}
+                <TouchableWithoutFeedback
+                  onPress={async () => {
+                    await WebBrowser.openBrowserAsync(POLICY_URL);
+                  }}
+                >
+                  <Text className="text-primary-500 font-psemibold">
+                    Política de privacidad
+                  </Text>
+                </TouchableWithoutFeedback>
+              </Text>
+            </View>
+
+            <View className="flex justify-center pt-6 flex-row gap-2">
               <Text className="text-lg text-gray-100 font-pregular">
                 No tienes cuenta?
               </Text>

@@ -4,12 +4,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import {
   View,
   Text,
-  ScrollView,
   Dimensions,
-  Alert,
-  Image,
   Platform,
   TouchableOpacity,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
@@ -26,6 +24,8 @@ import Toast from "react-native-toast-message";
 import { LinearGradient } from "expo-linear-gradient";
 import useGetUserFirstUpcomingEvent from "@/hooks/useGetUserFirstUpcomingEvent";
 import { useSession as useSessionContext } from "@/context/AuthProvider";
+import { POLICY_URL } from "@/constants";
+import * as WebBrowser from "expo-web-browser";
 
 const SignUp = () => {
   const { createUser } = useSession();
@@ -199,9 +199,15 @@ const SignUp = () => {
               </View>
               <View className="flex-row flex-wrap">
                 <Text className="text-gray-100">Acepto las </Text>
-                <Link href="/privacy-policy" className="text-primary-500">
-                  políticas de privacidad
-                </Link>
+                <TouchableWithoutFeedback
+                  onPress={async () => {
+                    await WebBrowser.openBrowserAsync(POLICY_URL);
+                  }}
+                >
+                  <Text className="text-primary-500 font-psemibold">
+                    Política de privacidad
+                  </Text>
+                </TouchableWithoutFeedback>
               </View>
             </TouchableOpacity>
 

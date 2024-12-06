@@ -12,6 +12,7 @@ interface TicketItemProps {
   removeFromCart: (item: Item) => void;
   nominated?: boolean;
   endAt?: string;
+  outOfStock?: boolean;
 }
 
 export function TicketItem({
@@ -23,6 +24,7 @@ export function TicketItem({
   removeFromCart,
   nominated,
   endAt,
+  outOfStock,
 }: TicketItemProps) {
   const quantity =
     itemsInCart?.find(
@@ -62,7 +64,7 @@ export function TicketItem({
           </Text>
         )}
       </View>
-      {item?.stock > 0 ? (
+      {!outOfStock ? (
         <QuantityControls
           quantity={quantity}
           disabledAdd={disabledAdd}

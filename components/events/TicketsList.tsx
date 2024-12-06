@@ -12,6 +12,7 @@ interface TicketsListProps {
   removeFromCart: (item: Item) => void;
   nominated?: boolean;
   endAt?: string;
+  outOfStock?: boolean;
 }
 
 export function TicketsList({
@@ -23,6 +24,7 @@ export function TicketsList({
   removeFromCart,
   nominated,
   endAt,
+  outOfStock,
 }: TicketsListProps) {
   if (!items?.length) return null;
 
@@ -42,6 +44,7 @@ export function TicketsList({
             removeFromCart={removeFromCart}
             nominated={nominated}
             endAt={endAt}
+            outOfStock={outOfStock}
           />
         )}
         ListHeaderComponent={() => (

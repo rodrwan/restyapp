@@ -98,6 +98,7 @@ export default function EventPage() {
             removeFromCart={removeFromCart}
             nominated={event?.nominated}
             endAt={endAt}
+            outOfStock={event?.out_of_stock}
           />
 
           <TicketsList

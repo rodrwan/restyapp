@@ -103,29 +103,25 @@ const SignWithGoogle = ({ setUser, redirectTo }: any) => {
   };
 
   return (
-    <View className="flex w-full justify-center items-center mt-4">
-      <TouchableOpacity
-        className="flex flex-row w-full min-h-[60px] bg-white justify-center items-center rounded-xl"
-        onPress={() => {
-          _signIn();
-        }}
-      >
-        <View className="flex w-[32px] h-[32px] items-center mr-6">
-          <GoogleIcon size={4} />
-        </View>
-        <Text className="text-lg font-semibold text-secondary-500 self-center">
-          Login con Google
-        </Text>
-        {isSubmitting && (
-          <ActivityIndicator
-            animating={isSubmitting}
-            color={Colors.secondary[500]}
-            size="small"
-            className="ml-2"
-          />
-        )}
-      </TouchableOpacity>
-    </View>
+    <TouchableOpacity
+      className="flex flex-row w-[48%] min-h-[60px] bg-white justify-center items-center rounded-xl"
+      onPress={() => {
+        _signIn();
+      }}
+    >
+      <View className="flex w-full h-[32px] items-center">
+        <GoogleIcon size={4} />
+      </View>
+
+      {isSubmitting && (
+        <ActivityIndicator
+          animating={isSubmitting}
+          color={Colors.secondary[500]}
+          size="small"
+          className="ml-2"
+        />
+      )}
+    </TouchableOpacity>
   );
 };
 
