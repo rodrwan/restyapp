@@ -1231,17 +1231,214 @@ query GetUserUpcomingEvents {
 
   async requestPasswordReset(email: string): Promise<any> {
     try {
-      throw new Error("not implemented");
-    } catch (error) {
-      throw error;
+      const document = graphql.gql`
+       mutation ForgotPassword($input: String!) {
+          forgotPassword(email: $input) {
+              success
+              message
+          }
+      }
+      `;
+
+      const variables = {
+        input: email,
+      };
+
+      const requestHeaders = {
+        "X-User-Roles": "system",
+        Authorization: `Bearer ${this.accessToken}`,
+      };
+
+      const response = await fetch(`${MANGO_API_URL}`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          "x-user-platform": "mobile",
+          ...requestHeaders,
+        },
+        body: JSON.stringify({
+          query: document,
+          variables,
+          operationName: "ForgotPassword",
+        }),
+      });
+
+      if (response.status === 503) {
+        console.log("DeleteMe Unavailable service");
+        return [];
+      } else if (response.status !== 200) {
+        console.log("DeleteMe response", response);
+        return [];
+      }
+      const resp = await response.json();
+
+      console.log("resp?.data?.forgotPassword", resp?.data?.forgotPassword);
+      return [resp?.data?.forgotPassword, resp?.errors];
+    } catch (error: any) {
+      console.log("error", error);
+      throw new Error(error);
     }
   }
 
   async resetPassword(code: string, newPassword: string): Promise<any> {
     try {
-      throw new Error("not implemented");
-    } catch (error) {
-      throw error;
+      const document = graphql.gql`
+       mutation ResetPassword($token: String!, $password: String!) {
+          resetPassword(token: $token, password: $password) {
+              success
+              message
+          }
+      }
+      `;
+
+      const variables = {
+        token: code,
+        password: newPassword,
+      };
+
+      const requestHeaders = {
+        "X-User-Roles": "system",
+        Authorization: `Bearer ${this.accessToken}`,
+      };
+
+      const response = await fetch(`${MANGO_API_URL}`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          "x-user-platform": "mobile",
+          ...requestHeaders,
+        },
+        body: JSON.stringify({
+          query: document,
+          variables,
+          operationName: "ResetPassword",
+        }),
+      });
+
+      if (response.status === 503) {
+        console.log("DeleteMe Unavailable service");
+        return [];
+      } else if (response.status !== 200) {
+        console.log("DeleteMe response", response);
+        return [];
+      }
+      const resp = await response.json();
+
+      console.log("resp?.data?.resetPassword", resp?.data?.resetPassword);
+      return [resp?.data?.resetPassword, resp?.errors];
+    } catch (error: any) {
+      console.log("error", error);
+      throw new Error(error);
+    }
+  }
+
+  async deleteMe(): Promise<any> {
+    try {
+      const document = graphql.gql`
+        mutation DeleteUser {
+            deleteUser {
+                success
+                message
+            }
+        }
+      `;
+
+      const variables = {};
+
+      const requestHeaders = {
+        "X-User-Roles": "system",
+        Authorization: `Bearer ${this.accessToken}`,
+      };
+
+      const response = await fetch(`${MANGO_API_URL}`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          "x-user-platform": "mobile",
+          ...requestHeaders,
+        },
+        body: JSON.stringify({
+          query: document,
+          variables,
+          operationName: "DeleteUser",
+        }),
+      });
+
+      if (response.status === 503) {
+        console.log("DeleteMe Unavailable service");
+        return [];
+      } else if (response.status !== 200) {
+        console.log("DeleteMe response", response);
+        return [];
+      }
+      const resp = await response.json();
+
+      console.log("resp?.data?.deleteUser", resp?.data?.deleteUser);
+      return [resp?.data?.deleteUser, resp?.errors];
+    } catch (error: any) {
+      console.log("error", error);
+      throw new Error(error);
+    }
+  }
+
+  async updateUserExtra(user: any): Promise<any> {
+    console.log("user", user);
+    try {
+      const document = graphql.gql`
+      mutation UpdateUserExtra($input: UpdateUserProfileExtraInput!) {
+        updateUserProfileExtra(input: $input) {
+          success
+          message
+        }
+      }
+      `;
+
+      const variables = {
+        input: user,
+      };
+      console.log("variables", variables);
+
+      const requestHeaders = {
+        "X-User-Roles": "system",
+        Authorization: `Bearer ${this.accessToken}`,
+      };
+
+      const response = await fetch(`${MANGO_API_URL}`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          "x-user-platform": "mobile",
+          ...requestHeaders,
+        },
+        body: JSON.stringify({
+          query: document,
+          variables,
+          operationName: "UpdateUserExtra",
+        }),
+      });
+
+      if (response.status === 503) {
+        console.log("UpdateUserExtra Unavailable service");
+        return [];
+      } else if (response.status !== 200) {
+        console.log("UpdateUserExtra response", response);
+        return [];
+      }
+      const resp = await response.json();
+      console.log("resp", resp);
+
+      console.log(
+        "resp?.data?.updateUserProfileExtra",
+        resp?.data?.updateUserProfileExtra
+      );
+      return [resp?.data?.updateUserProfileExtra, resp?.errors];
+    } catch (error: any) {
+      console.log("error", error);
+      throw new Error(error);
     }
   }
 }

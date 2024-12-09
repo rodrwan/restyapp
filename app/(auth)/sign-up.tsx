@@ -218,7 +218,7 @@ const SignUp = () => {
               isLoading={isSubmitting}
             />
 
-            <View className="flex justify-center pt-5 flex-row gap-2">
+            <View className="flex justify-center pt-5 flex-row gap-2 pb-8">
               <Text className="text-lg text-gray-100 font-pregular">
                 Ya tienes cuenta?
               </Text>

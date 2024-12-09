@@ -22,7 +22,7 @@ const navigationIntegration = Sentry.reactNavigationIntegration({
 
 Sentry.init({
   dsn: "https://e2842dcad510cf6a4ef20f5ef120a887@o4508393889464320.ingest.us.sentry.io/4508438730702848",
-  debug: true, // If `true`, Sentry will try to print out useful debugging information if something goes wrong with sending the event. Set it to `false` in production
+  debug: false, // If `true`, Sentry will try to print out useful debugging information if something goes wrong with sending the event. Set it to `false` in production
   tracesSampleRate: 1.0, // Set tracesSampleRate to 1.0 to capture 100% of transactions for tracing. Adjusting this value in production.
   integrations: [
     // Pass integration
@@ -93,6 +93,20 @@ function RootLayoutNav() {
           name="(modal)/payments"
           options={{
             title: "Medios de pago",
+            presentation: "modal",
+          }}
+        />
+        <Stack.Screen
+          name="(modal)/delete"
+          options={{
+            title: "Borrar cuenta",
+            presentation: "modal",
+          }}
+        />
+        <Stack.Screen
+          name="(modal)/complete-profile"
+          options={{
+            title: "Completar perfil",
             presentation: "modal",
           }}
         />

@@ -57,6 +57,12 @@ const HomePage = () => {
     );
   }
 
+  if (user?.gender === "" || !user?.birth_date || user?.dni === "") {
+    return router.push("/(modal)/complete-profile");
+  }
+
+  console.log("user", JSON.stringify(user, null, 2));
+
   const splittedStartAt = upcomingEvent?.event?.start_at.split(" ");
   const joinedStartAt = splittedStartAt?.[0] + " " + splittedStartAt?.[1];
   const startAt = new Date(joinedStartAt).toLocaleString("es-CL", {

@@ -131,7 +131,6 @@ const Checkout = () => {
     try {
       if (event.nominated) {
         const newPayment = await authorizeTransaction(orderId, nominees);
-        console.log("newPayment", newPayment);
         const { status } = newPayment;
         if (status === "AUTHORIZED") {
           setLoadingSubmit(false);
@@ -155,7 +154,7 @@ const Checkout = () => {
     try {
       const newPayment = await createInscription();
       const { url, token } = newPayment;
-      console.log(`/(events)/inscription?url=${url}&token=${token}`);
+
       return router.push(`/(cart)/inscription?url=${url}&token=${token}`);
     } catch (error) {
       console.log(error);

@@ -82,7 +82,10 @@ const useLogin = () => {
 
   const requestPasswordReset = async (email: string) => {
     try {
-      const response = await client.requestPasswordReset(email);
+      const [response, errors] = await client.requestPasswordReset(email);
+      if (errors?.length > 0) {
+        throw errors;
+      }
       return response.data;
     } catch (error) {
       throw error;
@@ -91,14 +94,54 @@ const useLogin = () => {
 
   const resetPassword = async (code: string, newPassword: string) => {
     try {
-      const response = await client.resetPassword(code, newPassword);
+      const [response, errors] = await client.resetPassword(code, newPassword);
+      if (errors?.length > 0) {
+        throw errors;
+      }
       return response.data;
     } catch (error) {
       throw error;
     }
   };
 
-  return { createSession, createUser, me, resetPassword, requestPasswordReset };
+  const deleteMe = async () => {
+    try {
+      const [response, errors] = await client.deleteMe();
+      if (errors?.length > 0) {
+        throw errors;
+      }
+
+      return response.data;
+    } catch (err: any) {
+      if (err?.response?.errors[0]?.message === "session has expired") {
+        throw new Error("expired session");
+      }
+
+      throw err;
+    }
+  };
+
+  const updateUserExtra = async (user: any) => {
+    try {
+      const [response, errors] = await client.updateUserExtra(user);
+      if (errors?.length > 0) {
+        throw errors;
+      }
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  return {
+    createSession,
+    createUser,
+    me,
+    resetPassword,
+    requestPasswordReset,
+    deleteMe,
+    updateUserExtra,
+  };
 };
 
 export default useLogin;

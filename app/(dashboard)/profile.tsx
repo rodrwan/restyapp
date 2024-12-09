@@ -57,12 +57,12 @@ const ProfilePage = () => {
   };
 
   return (
-    <LinearGradient
-      // Background Linear Gradient
-      colors={["#04121A", "#092838"]}
-      className="flex h-full"
-    >
-      <ScrollView className="flex h-full pt-4">
+    <ScrollView className="flex h-full pb-8">
+      <LinearGradient
+        // Background Linear Gradient
+        colors={["#04121A", "#092838"]}
+        className="flex h-full"
+      >
         {/* Profile view */}
         {!Boolean(user) ? (
           <UserInfoSkeleton />
@@ -72,7 +72,7 @@ const ProfilePage = () => {
               {user && (
                 <Image
                   source={{ uri: user?.picture }}
-                  className="w-[80px] h-[80px] rounded-full shadow-2xl"
+                  className="w-[80px] h-[80px] rounded-full shadow-2xl border border-secondary-500"
                   style={styles.elevationLow}
                 />
               )}
@@ -87,7 +87,7 @@ const ProfilePage = () => {
           </View>
         )}
 
-        <View className="flex flex-row mx-4 py-6 justify-between mb-4">
+        <View className="flex flex-row mx-4 py-6 justify-between mb-8">
           {user?.tbk_card_number === "" ? (
             <View className="flex bg-secondary-50 p-4 rounded-xl w-full">
               <Text className="text-lg text-black font-bold">
@@ -129,8 +129,18 @@ const ProfilePage = () => {
             <MemoizedPaymentSection user={user} />
           )}
         </View>
-      </ScrollView>
-    </LinearGradient>
+        <View className="flex-grow mt-4 justify-between items-end">
+          <TouchableOpacity
+            className="p-4 rounded-xl w-full"
+            onPress={() => router.push("/(modal)/delete")}
+          >
+            <Text className="text-primary-300 text-md font-regular underline">
+              Eliminar cuenta
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </LinearGradient>
+    </ScrollView>
   );
 };
 

@@ -45,7 +45,7 @@ const Payment = () => {
                   console.log("success");
                   router.dismissAll();
                   setTbkCardNumber(result?.tbk_user, result?.card_number);
-                  return router.push(`/${params?.redirectTo ?? "/(cart)"}`);
+                  return router.replace(`/${params?.redirectTo ?? "(cart)"}`);
                 }
                 console.log("failure");
                 router.dismissAll();

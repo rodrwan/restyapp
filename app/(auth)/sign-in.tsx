@@ -42,8 +42,8 @@ const SignIn = () => {
 
   const [isSubmitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
-    email: "",
-    password: "",
+    email: "test06@mangoticket.com",
+    password: "test06",
   });
   const [error, setError] = useState(null);
 
@@ -212,7 +212,7 @@ const SignIn = () => {
               </Link>
             </View>
 
-            <View className="flex justify-center pt-4 flex-row gap-2">
+            <View className="flex justify-center pt-4 flex-row gap-2 pb-8">
               <Link
                 href="/forgot-password"
                 className="text-base font-psemibold text-primary-500"

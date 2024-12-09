@@ -29,6 +29,8 @@ interface User {
   email: string;
   picture: string;
   dni: string;
+  gender: string;
+  birth_date: Date;
   tickets: Ticket[] | null;
   drinks: Drink[] | null;
   events: Event[] | null;
@@ -55,6 +57,8 @@ const initialState = {
   email: "",
   picture: "",
   dni: "",
+  gender: "",
+  birth_date: new Date(),
   tickets: null,
   drinks: null,
   events: null,

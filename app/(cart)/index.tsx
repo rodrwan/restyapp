@@ -75,7 +75,7 @@ const Cart = () => {
     try {
       if (!session) {
         return router.push(
-          `/(auth)/sign-in?redirectTo=/(cart)?goBackTo=${params?.goBackTo}`
+          `/(auth)/sign-in?redirectTo=(cart)?goBackTo=${params?.goBackTo}`
         );
       }
 
@@ -83,7 +83,7 @@ const Cart = () => {
       console.log("newOrder", newOrder);
       if (newOrder?.length === 0) {
         return router.push(
-          `/(auth)/sign-in?redirectTo=/(cart)?goBackTo=${params?.goBackTo}`
+          `/(auth)/sign-in?redirectTo=(cart)?goBackTo=${params?.goBackTo}`
         );
       }
 
