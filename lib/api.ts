@@ -199,10 +199,12 @@ mutation Register($input: RegisterData!) {
       const resp = await response.json();
 
       if (!resp.errors) {
+        console.log("resp.errors", resp.errors);
         this.accessToken = resp?.data?.register.access_token;
         AsyncStorage.setItem("accessToken", this.accessToken);
       }
 
+      console.log("resp?.data?.register", resp?.data?.register);
       return [resp?.data?.register, resp?.errors];
     } catch (error: any) {
       console.log("error", error);
