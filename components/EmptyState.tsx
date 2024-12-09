@@ -15,7 +15,8 @@ const EmptyState = ({ title, subtitle }: any) => {
       <CustomButton
         title="Comprar tickets"
         handlePress={() => router.push("../")}
-        containerStyles="w-full my-5"
+        containerStyles="my-5 justify-center items-center"
+        textStyles="text-white text-center"
       />
     </View>
   );
