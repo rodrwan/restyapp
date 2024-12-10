@@ -1,7 +1,7 @@
 export const MANGO_FEE = 0.15;
 // export const MANGO_API_URL = "https://api.local.mangoticket.com/graphql";
-// export const MANGO_API_URL = "https://api.mangoticket.com/graphql";
-export const MANGO_API_URL = "http://localhost:8080/graphql";
+export const MANGO_API_URL = "https://api.mangoticket.com/graphql";
+// export const MANGO_API_URL = "http://localhost:8080/graphql";
 // export const MANGO_API_URL = "http://192.168.1.34/graphql";
 export const TERMS_URL =
   "https://mangoticket-legal.nyc3.cdn.digitaloceanspaces.com/1.%20TERMINOS%20Y%20CONDICIONES%20(1).pdf";

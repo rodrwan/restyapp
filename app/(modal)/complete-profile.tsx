@@ -9,7 +9,8 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import Modal from "react-native-modal";
+import { Picker } from "@react-native-picker/picker";
 
 import CustomButton from "@/components/CustomButton";
 import FormField from "@/components/FormField";
@@ -43,6 +44,29 @@ const CompleteProfile = () => {
 
   const [scrollY, setScrollY] = useState(0);
 
+  const [selectedYear, setSelectedYear] = useState(
+    new Date().getFullYear() - 18
+  );
+  const [selectedMonth, setSelectedMonth] = useState(1);
+  const [selectedDay, setSelectedDay] = useState(1);
+
+  const years = Array.from(
+    { length: 100 },
+    (_, i) => new Date().getFullYear() - i
+  );
+
+  const months = Array.from({ length: 12 }, (_, i) => i + 1);
+
+  const getDaysInMonth = (year: number, month: number) => {
+    return new Date(year, month, 0).getDate();
+  };
+
+  const handleDateConfirm = () => {
+    const newDate = new Date(selectedYear, selectedMonth - 1, selectedDay);
+    setForm({ ...form, birth_date: newDate });
+    setShowDatePicker(false);
+  };
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTransparent: true,
@@ -63,13 +87,6 @@ const CompleteProfile = () => {
         ) : null,
     });
   }, [scrollY]);
-
-  const handleDateChange = (event: any, selectedDate?: Date) => {
-    setShowDatePicker(false);
-    if (selectedDate) {
-      setForm({ ...form, birth_date: selectedDate });
-    }
-  };
 
   const submit = async () => {
     setSubmitting(true);
@@ -95,7 +112,7 @@ const CompleteProfile = () => {
         birth_date: form.birth_date,
       });
 
-      router.replace("/");
+      router.replace("/(dashboard)");
     } catch (err: any) {
       console.log("err", err);
       Toast.show({
@@ -124,7 +141,13 @@ const CompleteProfile = () => {
             }}
           >
             <Text className="text-2xl font-semibold text-white mt-10 font-psemibold">
-              Completa tu perfil
+              ¡Ayúdanos a conocerte mejor!
+            </Text>
+
+            <Text className="text-base text-white mt-4 font-psemibold">
+              Completa tu DNI, género y fecha de nacimiento para que podamos
+              recomendarte eventos que vayan contigo. 😉 ¡Personaliza tu
+              experiencia al máximo!
             </Text>
 
             <FormField
@@ -160,7 +183,7 @@ const CompleteProfile = () => {
               <Text className="text-gray-100 mb-2">Fecha de nacimiento</Text>
               <TouchableOpacity
                 onPress={() => setShowDatePicker(true)}
-                className="bg-gray-700 p-4 rounded-lg"
+                className="bg-gray-700 p-4 rounded-lg flex-row justify-between items-center"
               >
                 <Text className="text-white">
                   {form.birth_date.toLocaleDateString("es-ES", {
@@ -169,18 +192,84 @@ const CompleteProfile = () => {
                     year: "numeric",
                   })}
                 </Text>
+                <Ionicons name="calendar-outline" size={20} color="white" />
               </TouchableOpacity>
             </View>
 
-            {showDatePicker && (
-              <DateTimePicker
-                value={form.birth_date}
-                mode="date"
-                display="default"
-                onChange={handleDateChange}
-                maximumDate={new Date()}
-              />
-            )}
+            <Modal
+              isVisible={showDatePicker}
+              onBackdropPress={() => setShowDatePicker(false)}
+              className="m-0 justify-end"
+            >
+              <View className="bg-secondary-800 rounded-t-3xl p-4">
+                <View className="flex-row justify-between items-center mb-4">
+                  <TouchableOpacity onPress={() => setShowDatePicker(false)}>
+                    <Text className="text-primary-500">Cancelar</Text>
+                  </TouchableOpacity>
+                  <Text className="text-white font-psemibold">
+                    Fecha de nacimiento
+                  </Text>
+                  <TouchableOpacity onPress={handleDateConfirm}>
+                    <Text className="text-primary-500">Confirmar</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <View className="flex-row">
+                  <Picker
+                    selectedValue={selectedDay}
+                    onValueChange={setSelectedDay}
+                    style={{ flex: 1, color: "white" }}
+                  >
+                    {Array.from(
+                      { length: getDaysInMonth(selectedYear, selectedMonth) },
+                      (_, i) => (
+                        <Picker.Item
+                          key={i + 1}
+                          label={String(i + 1)}
+                          value={i + 1}
+                          color="white"
+                        />
+                      )
+                    )}
+                  </Picker>
+
+                  <Picker
+                    selectedValue={selectedMonth}
+                    onValueChange={setSelectedMonth}
+                    style={{ flex: 1, color: "white" }}
+                  >
+                    {months.map((month) => (
+                      <Picker.Item
+                        key={month}
+                        label={new Date(2000, month - 1, 1).toLocaleString(
+                          "es-ES",
+                          {
+                            month: "long",
+                          }
+                        )}
+                        value={month}
+                        color="white"
+                      />
+                    ))}
+                  </Picker>
+
+                  <Picker
+                    selectedValue={selectedYear}
+                    onValueChange={setSelectedYear}
+                    style={{ flex: 1, color: "white" }}
+                  >
+                    {years.map((year) => (
+                      <Picker.Item
+                        key={year}
+                        label={String(year)}
+                        value={year}
+                        color="white"
+                      />
+                    ))}
+                  </Picker>
+                </View>
+              </View>
+            </Modal>
 
             <CustomButton
               title="Guardar"

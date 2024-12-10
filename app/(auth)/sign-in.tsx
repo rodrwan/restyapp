@@ -42,8 +42,8 @@ const SignIn = () => {
 
   const [isSubmitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
-    email: "test06@mangoticket.com",
-    password: "test06",
+    email: "",
+    password: "",
   });
   const [error, setError] = useState(null);
 
