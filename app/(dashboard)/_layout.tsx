@@ -22,7 +22,6 @@ const DashboardLayoutNav = () => {
     return <Redirect href="/(auth)/sign-in" />;
   }
   return (
-    // <CheckAuth redirectTo="/(dashboard)">
     <>
       <Stack>
         <Stack.Screen name="index" options={{ header: () => <Header /> }} />

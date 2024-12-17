@@ -1,5 +1,5 @@
 import { useLayoutEffect, useState } from "react";
-import { router, useNavigation } from "expo-router";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   View,
@@ -70,21 +70,8 @@ const CompleteProfile = () => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTransparent: true,
-      headerTitle: "",
+      headerTitle: "Completa tu perfil",
       headerTintColor: Colors.primary[500],
-      headerLeft: () =>
-        Platform.OS === "ios" && scrollY <= 30 ? (
-          <TouchableOpacity
-            onPress={() => router.back()}
-            className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2 bg-secondary-500"
-          >
-            <Ionicons
-              name="chevron-back-outline"
-              size={20}
-              color={Colors.primary[500]}
-            />
-          </TouchableOpacity>
-        ) : null,
     });
   }, [scrollY]);
 
@@ -112,7 +99,7 @@ const CompleteProfile = () => {
         birth_date: form.birth_date,
       });
 
-      router.replace("/(dashboard)");
+      return router.back();
     } catch (err: any) {
       console.log("err", err);
       Toast.show({

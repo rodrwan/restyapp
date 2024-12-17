@@ -95,7 +95,7 @@ const useGetEventsFromUser = () => {
       console.log(">>> getEvents error", error);
       if (String(error).includes("unauthorized")) {
         console.log("getEvents error", error);
-        return router.replace("/(auth)/sign-in?redirectTo=/(dashboard)");
+        return router.replace("/(auth)/sign-in?redirectTo=(dashboard)");
       }
       setLoadingGetEvents(false);
       Alert.alert(">> Error", error.message);

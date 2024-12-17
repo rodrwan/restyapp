@@ -104,7 +104,7 @@ const SignIn = () => {
       getUserFirstUpcomingEvent();
       console.log(params?.redirectTo);
 
-      router.replace(params?.redirectTo || "/");
+      return router.replace(`/${params?.redirectTo ?? "(dashboard)"}`);
     } catch (err: any) {
       console.log(err);
       Toast.show({

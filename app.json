@@ -2,7 +2,7 @@
   "expo": {
     "name": "Mangoticket",
     "slug": "mangoticket",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "scheme": "mangoticket",
     "icon": "./assets/images/icon.png",
@@ -79,9 +79,10 @@
       [
         "@sentry/react-native/expo",
         {
-          "organization": "mangoticket",
-          "project": "mangoticket-app",
-          "url": "https://sentry.io/"
+          "url": "https://sentry.io/",
+          "note": "Use SENTRY_AUTH_TOKEN env to authenticate with Sentry.",
+          "project": "react-native",
+          "organization": "mangoticket"
         }
       ]
     ],

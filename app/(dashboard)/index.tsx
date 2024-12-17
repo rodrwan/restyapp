@@ -12,16 +12,17 @@ import {
   RefreshControl,
 } from "react-native";
 import { router, Href } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
 
-import Colors from "@/constants/Colors";
 import EmptyState from "@/components/EmptyState";
 import useUserStore from "@/stores/useUser";
 import useGetEventsFromUser from "@/hooks/useGetEventsFromUser";
 import useGetUserFirstUpcomingEvent from "@/hooks/useGetUserFirstUpcomingEvent";
 import { LinearGradient } from "expo-linear-gradient";
+import { useSession } from "@/context/AuthProvider";
 
 const HomePage = () => {
+  const { session } = useSession();
+  console.log("session", session);
   const { loadingUpcomingEvent, getUserFirstUpcomingEvent } =
     useGetUserFirstUpcomingEvent();
   const { user, upcomingEvent } = useUserStore();
@@ -35,13 +36,6 @@ const HomePage = () => {
   const onRefreshUserFirstUpcomingEvent = () => {
     getUserFirstUpcomingEvent();
   };
-  // const isFocused = useIsFocused();
-  // React.useEffect(() => {
-  //   if (isFocused && auth.isLogged) {
-  //     getEvents();
-  //     getUserFirstUpcomingEvent();
-  //   }
-  // }, [isFocused, auth]);
 
   if (loadingGetEvents && loadingUpcomingEvent) {
     return (
@@ -55,10 +49,6 @@ const HomePage = () => {
         </View>
       </LinearGradient>
     );
-  }
-
-  if (user?.gender === "" || !user?.birth_date || user?.dni === "") {
-    return router.push("/(modal)/complete-profile");
   }
 
   const splittedStartAt = upcomingEvent?.event?.start_at.split(" ");
@@ -93,12 +83,24 @@ const HomePage = () => {
           />
         }
       >
-        {!user?.events?.length && (
-          <EmptyState
-            title="No tienes eventos"
-            subtitle="No tienes próximos eventos"
-          />
-        )}
+        {user?.gender === "" || !user?.birth_date || user?.dni === "" ? (
+          <TouchableOpacity
+            onPress={() => router.push("/(modal)/complete-profile")}
+            className="p-2 mx-4 justify-center items-center bg-white rounded-xl mb-4"
+          >
+            <Text className="text-base font-base">
+              ¡Hola! Para brindarte la mejor experiencia, necesitamos algunos
+              datos adicionales de tu perfil. Con esta información podremos
+              recomendarte eventos que realmente te interesen.
+            </Text>
+
+            <View className="flex flex-row justify-center items-center bg-primary-500 p-4 rounded-xl mt-4">
+              <Text className="text-base font-base text-white">
+                Completar perfil
+              </Text>
+            </View>
+          </TouchableOpacity>
+        ) : null}
 
         {/* next event */}
         {upcomingEvent?.event?.id && (

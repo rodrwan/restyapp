@@ -77,7 +77,7 @@ const SignWithGoogle = ({ setUser, redirectTo }: any) => {
         getEvents();
 
         console.log("redirectTo", redirectTo);
-        router.replace(redirectTo);
+        router.replace(`/${redirectTo}`);
       }
     } catch (error) {
       if (isErrorWithCode(error)) {
