@@ -1229,6 +1229,81 @@ query GetUserUpcomingEvents {
     }
   }
 
+  async getOrderById(id: string): Promise<any> {
+    try {
+      const document = graphql.gql`
+        query GetOrderById($id: ID!) {
+          getOrderById(id: $id) {
+            order {
+              id
+              items {
+                type
+                name
+                price
+                quantity
+              }
+            }
+            payment {
+              id
+              amount
+              status
+              invoice_href
+              created_at
+            }
+            event {
+              id
+              name
+              start_at
+              place
+              description
+              image
+              address
+            }
+          }
+        }`;
+
+      const variables = {
+        id,
+      };
+
+      const requestHeaders = {
+        "X-User-Roles": "system",
+        Authorization: `Bearer ${this.accessToken}`,
+      };
+
+      const response = await fetch(`${MANGO_API_URL}`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          "x-user-platform": "mobile",
+          ...requestHeaders,
+        },
+        body: JSON.stringify({
+          query: document,
+          variables,
+          operationName: "GetOrderById",
+        }),
+      });
+
+      console.log("response", response);
+      if (response.status === 503) {
+        console.log("GetOrderById Unavailable service");
+        return [];
+      } else if (response.status !== 200) {
+        console.log("GetOrderById response", response);
+        return [];
+      }
+      const { data } = await response.json();
+      console.log("data", data);
+
+      return data.getOrderById;
+    } catch (error: any) {
+      console.log("error", error);
+      throw new Error(error);
+    }
+  }
+
   async requestPasswordReset(email: string): Promise<any> {
     try {
       const document = graphql.gql`
@@ -1397,7 +1472,10 @@ query GetUserUpcomingEvents {
       `;
 
       const variables = {
-        input: user,
+        input: {
+          ...user,
+          dni: user?.dni?.toString().replaceAll(".", ""),
+        },
       };
       console.log("variables", variables);
 

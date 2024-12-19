@@ -134,7 +134,7 @@ const Checkout = () => {
         const { status } = newPayment;
         if (status === "AUTHORIZED") {
           setLoadingSubmit(false);
-          return router.push("/(cart)/success");
+          return router.push(`/(cart)/success?orderId=${orderId}`);
         }
       }
 
@@ -142,7 +142,7 @@ const Checkout = () => {
       const { status } = newPayment;
       if (status === "AUTHORIZED") {
         setLoadingSubmit(false);
-        return router.push("/(cart)/success");
+        return router.push(`/(cart)/success?orderId=${orderId}`);
       }
     } catch (error) {
       console.log(">>>>", error);
@@ -155,7 +155,9 @@ const Checkout = () => {
       const newPayment = await createInscription();
       const { url, token } = newPayment;
 
-      return router.push(`/(cart)/inscription?url=${url}&token=${token}`);
+      return router.push(
+        `/(cart)/inscription?url=${url}&token=${token}&redirectTo=(cart)/checkout`
+      );
     } catch (error) {
       console.log(error);
     }

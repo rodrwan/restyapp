@@ -11,6 +11,7 @@ import useGetEventsWithPagination from "@/hooks/useGetEvents";
 import { Event } from "./types";
 import { sortByStartAt } from "./utils";
 import EventCard from "./components/EventCard";
+import { Link } from "expo-router";
 
 export default function HomePage() {
   const { data, refetch } = useGetEventsWithPagination();
@@ -47,6 +48,9 @@ export default function HomePage() {
             <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
           }
         />
+        <Link href="/(cart)/success?orderId=5e6f42e7-76c7-462f-ac64-be9020c408bc">
+          Success
+        </Link>
       </View>
     </LinearGradient>
   );
