@@ -6,7 +6,7 @@ import { router } from "expo-router";
 import useSession from "@/hooks/useSession";
 import useGetEventsFromUser from "@/hooks/useGetEventsFromUser";
 import { useSession as useSessionContext } from "@/context/AuthProvider";
-import { Colors } from "react-native/Libraries/NewAppScreen";
+import Colors from "@/constants/Colors";
 
 const SignWithApple = ({ setUser, redirectTo }: any) => {
   const [isSubmitting, setSubmitting] = React.useState(false);
