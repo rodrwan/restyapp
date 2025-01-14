@@ -57,7 +57,7 @@ const ProfilePage = () => {
   };
 
   return (
-    <ScrollView className="flex h-full pb-8">
+    <ScrollView className="flex h-full pb-8 bg-[#04121A]">
       <LinearGradient
         // Background Linear Gradient
         colors={["#04121A", "#092838"]}

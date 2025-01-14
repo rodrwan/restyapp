@@ -70,18 +70,19 @@ const HomePage = () => {
   const nextEventUrl: string = `/(dashboard)/events/${upcomingEvent?.event?.id}`;
 
   return (
-    <LinearGradient
-      // Background Linear Gradient
-      colors={["#04121A", "#092838"]}
+    <ScrollView
+      className="flex h-full pb-8 bg-[#04121A]"
+      refreshControl={
+        <RefreshControl
+          refreshing={loadingUpcomingEvent}
+          onRefresh={onRefreshUserFirstUpcomingEvent}
+        />
+      }
     >
-      <ScrollView
-        className="flex h-full pt-4"
-        refreshControl={
-          <RefreshControl
-            refreshing={loadingUpcomingEvent}
-            onRefresh={onRefreshUserFirstUpcomingEvent}
-          />
-        }
+      <LinearGradient
+        // Background Linear Gradient
+        colors={["#04121A", "#092838"]}
+        className="flex h-full"
       >
         {user?.gender === "" || !user?.birth_date || user?.dni === "" ? (
           <TouchableOpacity
@@ -196,8 +197,8 @@ const HomePage = () => {
             </View>
           </View>
         )}
-      </ScrollView>
-    </LinearGradient>
+      </LinearGradient>
+    </ScrollView>
   );
 };
 

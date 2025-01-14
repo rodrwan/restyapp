@@ -472,7 +472,7 @@ function AccordionView({ orderId, tickets, assignTicket }: any) {
             handleChangeText={(e: any) => {
               form[index] = {
                 ...form[index],
-                dni: format(e),
+                dni: format(e, { dots: false }),
               };
               setForm([...form]);
             }}
