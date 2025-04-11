@@ -10,7 +10,7 @@
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#041e2b"
+      "backgroundColor": "#04121A"
     },
     "ios": {
       "supportsTablet": false,
@@ -37,10 +37,10 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.mangoticket.mangoticketapp"
+      "package": "com.mangoticketapp.mangoticketapp"
     },
     "web": {
       "bundler": "metro",

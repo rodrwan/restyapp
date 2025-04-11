@@ -7,6 +7,7 @@ import {
   Image,
   Animated,
   Dimensions,
+  Platform,
 } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -52,18 +53,21 @@ const TicketPage = () => {
       headerTransparent: true,
       headerTitle: "",
       headerTintColor: Colors.primary[500],
-      headerLeft: () => (
-        <TouchableOpacity
-          onPress={() => router.replace("/(dashboard)")}
-          className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2"
-        >
-          <Ionicons
-            name="chevron-back-outline"
-            size={20}
-            color={Colors.primary[500]}
-          />
-        </TouchableOpacity>
-      ),
+      headerLeft: () =>
+        Platform.OS === "ios" && scrollY <= 30 ? (
+          <TouchableOpacity
+            onPress={() => router.replace("/(dashboard)")}
+            className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2"
+          >
+            <Ionicons
+              name="chevron-back-outline"
+              size={20}
+              color={Colors.primary[500]}
+            />
+          </TouchableOpacity>
+        ) : (
+          <View />
+        ),
       headerRight: () => (
         <TouchableOpacity onPress={() => router.push("/menu")}>
           <Ionicons name="menu" size={32} color={Colors.primary[500]} />

@@ -3,12 +3,17 @@ import HTTPClient from "@/lib/api";
 const client = HTTPClient.getInstance();
 
 const useAuthorizeTransaction = () => {
-  const authorizeTransaction = async (orderId: string, nominees: any[]) => {
+  const authorizeTransaction = async (
+    orderId: string,
+    nominees: any[],
+    installments: number
+  ) => {
     try {
       const body: any = {
         order_id: orderId,
         terms_and_conditions_signed: true,
         alcohol_signed: true,
+        installments: installments,
         nominated_items: nominees?.map((nominated: any) => {
           return {
             order_id: nominated.orderId,

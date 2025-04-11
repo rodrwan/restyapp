@@ -80,6 +80,7 @@ class Client {
           source
           tbk_user_id
           tbk_card_number
+          tbk_card_type
         }
         can_access
         access_token
@@ -158,6 +159,7 @@ mutation Register($input: RegisterData!) {
             source
             tbk_user_id
             tbk_card_number
+            tbk_card_type
         }
         access_token
     }
@@ -242,6 +244,7 @@ mutation Register($input: RegisterData!) {
           source
           tbk_user_id
           tbk_card_number
+          tbk_card_type
         }
       }
     }
@@ -882,6 +885,20 @@ mutation Register($input: RegisterData!) {
         Authorization: `Bearer ${this.accessToken}`,
       };
 
+      console.log({
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          "x-user-platform": "mobile",
+          ...requestHeaders,
+        },
+        body: JSON.stringify({
+          query: document,
+          variables,
+          operationName: "CreateInscription",
+        }),
+      });
       const response = await fetch(`${MANGO_API_URL}`, {
         method: "POST",
         headers: {
@@ -1222,7 +1239,7 @@ query GetUserUpcomingEvents {
       }
       const { data } = await response.json();
 
-      return data.getTicketById;
+      return data?.getTicketById;
     } catch (error: any) {
       console.log("error", error);
       throw new Error(error);

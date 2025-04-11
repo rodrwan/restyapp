@@ -98,7 +98,7 @@ const useUserStore = create<Store>((set) => ({
   updateTicket: (ticket: Ticket) => {
     set((state) => {
       const tickets = state?.user?.tickets ? [...state.user.tickets] : [];
-      const ticketIndex = tickets.findIndex((t) => t.id === ticket.id);
+      const ticketIndex = tickets.findIndex((t) => t?.id === ticket?.id);
 
       if (ticketIndex > -1) {
         tickets[ticketIndex] = {
@@ -110,7 +110,7 @@ const useUserStore = create<Store>((set) => ({
       }
 
       const drinks = state?.user?.drinks ? [...state.user.drinks] : [];
-      const drinkIndex = drinks.findIndex((t) => t.id === ticket.id);
+      const drinkIndex = drinks.findIndex((t) => t?.id === ticket?.id);
       if (drinkIndex > -1) {
         drinks[drinkIndex] = {
           ...drinks[drinkIndex],

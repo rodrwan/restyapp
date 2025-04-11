@@ -14,7 +14,6 @@ const payments = () => {
     try {
       const newPayment = await createInscription();
       const { url, token } = newPayment;
-      console.log(`/(events)/inscription?url=${url}&token=${token}`);
       return router.push(`/(cart)/inscription?url=${url}&token=${token}`);
     } catch (error) {
       console.log(error);

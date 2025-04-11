@@ -16,7 +16,7 @@ const AuthLayoutNav = () => {
         <Stack.Screen name="reset-password" />
       </Stack>
 
-      <StatusBar backgroundColor="#16162" style="light" />
+      <StatusBar backgroundColor="#04121A" style="light" />
     </>
   );
 };

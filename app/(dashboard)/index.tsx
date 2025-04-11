@@ -22,7 +22,6 @@ import { useSession } from "@/context/AuthProvider";
 
 const HomePage = () => {
   const { session } = useSession();
-  console.log("session", session);
   const { loadingUpcomingEvent, getUserFirstUpcomingEvent } =
     useGetUserFirstUpcomingEvent();
   const { user, upcomingEvent } = useUserStore();

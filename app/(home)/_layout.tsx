@@ -1,7 +1,6 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import Colors from "@/constants/Colors";
-
+import { View } from "react-native";
 export const unstable_settings = {
   // Ensure any route can link back to `/`
   initialRouteName: "index",
@@ -9,11 +8,11 @@ export const unstable_settings = {
 
 export default function HomeLayoutNav() {
   return (
-    <>
+    <View className="flex-1">
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" />
       </Stack>
-      <StatusBar backgroundColor={Colors.secondary[500]} style="light" />
-    </>
+      <StatusBar backgroundColor="#04121A" style="light" />
+    </View>
   );
 }

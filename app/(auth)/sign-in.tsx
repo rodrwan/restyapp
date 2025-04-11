@@ -161,17 +161,26 @@ const SignIn = () => {
               </Text>
             </View>
 
-            <View className="flex flex-row items-center justify-between mt-6 rounded-xl">
-              <SignWithGoogle
-                setUser={setUser}
-                redirectTo={params?.redirectTo ?? "(dashboard)"}
-              />
+            {Platform.OS === "ios" ? (
+              <View className="flex flex-row items-center justify-between mt-6 rounded-xl">
+                <SignWithGoogle
+                  setUser={setUser}
+                  redirectTo={params?.redirectTo ?? "(dashboard)"}
+                />
 
-              <SignWithApple
-                setUser={setUser}
-                redirectTo={params?.redirectTo ?? "(dashboard)"}
-              />
-            </View>
+                <SignWithApple
+                  setUser={setUser}
+                  redirectTo={params?.redirectTo ?? "(dashboard)"}
+                />
+              </View>
+            ) : (
+              <View className="flex flex-row items-center justify-between mt-6 rounded-xl">
+                <SignWithGoogle
+                  setUser={setUser}
+                  redirectTo={params?.redirectTo ?? "(dashboard)"}
+                />
+              </View>
+            )}
 
             <View className="flex flex-row items-center justify-center mt-6">
               <Text className="text-sm text-gray-100 font-pregular text-center">

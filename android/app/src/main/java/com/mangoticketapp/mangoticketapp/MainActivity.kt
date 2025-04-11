@@ -1,4 +1,4 @@
-package com.mangoticket.mangoticketapp
+package com.mangoticketapp.mangoticketapp
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

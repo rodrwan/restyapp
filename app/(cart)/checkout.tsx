@@ -42,15 +42,14 @@ const Checkout = () => {
 
   const { orderId } = params;
   const { user }: any = useUserStore();
-
   const { items, nominees, assignTicket, clearCart, clearTicketToNominate } =
     useCartStore();
   const { event } = useEventStore();
 
-  console.log("event", event);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [termAndConditions, setTermAndConditions] = useState(false);
   const [scrollY, setScrollY] = useState(0);
+  const [installments, setInstallments] = useState(0);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -111,6 +110,13 @@ const Checkout = () => {
     })();
   });
 
+  React.useEffect(() => {
+    if (user?.firstname === "") {
+      // logout
+      router.replace("/(auth)/sign-in?redirectTo=(cart)06@");
+    }
+  }, [user?.firstname]);
+
   const onAuthenticate = async () => {
     const result = await LocalAuthentication.authenticateAsync({
       promptMessage: "Confirma tu compra",
@@ -130,7 +136,11 @@ const Checkout = () => {
     setLoadingSubmit(true);
     try {
       if (event.nominated) {
-        const newPayment = await authorizeTransaction(orderId, nominees);
+        const newPayment = await authorizeTransaction(
+          orderId,
+          nominees,
+          installments
+        );
         const { status } = newPayment;
         if (status === "AUTHORIZED") {
           setLoadingSubmit(false);
@@ -138,7 +148,7 @@ const Checkout = () => {
         }
       }
 
-      const newPayment = await authorizeTransaction(orderId, []);
+      const newPayment = await authorizeTransaction(orderId, [], installments);
       const { status } = newPayment;
       if (status === "AUTHORIZED") {
         setLoadingSubmit(false);
@@ -187,11 +197,10 @@ const Checkout = () => {
     return nominee?.dni && nominee?.email;
   });
 
-  console.log(
-    event.nominated,
-    nominees?.length,
-    event.nominated && nominees?.length > 0
-  );
+  console.log("user", JSON.stringify(user, null, 2));
+  console.log("installments", installments);
+  console.log("user.tbk_card_type", user?.tbk_card_type);
+  console.log(["RedCompra", "PrePago"].includes(user.tbk_cart_type));
   return (
     <LinearGradient
       // Background Linear Gradient
@@ -331,6 +340,21 @@ const Checkout = () => {
                       expiryDate="XX/XX"
                     />
                   </TouchableOpacity>
+
+                  {!["RedCompra", "PrePago"].includes(user.tbk_card_type) && (
+                    <View className="flex flex-col items-center justify-between w-full px-2">
+                      <FormField
+                        title="Cuotas"
+                        value={installments}
+                        handleChangeText={(e: any) => setInstallments(e)}
+                        otherStyles="mt-1 mb-4"
+                        autoComplete="name"
+                        textStyle="ml-5"
+                        keyboardType="numeric"
+                        defaultValue={installments ?? 0}
+                      />
+                    </View>
+                  )}
                 </View>
               )}
             </View>

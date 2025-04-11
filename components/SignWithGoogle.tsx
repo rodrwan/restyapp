@@ -1,4 +1,10 @@
-import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Platform,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 
 import {
@@ -104,22 +110,24 @@ const SignWithGoogle = ({ setUser, redirectTo }: any) => {
 
   return (
     <TouchableOpacity
-      className="flex flex-row w-[48%] min-h-[60px] bg-white justify-center items-center rounded-xl"
+      className={`flex flex-row w-[48%] min-h-[60px] bg-white justify-center items-center rounded-xl ${
+        Platform.OS !== "ios" ? "w-full" : ""
+      }`}
       onPress={() => {
         _signIn();
       }}
     >
-      <View className="flex w-full h-[32px] items-center">
-        <GoogleIcon size={4} />
-      </View>
-
-      {isSubmitting && (
+      {isSubmitting ? (
         <ActivityIndicator
           animating={isSubmitting}
           color={Colors.secondary[500]}
           size="small"
           className="ml-2"
         />
+      ) : (
+        <View className="flex w-full h-[32px] items-center">
+          <GoogleIcon size={4} />
+        </View>
       )}
     </TouchableOpacity>
   );

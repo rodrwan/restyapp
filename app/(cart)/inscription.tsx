@@ -5,12 +5,14 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import queryString from "query-string";
 import useConfirmInscription from "@/hooks/useConfirmInscription";
 import useUserStore from "@/stores/useUser";
+import useSession from "@/hooks/useSession";
 
 const Payment = () => {
   const params: any = useLocalSearchParams();
   const router = useRouter();
   const { confirmInscription } = useConfirmInscription();
   const { setTbkCardNumber } = useUserStore();
+  const { me } = useSession();
 
   return (
     <View className="flex flex-1">
@@ -42,6 +44,7 @@ const Payment = () => {
               try {
                 const result = await confirmInscription(TBK_TOKEN);
                 if (result) {
+                  await me();
                   console.log("success");
                   router.dismissAll();
                   setTbkCardNumber(result?.tbk_user, result?.card_number);

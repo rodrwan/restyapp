@@ -16,9 +16,6 @@ const useGetPostWithPagination = () => {
     try {
       const res = await client.getEvents();
       setData(res);
-      // const nArrays = [...data, ...res];
-      // setData([].concat(...nArrays));
-      // nextPageIdentifierRef.current = res[res.length - 1]?.createdAt;
     } catch (error: any) {
       console.log("error", error);
       Alert.alert(">> Error", error.message);

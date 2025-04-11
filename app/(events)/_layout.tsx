@@ -1,14 +1,14 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import Colors from "@/constants/Colors";
+import { View } from "react-native";
 
 export default function EventsLayoutNav() {
   return (
-    <>
+    <View className="flex-1">
       <Stack>
         <Stack.Screen name="[eventId]" />
       </Stack>
-      <StatusBar backgroundColor={Colors.secondary[500]} style="light" />
-    </>
+      <StatusBar backgroundColor="#04121A" style="light" />
+    </View>
   );
 }
