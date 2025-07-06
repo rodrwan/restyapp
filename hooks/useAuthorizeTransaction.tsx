@@ -25,7 +25,7 @@ const useAuthorizeTransaction = () => {
       };
       const response: any = await client.authorizeTransaction(body);
 
-      return response;
+      return response.data?.authorizeTransaction;
     } catch (err: any) {
       if (err?.response?.errors[0]?.message === "session has expired") {
         throw new Error("expired session");

@@ -47,6 +47,7 @@ const TicketPage = () => {
   const { user, updateTicket } = useUserStore();
   const scrollX = React.useRef(new Animated.Value(0)).current;
   const { data: ticketFound, getTicket }: any = useGetTicketById();
+  const [scrollY, setScrollY] = React.useState(0);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -244,8 +245,8 @@ const TicketPage = () => {
                 ) : (
                   <View className="flex justify-center items-center h-full">
                     <EmptyState
-                      title="No tienes entradas"
-                      subtitle="No has comprado entradas para algún evento."
+                      title="El sistema aún no ha encontrado nuevos eventos"
+                      subtitle="Próximamente acá aparecerán los eventos que tienes a tu disposición"
                     />
                   </View>
                 )}

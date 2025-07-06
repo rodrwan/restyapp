@@ -6,10 +6,10 @@ const useConfirmPayment = () => {
   const confirmPayment = async (token: string) => {
     try {
       const payment: any = await client.getPaymentByToken(String(token));
+      const data = payment.data?.getPaymentByToken;
+      const response: any = await client.confirmNewPayment(data.id);
 
-      const response: any = await client.confirmNewPayment(payment.id);
-
-      switch (response.status) {
+      switch (response.data?.confirmPayment.status) {
         case 1:
           return true;
         case 7:
@@ -17,7 +17,7 @@ const useConfirmPayment = () => {
         default:
           console.log(
             "default confirmPayment response.status",
-            response.status
+            response.data?.confirmPayment.status
           );
           return false;
       }

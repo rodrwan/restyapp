@@ -1,6 +1,7 @@
 import HTTPClient from "@/lib/api";
 import useUserStore from "@/stores/useUser";
 import React from "react";
+import { router } from "expo-router";
 
 const client = HTTPClient.getInstance();
 
@@ -11,17 +12,13 @@ const useMe = () => {
   const me = async () => {
     setLoadingUserData(true);
     try {
-      const [response, errors] = await client.me();
-      console.log("errors", errors);
-      console.log("response", response);
-      if (errors?.length > 0) {
-        throw errors;
+      const response = await client.me();
+      if (!response.data?.me?.user) {
+        return router.replace("/(auth)/sign-in?redirectTo=(dashboard)");
       }
-
-      console.log("response", response);
-      setUser(response?.user);
+      setUser(response.data?.me?.user);
       setLoadingUserData(false);
-      return response;
+      return response.data?.me?.user;
     } catch (err: any) {
       if (err?.response?.errors[0]?.message === "session has expired") {
         throw new Error("expired session");

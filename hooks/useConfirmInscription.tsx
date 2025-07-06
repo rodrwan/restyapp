@@ -3,12 +3,12 @@ import HTTPClient from "@/lib/api";
 const client = HTTPClient.getInstance();
 
 const useConfirmInscription = () => {
-  const confirmInscription = async (token: string) => {
+  const confirmInscription = async (token: string, eventId: string) => {
     try {
-      const response: any = await client.confirmInscription(token);
-
-      if (response.card_number) {
-        return response;
+      const response: any = await client.confirmInscription(token, eventId);
+      const data = response.data?.confirmInscription;
+      if (data.card_number) {
+        return data;
       }
       return null;
     } catch (err: any) {

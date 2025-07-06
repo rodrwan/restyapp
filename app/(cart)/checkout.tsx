@@ -13,12 +13,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import Accordion from "react-native-collapsible/Accordion";
-import {
-  router,
-  useLocalSearchParams,
-  useNavigation,
-  useSegments,
-} from "expo-router";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 
 import Colors from "@/constants/Colors";
@@ -130,7 +125,7 @@ const Checkout = () => {
   };
 
   const { authorizeTransaction } = useAuthorizeTransaction();
-  const { createInscription } = useCreateInscription();
+  const { createInscription } = useCreateInscription(event?.id);
 
   const onSubmit = async () => {
     setLoadingSubmit(true);
@@ -141,6 +136,7 @@ const Checkout = () => {
           nominees,
           installments
         );
+        console.log("newPayment", newPayment);
         const { status } = newPayment;
         if (status === "AUTHORIZED") {
           setLoadingSubmit(false);
@@ -149,6 +145,7 @@ const Checkout = () => {
       }
 
       const newPayment = await authorizeTransaction(orderId, [], installments);
+      console.log("newPayment", newPayment);
       const { status } = newPayment;
       if (status === "AUTHORIZED") {
         setLoadingSubmit(false);
@@ -197,7 +194,6 @@ const Checkout = () => {
     return nominee?.dni && nominee?.email;
   });
 
-  console.log("user", JSON.stringify(user, null, 2));
   console.log("installments", installments);
   console.log("user.tbk_card_type", user?.tbk_card_type);
   console.log(["RedCompra", "PrePago"].includes(user.tbk_cart_type));

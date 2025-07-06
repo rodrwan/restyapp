@@ -14,8 +14,8 @@ const useGetEventsFromUser = () => {
     setLoadingGetEvents(true);
     try {
       const orders = await client.getOrderItemsByUser();
-
-      if ((orders?.length ?? 0) === 0) {
+      const orderData = orders.data?.getOrderItemsByUser;
+      if ((orderData?.length ?? 0) === 0) {
         return {
           orders: [],
           tickets: [],
@@ -24,13 +24,14 @@ const useGetEventsFromUser = () => {
         };
       }
 
-      const events = orders
+      const events = orderData
         ?.map((order: any) => order?.items?.map((item: any) => item?.event_id))
         ?.flat()
         .filter((x: any, i: any, a: any) => a.indexOf(x) == i);
 
       const response = await client.getEventsByIds(events);
-      if (!response) {
+      const eventsData = response.data?.getEventsByIds;
+      if (!response.data?.getEventsByIds?.events) {
         return {
           orders: [],
           tickets: [],
@@ -39,14 +40,14 @@ const useGetEventsFromUser = () => {
         };
       }
 
-      const data = await Promise.all(
-        response?.events?.map(async (event: any) => {
+      const ticketsData = await Promise.all(
+        response.data?.getEventsByIds?.events?.map(async (event: any) => {
           return await client.getTicketsByUserAndEventID(event.id);
         })
       );
 
-      const tickets = data?.map((d) => {
-        return d?.data?.map((cur: any) => {
+      const tickets = ticketsData?.map((d: any) => {
+        return d?.data?.getTickets?.data?.map((cur: any) => {
           if (cur?.event_item?.type !== "ENTRANCE") {
             return;
           }
@@ -57,13 +58,17 @@ const useGetEventsFromUser = () => {
             isValidated: cur?.ticket?.is_validated,
             name: cur?.event_item?.name,
             event: cur?.event,
+            cover: cur?.ticket?.cover,
           };
         }, {});
       });
 
-      const drinks = data?.map((d) => {
-        return d?.data?.map((cur: any) => {
-          if (cur?.event_item?.type !== "DRINK") {
+      const drinks = ticketsData?.map((d: any) => {
+        return d?.data?.getTickets?.data?.map((cur: any) => {
+          if (
+            cur?.event_item?.type !== "COVER" &&
+            cur?.event_item?.type !== "DRINK"
+          ) {
             return;
           }
 
@@ -81,7 +86,7 @@ const useGetEventsFromUser = () => {
         orders,
         tickets: tickets?.flat()?.filter(Boolean),
         drinks: drinks?.flat()?.filter(Boolean),
-        events: response?.events,
+        events: response.data?.getEventsByIds?.events,
       };
       // .filter((ticket) => !ticket?.isValidated),
       // .filter((ticket) => !ticket?.isValidated),
@@ -92,9 +97,9 @@ const useGetEventsFromUser = () => {
       setLoadingGetEvents(false);
       return result;
     } catch (error: any) {
-      console.log(">>> getEvents error", error);
+      console.log(">>> useGetEventsFromUser getEvents error", error);
       if (String(error).includes("unauthorized")) {
-        console.log("getEvents error", error);
+        console.log("useGetEventsFromUser getEvents unauthorized error", error);
         return router.replace("/(auth)/sign-in?redirectTo=(dashboard)");
       }
       setLoadingGetEvents(false);

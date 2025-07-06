@@ -12,7 +12,7 @@ const useGetOrderById = () => {
     setLoading(true);
     try {
       const res = await client.getOrderById(orderId);
-      setData(res);
+      setData(res.data?.getOrderById);
     } catch (error: any) {
       Alert.alert(">> Error", error.message);
     } finally {

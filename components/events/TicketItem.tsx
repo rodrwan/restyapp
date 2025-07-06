@@ -43,13 +43,21 @@ export function TicketItem({
     >
       <View className="flex flex-col">
         <Text className="text-white text-base font-bold mb-2">
-          {item?.name}
+          {`${item?.name} `}
           {nominated && (
             <Text className="py-1.5 text-xs text-secondary-200">
               (Nominada)
             </Text>
           )}
         </Text>
+
+        {item?.cover && (
+          <View>
+            <Text className="py-1.5 text-xs text-secondary-200">
+              (Con cover)
+            </Text>
+          </View>
+        )}
         {nominated && endAt && (
           <Text className="py-1.5 text-secondary-200" numberOfLines={1}>
             Válido hasta las {endAt}

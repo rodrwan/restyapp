@@ -9,6 +9,7 @@ export interface Item {
   isValidated?: boolean;
   base64?: string;
   event?: Event;
+  cover?: boolean;
 }
 
 export interface Event {

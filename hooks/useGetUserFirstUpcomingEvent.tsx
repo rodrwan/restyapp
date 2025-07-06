@@ -15,7 +15,7 @@ const getUserFirstUpcomingEvent = () => {
     setLoadingUpcomingEvent(true);
     try {
       const result = await client.getUserFirstUpcomingEvent();
-      setUpcomingEvent(result);
+      setUpcomingEvent(result.data?.getUserFirstUpcomingEvent);
       setLoadingUpcomingEvent(false);
       return result;
     } catch (err: any) {

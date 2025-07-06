@@ -2,13 +2,15 @@ import { View, Text, TouchableOpacity, Image } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import useUserStore from "@/stores/useUser";
+import useEventStore from "@/stores/useEvent";
 import { CreditCard } from "@/components/CreditCard";
 import useCreateInscription from "@/hooks/useCreateInscription";
 import { router } from "expo-router";
 
 const payments = () => {
   const { user }: any = useUserStore();
-  const { createInscription } = useCreateInscription();
+  const { event } = useEventStore();
+  const { createInscription } = useCreateInscription(event?.id);
 
   const onSubmitRegisterCard = async () => {
     try {

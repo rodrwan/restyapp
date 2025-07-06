@@ -25,6 +25,7 @@ const HomePage = () => {
   const { loadingUpcomingEvent, getUserFirstUpcomingEvent } =
     useGetUserFirstUpcomingEvent();
   const { user, upcomingEvent } = useUserStore();
+
   const { loadingGetEvents, getEvents } = useGetEventsFromUser();
 
   React.useEffect(() => {
@@ -70,7 +71,7 @@ const HomePage = () => {
 
   return (
     <ScrollView
-      className="flex h-full pb-8 bg-[#04121A]"
+      className="flex h-auto pb-8 bg-[#04121A]"
       refreshControl={
         <RefreshControl
           refreshing={loadingUpcomingEvent}
@@ -81,7 +82,7 @@ const HomePage = () => {
       <LinearGradient
         // Background Linear Gradient
         colors={["#04121A", "#092838"]}
-        className="flex h-full"
+        className="flex h-screen"
       >
         {user?.gender === "" || !user?.birth_date || user?.dni === "" ? (
           <TouchableOpacity
@@ -100,9 +101,35 @@ const HomePage = () => {
               </Text>
             </View>
           </TouchableOpacity>
-        ) : null}
+        ) : (
+          <View className="flex flex-row bg-white rounded-xl mx-4 py-6 px-8 justify-between my-4">
+            <View className="w-1/4">
+              {user && (
+                <Image
+                  source={{ uri: user?.picture }}
+                  className="w-[80px] h-[80px] rounded-full shadow-2xl border border-secondary-500"
+                  style={styles.elevationLow}
+                />
+              )}
+            </View>
+            <View className="w-3/4 justify-center ml-4">
+              <Text className="text-base " numberOfLines={1}>
+                {user?.firstname} {user?.lastname}
+              </Text>
+              <Text className="text-base ">{user?.dni}</Text>
+              <Text className="text-xs text-secondary-200 ">{user?.email}</Text>
+            </View>
+          </View>
+        )}
 
         {/* next event */}
+        {!upcomingEvent && (
+          <View className="h-full mx-2 my-4 justify-start items-center">
+            <Text className="text-white font-bold text-xl mx-2">
+              Aún no tienes eventos
+            </Text>
+          </View>
+        )}
         {upcomingEvent?.event?.id && (
           <UpcomingEventMemo
             upcomingEvent={upcomingEvent}
@@ -188,8 +215,8 @@ const HomePage = () => {
                 }}
                 ListEmptyComponent={() => (
                   <EmptyState
-                    title="No tienes eventos"
-                    subtitle="No tienes próximos eventos"
+                    title="El sistema aún no ha encontrado nuevos eventos"
+                    subtitle="Próximamente acá aparecerán los eventos que tienes a tu disposición"
                   />
                 )}
               />
@@ -280,12 +307,12 @@ const UpcomingEventMemo = ({
               <View className="ml-2">
                 <Text className="text-xs text-secondary-300">
                   {user?.tickets
-                    ?.filter(
-                      (drink: any) =>
-                        drink.event.id === upcomingEvent?.event?.id
-                    )
-                    ?.filter((drink: any) => !drink?.isValidated)?.length ??
-                    0}{" "}
+                    ?.filter((ticket: any) => {
+                      return ticket.event.id === upcomingEvent?.event?.id;
+                    })
+                    ?.filter((ticket: any) => {
+                      return !ticket?.isValidated;
+                    })?.length ?? 0}{" "}
                   Disponibles
                 </Text>
                 <Text className="font-bold">Entradas</Text>

@@ -12,7 +12,7 @@ const useGetEventById = (eventId: string) => {
     setLoading(true);
     try {
       const res = await client.getEventById(eventId);
-      setData(res);
+      setData(res.data?.getEventById);
     } catch (error: any) {
       Alert.alert(">> Error", error.message);
     } finally {

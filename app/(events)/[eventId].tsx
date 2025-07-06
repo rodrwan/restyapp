@@ -45,6 +45,7 @@ export default function EventPage() {
   }: any = useGetEventById(eventId);
 
   React.useEffect(() => {
+    console.log("event", event);
     setEvent(event);
   }, [event]);
   if (!Boolean(eventId) || loading) {

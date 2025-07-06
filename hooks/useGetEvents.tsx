@@ -15,7 +15,7 @@ const useGetPostWithPagination = () => {
     setLoading(true);
     try {
       const res = await client.getEvents();
-      setData(res);
+      setData(res.data?.getEvents);
     } catch (error: any) {
       console.log("error", error);
       Alert.alert(">> Error", error.message);

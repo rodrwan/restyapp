@@ -12,7 +12,7 @@ const useGetTicketById = () => {
     setLoading(true);
     try {
       const res = await client.getTicketById(ticketId);
-      setData(res);
+      setData(res.data?.getTicketById);
     } catch (error: any) {
       Alert.alert(">> Error", error.message);
     } finally {

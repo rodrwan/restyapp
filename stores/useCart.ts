@@ -6,6 +6,7 @@ interface Item {
   type: string;
   price: number;
   quantity?: number;
+  cover?: boolean;
 }
 
 interface Nominated {
@@ -36,6 +37,7 @@ const useCartStore = create<Store>((set) => ({
   nominees: initialNominees,
 
   addToCart: (item: Item) => {
+    console.log("item", item);
     set((state) => {
       const isItemInCart = state?.items?.find(
         (cartItem: any) => cartItem.id === item.id
@@ -51,6 +53,7 @@ const useCartStore = create<Store>((set) => ({
           ),
         };
       }
+
       return {
         ...state,
         items: [...state.items, { ...item, quantity: 1 }],

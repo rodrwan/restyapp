@@ -6,6 +6,7 @@ import queryString from "query-string";
 import useConfirmInscription from "@/hooks/useConfirmInscription";
 import useUserStore from "@/stores/useUser";
 import useSession from "@/hooks/useSession";
+import useEventStore from "@/stores/useEvent";
 
 const Payment = () => {
   const params: any = useLocalSearchParams();
@@ -13,7 +14,8 @@ const Payment = () => {
   const { confirmInscription } = useConfirmInscription();
   const { setTbkCardNumber } = useUserStore();
   const { me } = useSession();
-
+  const { event } = useEventStore();
+  console.log("params.url", params.url);
   return (
     <View className="flex flex-1">
       <WebView
@@ -42,7 +44,7 @@ const Payment = () => {
             // call confirm payment using token_ws
             if (TBK_TOKEN) {
               try {
-                const result = await confirmInscription(TBK_TOKEN);
+                const result = await confirmInscription(TBK_TOKEN, event?.id);
                 if (result) {
                   await me();
                   console.log("success");

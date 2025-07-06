@@ -3,6 +3,95 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { MANGO_API_URL } from "@/constants";
 
+// Tipos de error personalizados
+export enum ApiErrorType {
+  NETWORK_ERROR = "NETWORK_ERROR",
+  AUTHENTICATION_ERROR = "AUTHENTICATION_ERROR",
+  AUTHORIZATION_ERROR = "AUTHORIZATION_ERROR",
+  VALIDATION_ERROR = "VALIDATION_ERROR",
+  SERVER_ERROR = "SERVER_ERROR",
+  SERVICE_UNAVAILABLE = "SERVICE_UNAVAILABLE",
+  UNKNOWN_ERROR = "UNKNOWN_ERROR",
+}
+
+export interface ApiError {
+  type: ApiErrorType;
+  message: string;
+  statusCode?: number;
+  originalError?: any;
+  timestamp: Date;
+}
+
+// Clase para manejo centralizado de errores
+class ApiErrorHandler {
+  static createError(
+    type: ApiErrorType,
+    message: string,
+    statusCode?: number,
+    originalError?: any
+  ): ApiError {
+    return {
+      type,
+      message,
+      statusCode,
+      originalError,
+      timestamp: new Date(),
+    };
+  }
+
+  static handleHttpError(statusCode: number, response?: Response): ApiError {
+    switch (statusCode) {
+      case 401:
+        return this.createError(
+          ApiErrorType.AUTHENTICATION_ERROR,
+          "Sesión expirada o credenciales inválidas",
+          statusCode
+        );
+      case 403:
+        return this.createError(
+          ApiErrorType.AUTHORIZATION_ERROR,
+          "No tienes permisos para realizar esta acción",
+          statusCode
+        );
+      case 422:
+        return this.createError(
+          ApiErrorType.VALIDATION_ERROR,
+          "Datos de entrada inválidos",
+          statusCode
+        );
+      case 503:
+        return this.createError(
+          ApiErrorType.SERVICE_UNAVAILABLE,
+          "Servicio temporalmente no disponible",
+          statusCode
+        );
+      case 500:
+        return this.createError(
+          ApiErrorType.SERVER_ERROR,
+          "Error interno del servidor",
+          statusCode
+        );
+      default:
+        return this.createError(
+          ApiErrorType.UNKNOWN_ERROR,
+          `Error HTTP ${statusCode}`,
+          statusCode
+        );
+    }
+  }
+
+  static logError(error: ApiError, context: string) {
+    console.error(`[${context}] Error:`, {
+      type: error.type,
+      message: error.message,
+      statusCode: error.statusCode,
+      timestamp: error.timestamp,
+      originalError: error.originalError,
+    });
+  }
+}
+
+// Interfaces mejoradas
 interface LoginInput {
   password: string;
   username: string;
@@ -19,10 +108,29 @@ interface RegisterInput {
   reference_id: string;
 }
 
+export interface ApiResponse<T> {
+  data?: T;
+  error?: ApiError;
+}
+
+// Configuración de la API
+interface ApiConfig {
+  baseUrl: string;
+  timeout: number;
+  retryAttempts: number;
+  retryDelay: number;
+}
+
 class Client {
   private static _instance: Client = new Client();
-  accessToken: string = "";
-  refreshToken: string = "";
+  private accessToken: string = "";
+  private refreshToken: string = "";
+  private config: ApiConfig = {
+    baseUrl: MANGO_API_URL,
+    timeout: 30000, // 30 segundos
+    retryAttempts: 3,
+    retryDelay: 1000, // 1 segundo
+  };
 
   constructor() {
     if (Client._instance) {
@@ -33,115 +141,229 @@ class Client {
     Client._instance = this;
   }
 
-  public async getAccessToken(): Promise<string | null> {
-    const accessToken = await AsyncStorage.getItem("accessToken");
-    if (accessToken) {
-      this.accessToken = accessToken;
-    }
-    return this.accessToken;
-  }
-
-  public async setAccessToken(accessToken: string) {
-    this.accessToken = accessToken;
-  }
-
   public static getInstance(): Client {
     return Client._instance;
   }
 
-  // Initialize session
-  async signIn(input: LoginInput) {
+  // Método centralizado para hacer requests
+  private async makeRequest<T>(
+    query: string,
+    variables: any = {},
+    operationName: string,
+    requiresAuth: boolean = false,
+    retryCount: number = 0
+  ): Promise<ApiResponse<T>> {
     try {
-      const document = graphql.gql`
-    mutation Login($input: LoginData!) {
-      login(input: $input) {
-        user {
-          id
-          firstname
-          lastname
-          email
-          dni
-          preferences
-          news_subscription
-          roles
-          resale_sign
-          resale_contract_url
-          bank_account {
-            number
-            bank_name
-            type
-            email
-            dni
-          }
-          gender
-          phone
-          birth_date
-          picture
-          source
-          tbk_user_id
-          tbk_card_number
-          tbk_card_type
-        }
-        can_access
-        access_token
-      }
-    }
-      `;
-
-      const variables = {
-        input: {
-          username: input.username,
-          password: input.password,
-          source: input.source,
-        },
-      };
-
-      const requestHeaders = {
+      const headers: Record<string, string> = {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "x-user-platform": "mobile",
         "X-User-Roles": "system",
       };
 
-      const response = await fetch(`${MANGO_API_URL}`, {
+      if (requiresAuth) {
+        const token = await this.getAccessToken();
+        if (!token) {
+          const error = ApiErrorHandler.createError(
+            ApiErrorType.AUTHENTICATION_ERROR,
+            "Token de acceso no encontrado"
+          );
+          ApiErrorHandler.logError(error, operationName);
+          return { error };
+        }
+        headers.Authorization = `Bearer ${token}`;
+      }
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(
+        () => controller.abort(),
+        this.config.timeout
+      );
+
+      const response = await fetch(this.config.baseUrl, {
         method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "x-user-platform": "mobile",
-          ...requestHeaders,
-        },
+        headers,
         body: JSON.stringify({
-          query: document,
+          query,
           variables,
-          operationName: "Login",
+          operationName,
         }),
+        signal: controller.signal,
       });
 
-      if (response.status === 503) {
-        console.log("Login Unavailable service");
-        return [];
-      } else if (response.status !== 200) {
-        console.log("Login response", response);
-        return [];
-      }
-      const resp = await response.json();
+      clearTimeout(timeoutId);
 
-      if (!resp.errors) {
-        this.accessToken = resp?.data?.login.access_token;
-        AsyncStorage.setItem("accessToken", this.accessToken);
+      // Manejo de errores HTTP
+      if (!response.ok) {
+        const error = ApiErrorHandler.handleHttpError(
+          response.status,
+          response
+        );
+        ApiErrorHandler.logError(error, operationName);
+
+        // Reintento automático para errores 5xx
+        if (response.status >= 500 && retryCount < this.config.retryAttempts) {
+          await new Promise((resolve) =>
+            setTimeout(resolve, this.config.retryDelay * (retryCount + 1))
+          );
+          return this.makeRequest<T>(
+            query,
+            variables,
+            operationName,
+            requiresAuth,
+            retryCount + 1
+          );
+        }
+
+        return { error };
       }
 
-      return [resp?.data?.login, resp?.errors];
+      const result = await response.json();
+
+      // Manejo de errores GraphQL
+      if (result.errors && result.errors.length > 0) {
+        const graphqlError = result.errors[0];
+        const error = ApiErrorHandler.createError(
+          ApiErrorType.VALIDATION_ERROR,
+          graphqlError.message || "Error en la consulta GraphQL",
+          response.status,
+          graphqlError
+        );
+        ApiErrorHandler.logError(error, operationName);
+        return { error };
+      }
+
+      return { data: result.data };
     } catch (error: any) {
-      console.log("error", error);
-      throw new Error(error);
+      let apiError: ApiError;
+
+      if (error.name === "AbortError") {
+        apiError = ApiErrorHandler.createError(
+          ApiErrorType.NETWORK_ERROR,
+          "Tiempo de espera agotado",
+          undefined,
+          error
+        );
+      } else if (error.message?.includes("Network request failed")) {
+        apiError = ApiErrorHandler.createError(
+          ApiErrorType.NETWORK_ERROR,
+          "Error de conexión de red",
+          undefined,
+          error
+        );
+      } else {
+        apiError = ApiErrorHandler.createError(
+          ApiErrorType.UNKNOWN_ERROR,
+          "Error inesperado en la solicitud",
+          undefined,
+          error
+        );
+      }
+
+      ApiErrorHandler.logError(apiError, operationName);
+      return { error: apiError };
     }
   }
 
-  async signUp(input: RegisterInput) {
+  public async getAccessToken(): Promise<string | null> {
     try {
-      const document = graphql.gql`
-mutation Register($input: RegisterData!) {
-    register(input: $input) {
-        user {
+      const accessToken = await AsyncStorage.getItem("accessToken");
+      if (accessToken) {
+        this.accessToken = accessToken;
+      }
+      return this.accessToken;
+    } catch (error) {
+      const apiError = ApiErrorHandler.createError(
+        ApiErrorType.UNKNOWN_ERROR,
+        "Error al obtener el token de acceso",
+        undefined,
+        error
+      );
+      ApiErrorHandler.logError(apiError, "getAccessToken");
+      return null;
+    }
+  }
+
+  public async setAccessToken(accessToken: string): Promise<void> {
+    try {
+      this.accessToken = accessToken;
+      await AsyncStorage.setItem("accessToken", accessToken);
+    } catch (error) {
+      const apiError = ApiErrorHandler.createError(
+        ApiErrorType.UNKNOWN_ERROR,
+        "Error al guardar el token de acceso",
+        undefined,
+        error
+      );
+      ApiErrorHandler.logError(apiError, "setAccessToken");
+      throw apiError;
+    }
+  }
+
+  // Initialize session
+  async signIn(input: LoginInput): Promise<ApiResponse<{ login: any }>> {
+    const document = graphql.gql`
+      mutation Login($input: LoginData!) {
+        login(input: $input) {
+          user {
+            id
+            firstname
+            lastname
+            email
+            dni
+            preferences
+            news_subscription
+            roles
+            resale_sign
+            resale_contract_url
+            bank_account {
+              number
+              bank_name
+              type
+              email
+              dni
+            }
+            gender
+            phone
+            birth_date
+            picture
+            source
+            tbk_user_id
+            tbk_card_number
+            tbk_card_type
+          }
+          can_access
+          access_token
+        }
+      }
+    `;
+
+    const variables = {
+      input: {
+        username: input.username,
+        password: input.password,
+        source: input.source,
+      },
+    };
+
+    const result = await this.makeRequest<{ login: any }>(
+      document,
+      variables,
+      "Login"
+    );
+
+    if (result.data?.login?.access_token) {
+      await this.setAccessToken(result.data.login.access_token);
+    }
+
+    return result;
+  }
+
+  async signUp(input: RegisterInput): Promise<ApiResponse<{ register: any }>> {
+    const document = graphql.gql`
+      mutation Register($input: RegisterData!) {
+        register(input: $input) {
+          user {
             id
             firstname
             lastname
@@ -160,640 +382,413 @@ mutation Register($input: RegisterData!) {
             tbk_user_id
             tbk_card_number
             tbk_card_type
+          }
+          access_token
         }
-        access_token
-    }
-}
-      `;
-
-      const variables = {
-        input: {
-          ...input,
-        },
-      };
-
-      const requestHeaders = {
-        "X-User-Roles": "system",
-      };
-
-      const response = await fetch(`${MANGO_API_URL}`, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "x-user-platform": "mobile",
-          ...requestHeaders,
-        },
-        body: JSON.stringify({
-          query: document,
-          variables,
-          operationName: "Register",
-        }),
-      });
-
-      if (response.status === 503) {
-        console.log("Register Unavailable service");
-        return [];
-      } else if (response.status !== 200) {
-        console.log("Register response", response);
-        return [];
       }
-      const resp = await response.json();
+    `;
 
-      if (!resp.errors) {
-        console.log("resp.errors", resp.errors);
-        this.accessToken = resp?.data?.register.access_token;
-        AsyncStorage.setItem("accessToken", this.accessToken);
-      }
+    const variables = { input };
 
-      console.log("resp?.data?.register", resp?.data?.register);
-      return [resp?.data?.register, resp?.errors];
-    } catch (error: any) {
-      console.log("error", error);
-      throw new Error(error);
+    const result = await this.makeRequest<{ register: any }>(
+      document,
+      variables,
+      "Register"
+    );
+
+    if (result.data?.register?.access_token) {
+      await this.setAccessToken(result.data.register.access_token);
     }
+
+    return result;
   }
 
-  async me() {
-    try {
-      const document = graphql.gql`
-    query Me {
-      me {
-        user {
-          id
-          firstname
-          lastname
-          email
-          dni
-          preferences
-          news_subscription
-          roles
-          resale_sign
-          resale_contract_url
-          bank_account {
-            number
-            bank_name
-            type
+  async me(): Promise<ApiResponse<any>> {
+    const document = graphql.gql`
+      query Me {
+        me {
+          user {
+            id
+            firstname
+            lastname
             email
             dni
+            preferences
+            news_subscription
+            roles
+            resale_sign
+            resale_contract_url
+            bank_account {
+              number
+              bank_name
+              type
+              email
+              dni
+            }
+            gender
+            phone
+            birth_date
+            picture
+            source
+            tbk_user_id
+            tbk_card_number
+            tbk_card_type
           }
-          gender
-          phone
-          birth_date
-          picture
-          source
-          tbk_user_id
-          tbk_card_number
-          tbk_card_type
         }
       }
-    }
-      `;
+    `;
 
-      const requestHeaders = {
-        "X-User-Roles": "system",
-        Authorization: `Bearer ${this.accessToken}`,
-      };
-
-      const response = await fetch(`${MANGO_API_URL}`, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "x-user-platform": "mobile",
-          ...requestHeaders,
-        },
-        body: JSON.stringify({
-          query: document,
-          variables: {},
-          operationName: "Me",
-        }),
-      });
-
-      if (response.status === 503) {
-        console.log("Me Unavailable service");
-        return [];
-      } else if (response.status !== 200) {
-        console.log("Me response", response);
-        return [];
-      }
-      const resp = await response.json();
-
-      return [resp?.data?.me, resp?.errors];
-    } catch (error: any) {
-      console.log("error", error);
-      throw new Error(error);
-    }
+    return this.makeRequest(document, {}, "Me", true);
   }
 
   // upload a file
-  async uploadFile(file: any) {
-    let body: any = new FormData();
-    body.append("file", {
-      uri: file.uri,
-      name: file.name,
-      filename: file.name,
-      type: file.mimeType,
-    });
-    body.append("Content-Type", file.mimeType);
-
+  async uploadFile(file: any): Promise<ApiResponse<any>> {
     try {
-      const response = await fetch(`${MANGO_API_URL}/upload`, {
+      const body = new FormData();
+      body.append("file", {
+        uri: file.uri,
+        name: file.name,
+        filename: file.name,
+        type: file.mimeType,
+      } as any);
+      body.append("Content-Type", file.mimeType);
+
+      const token = await this.getAccessToken();
+      if (!token) {
+        const error = ApiErrorHandler.createError(
+          ApiErrorType.AUTHENTICATION_ERROR,
+          "Token de acceso requerido para subir archivos"
+        );
+        return { error };
+      }
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(
+        () => controller.abort(),
+        this.config.timeout
+      );
+
+      const response = await fetch(`${this.config.baseUrl}/upload`, {
         method: "POST",
         headers: {
           Accept: "application/json",
           "Content-Type": "multipart/form-data",
           "x-user-platform": "mobile",
-          Authorization: `Bearer ${this.accessToken}`,
+          Authorization: `Bearer ${token}`,
         },
         body,
+        signal: controller.signal,
       });
 
-      if (response.status === 503) {
-        console.log("Unavailable service");
-        return [];
-      } else if (response.status !== 200) {
-        console.log("response", response);
-        return [];
-      }
-      const { data } = await response.json();
+      clearTimeout(timeoutId);
 
-      return data;
+      if (!response.ok) {
+        const error = ApiErrorHandler.handleHttpError(
+          response.status,
+          response
+        );
+        ApiErrorHandler.logError(error, "uploadFile");
+        return { error };
+      }
+
+      const { data } = await response.json();
+      return { data };
     } catch (error: any) {
-      throw new Error(error);
+      const apiError = ApiErrorHandler.createError(
+        ApiErrorType.UNKNOWN_ERROR,
+        "Error al subir el archivo",
+        undefined,
+        error
+      );
+      ApiErrorHandler.logError(apiError, "uploadFile");
+      return { error: apiError };
     }
   }
 
-  async getEvents(): Promise<any> {
-    try {
-      const document = graphql.gql`
-        query GetEvents {
-          getEvents {
-            id
-            image
-            name
-            start_at
-            start_at
-            end_at
-            start_hour
-            end_hour
-            nominated
-            items {
-              price
-            }
-          }
-        }
-      `;
-
-      const variables = {};
-
-      const requestHeaders = {};
-
-      const response = await fetch(MANGO_API_URL, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "x-user-platform": "mobile",
-          ...requestHeaders,
-        },
-        body: JSON.stringify({
-          query: document,
-          variables,
-          operationName: "GetEvents",
-        }),
-      });
-
-      if (response.status === 503) {
-        console.log("GetEvents Unavailable service");
-        return [];
-      } else if (response.status !== 200) {
-        console.log("GetEvents response", response);
-        return [];
-      }
-      const { data } = await response.json();
-
-      return data.getEvents;
-    } catch (error: any) {
-      console.log("getEvents error", error);
-      throw new Error(error);
-    }
-  }
-  async getEventById(id: string): Promise<any> {
-    try {
-      const document = graphql.gql`
-        query GetEventById($id: String!) {
-      getEventById(id: $id) {
-        event {
+  async getEvents(): Promise<ApiResponse<any>> {
+    const document = graphql.gql`
+      query GetEvents {
+        getEvents {
           id
           image
           name
-          description
-          place
-          nominated
           start_at
           end_at
           start_hour
           end_hour
-          address
+          nominated
+          items {
+            price
+          }
+        }
+      }
+    `;
+
+    return this.makeRequest(document, {}, "GetEvents");
+  }
+
+  async getEventById(id: string): Promise<ApiResponse<any>> {
+    const document = graphql.gql`
+      query GetEventById($id: String!) {
+        getEventById(id: $id) {
+          event {
+            id
+            image
+            name
+            description
+            place
+            nominated
+            start_at
+            end_at
+            start_hour
+            end_hour
+            address
+            items {
+              id
+              type
+              name
+              price
+              stock
+              max_per_sale
+              event_id
+              priority
+              end_at
+              end_hour
+              out_of_stock
+              cover
+            }
+          }
+        }
+      }
+    `;
+
+    return this.makeRequest(document, { id }, "GetEventById");
+  }
+
+  async createOrder(orderData: any): Promise<ApiResponse<any>> {
+    const document = graphql.gql`
+      mutation CreateOrder($input: CreateOrderData!) {
+        createOrder(input: $input) {
+          id
           items {
             id
             type
             name
-            price
-            stock
-            max_per_sale
-            event_id
-            priority
-            end_at
-            end_hour
-            out_of_stock
           }
         }
       }
-    }
-      `;
+    `;
 
-      const variables = {
-        id,
-      };
-
-      const requestHeaders = {
-        "X-User-Roles": "system",
-      };
-
-      const response = await fetch(`${MANGO_API_URL}`, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "x-user-platform": "mobile",
-          ...requestHeaders,
-        },
-        body: JSON.stringify({
-          query: document,
-          variables,
-          operationName: "GetEventById",
-        }),
-      });
-
-      if (response.status === 503) {
-        console.log("GetEventById Unavailable service");
-        return [];
-      } else if (response.status !== 200) {
-        console.log("GetEventById response", response);
-        return [];
-      }
-      const { data } = await response.json();
-
-      return data.getEventById;
-    } catch (error: any) {
-      console.log("error", error);
-      throw new Error(error);
-    }
+    return this.makeRequest(
+      document,
+      { input: orderData },
+      "CreateOrder",
+      true
+    );
   }
-  async createOrder(orderData: any): Promise<any> {
-    try {
-      const document = graphql.gql`
-    mutation CreateOrder($input: CreateOrderData!) {
-      createOrder(input: $input) {
-        id
-        items {
-          id
-          type
-          name
+
+  async createPayment(paymentData: any): Promise<ApiResponse<any>> {
+    const document = graphql.gql`
+      mutation CreatePayment($input: CreatePaymentData!) {
+        createPayment(input: $input) {
+          url
+          token
         }
       }
-    }
-      `;
+    `;
 
-      const variables = {
-        input: {
-          ...orderData,
-        },
-      };
-
-      const requestHeaders = {
-        "X-User-Roles": "system",
-        Authorization: `Bearer ${this.accessToken}`,
-      };
-
-      const response = await fetch(`${MANGO_API_URL}`, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "x-user-platform": "mobile",
-          ...requestHeaders,
-        },
-        body: JSON.stringify({
-          query: document,
-          variables,
-          operationName: "CreateOrder",
-        }),
-      });
-
-      if (response.status === 503) {
-        console.log("CreateOrder Unavailable service");
-        return [];
-      } else if (response.status !== 200) {
-        console.log("CreateOrder response", response);
-        return [];
-      }
-
-      const { data } = await response.json();
-
-      return data.createOrder;
-    } catch (error: any) {
-      console.log("error", error);
-      throw new Error(error);
-    }
+    return this.makeRequest(
+      document,
+      { input: paymentData },
+      "CreatePayment",
+      true
+    );
   }
 
-  async createPayment(paymentData: any): Promise<any> {
-    try {
-      const document = graphql.gql`
-    mutation CreatePayment($input: CreatePaymentData!) {
-      createPayment(input: $input) {
-        url
-        token
-      }
-    }
-      `;
-
-      const variables = {
-        input: {
-          ...paymentData,
-        },
-      };
-
-      const requestHeaders = {
-        "X-User-Roles": "system",
-        Authorization: `Bearer ${this.accessToken}`,
-      };
-
-      const response = await fetch(`${MANGO_API_URL}`, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "x-user-platform": "mobile",
-          ...requestHeaders,
-        },
-        body: JSON.stringify({
-          query: document,
-          variables,
-          operationName: "CreatePayment",
-        }),
-      });
-
-      if (response.status === 503) {
-        console.log("CreatePayment Unavailable service");
-        return [];
-      } else if (response.status !== 200) {
-        console.log("CreatePayment response", response);
-        return [];
-      }
-      const { data } = await response.json();
-
-      return data.createPayment;
-    } catch (error: any) {
-      console.log("error", error);
-      throw new Error(error);
-    }
-  }
-
-  async getPaymentByToken(token: any): Promise<any> {
-    try {
-      const document = graphql.gql`
-    query GetPaymentByToken($token: String!) {
-      getPaymentByToken(token: $token) {
-        id
-      }
-    }
-      `;
-
-      const variables = {
-        token,
-      };
-
-      const requestHeaders = {
-        "X-User-Roles": "system",
-      };
-
-      const response = await fetch(`${MANGO_API_URL}`, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          ...requestHeaders,
-        },
-        body: JSON.stringify({
-          query: document,
-          variables,
-          operationName: "GetPaymentByToken",
-        }),
-      });
-
-      console.log("response", response);
-      if (response.status === 503) {
-        console.log("CreatePayment Unavailable service");
-        return [];
-      } else if (response.status !== 200) {
-        console.log("CreatePayment response", response);
-        return [];
-      }
-      const { data } = await response.json();
-      console.log("data", data);
-
-      return data.getPaymentByToken;
-    } catch (error: any) {
-      console.log("error", error);
-      throw new Error(error);
-    }
-  }
-  async confirmNewPayment(paymentId: any): Promise<any> {
-    try {
-      const document = graphql.gql`
-    mutation ConfirmPayment($paymentId: String!) {
-      confirmPayment(paymentId: $paymentId) {
-        status
-        order_id
-      }
-    }
-      `;
-
-      const variables = {
-        paymentId,
-      };
-
-      const requestHeaders = {
-        "X-User-Roles": "system",
-      };
-
-      const response = await fetch(`${MANGO_API_URL}`, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "x-user-platform": "mobile",
-          ...requestHeaders,
-        },
-        body: JSON.stringify({
-          query: document,
-          variables,
-          operationName: "ConfirmPayment",
-        }),
-      });
-
-      console.log("response", response);
-      if (response.status === 503) {
-        console.log("CreatePayment Unavailable service");
-        return [];
-      } else if (response.status !== 200) {
-        console.log("CreatePayment response", response);
-        return [];
-      }
-      const { data } = await response.json();
-      console.log("data", data);
-
-      return data.confirmPayment;
-    } catch (error: any) {
-      console.log("error", error);
-      throw new Error(error);
-    }
-  }
-  async getEventsByIds(ids: string[]): Promise<any> {
-    try {
-      const document = graphql.gql`
-    query getEventsByIds($ids: GetEventsByIdsInput) {
-      getEventsByIds(input: $ids) {
-        events {
+  async getPaymentByToken(token: string): Promise<ApiResponse<any>> {
+    const document = graphql.gql`
+      query GetPaymentByToken($token: String!) {
+        getPaymentByToken(token: $token) {
           id
-          name
-          image
-          description
-          start_at
-          place
-          items {
-            price
+        }
+      }
+    `;
+
+    return this.makeRequest(document, { token }, "GetPaymentByToken");
+  }
+
+  async confirmNewPayment(paymentId: string): Promise<ApiResponse<any>> {
+    const document = graphql.gql`
+      mutation ConfirmPayment($paymentId: String!) {
+        confirmPayment(paymentId: $paymentId) {
+          status
+          order_id
+        }
+      }
+    `;
+
+    return this.makeRequest(document, { paymentId }, "ConfirmPayment");
+  }
+
+  async getEventsByIds(ids: string[]): Promise<ApiResponse<any>> {
+    const document = graphql.gql`
+      query getEventsByIds($ids: GetEventsByIdsInput) {
+        getEventsByIds(input: $ids) {
+          events {
+            id
             name
-            type
+            image
+            description
+            start_at
+            place
+            items {
+              price
+              name
+              type
+            }
           }
         }
       }
-    }
-      `;
+    `;
 
-      const variables = {
-        ids: {
-          id: ids,
-        },
-      };
-
-      const requestHeaders = {
-        "X-User-Roles": "system",
-        Authorization: `Bearer ${this.accessToken}`,
-      };
-
-      const response = await fetch(`${MANGO_API_URL}`, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "x-user-platform": "mobile",
-          ...requestHeaders,
-        },
-        body: JSON.stringify({
-          query: document,
-          variables,
-          operationName: "getEventsByIds",
-        }),
-      });
-
-      if (response.status === 503) {
-        console.log("getOrderItemsByUser Unavailable service");
-        return [];
-      } else if (response.status !== 200) {
-        console.log("getOrderItemsByUser response", response);
-        return [];
-      }
-      const { data } = await response.json();
-
-      return data.getEventsByIds;
-    } catch (error: any) {
-      console.log("error", error);
-      throw new Error(error);
-    }
+    return this.makeRequest(
+      document,
+      { ids: { id: ids } },
+      "getEventsByIds",
+      true
+    );
   }
-  async getOrderItemsByUser(): Promise<any> {
-    try {
-      const document = graphql.gql`
-    query getOrdersByUser($input: GetOrderItemsByUserIdInput!) {
-      getOrderItemsByUser(input: $input) {
-        id
-        items {
+
+  async getOrderItemsByUser(): Promise<ApiResponse<any>> {
+    const document = graphql.gql`
+      query getOrdersByUser($input: GetOrderItemsByUserIdInput!) {
+        getOrderItemsByUser(input: $input) {
           id
-          item_id
-          event_id
-          type
-          name
-          price
-          quantity
+          items {
+            id
+            item_id
+            event_id
+            type
+            name
+            price
+            quantity
+          }
         }
       }
-    }
-      `;
+    `;
 
-      const variables = {
-        input: {
-          status: "1",
-        },
-      };
-
-      const requestHeaders = {
-        "X-User-Roles": "system",
-        Authorization: `Bearer ${this.accessToken}`,
-      };
-
-      const response = await fetch(`${MANGO_API_URL}`, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "x-user-platform": "mobile",
-          ...requestHeaders,
-        },
-        body: JSON.stringify({
-          query: document,
-          variables,
-          operationName: "getOrdersByUser",
-        }),
-      });
-
-      if (response.status === 503) {
-        console.log("getOrdersByUser Unavailable service");
-        return [];
-      } else if (response.status !== 200) {
-        console.log("getOrdersByUser response", response);
-        return [];
-      }
-      const { data } = await response.json();
-
-      return data.getOrderItemsByUser;
-    } catch (error: any) {
-      console.log("error", error);
-      throw new Error(error);
-    }
+    return this.makeRequest(
+      document,
+      { input: { status: "1" } },
+      "getOrdersByUser",
+      true
+    );
   }
 
-  async getTicketsByUserAndEventID(eventId: string): Promise<any> {
-    try {
-      const document = graphql.gql`
-    query getTicketsByUserAndEventID($input: GetTicketsInput!) {
-      getTickets(input: $input) {
-        data {
-          ticket {
+  async getTicketsByUserAndEventID(eventId: string): Promise<ApiResponse<any>> {
+    const document = graphql.gql`
+      query getTicketsByUserAndEventID($input: GetTicketsInput!) {
+        getTickets(input: $input) {
+          data {
+            ticket {
+              id
+              base64
+              event {
+                id
+                name
+                start_at
+                place
+                description
+                image
+              }
+              is_validated
+              cover
+            }
+            event {
+              id
+              name
+              start_at
+              place
+              image
+              end_hour
+              end_at
+              description
+            }
+            event_item {
+              name
+              type
+              cover
+            }
+          }
+        }
+      }
+    `;
+
+    return this.makeRequest(
+      document,
+      { input: { event_id: eventId } },
+      "getTicketsByUserAndEventID",
+      true
+    );
+  }
+
+  async createInscription(eventId: string): Promise<ApiResponse<any>> {
+    const document = graphql.gql`
+      mutation CreateInscription($eventId: String!) {
+        createInscription(eventId: $eventId) {
+          url
+          token
+        }
+      }
+    `;
+
+    return this.makeRequest(document, { eventId }, "CreateInscription", true);
+  }
+
+  async confirmInscription(
+    token: string,
+    eventId: string
+  ): Promise<ApiResponse<any>> {
+    const document = graphql.gql`
+      mutation ConfirmInscription($input: ConfirmInscriptionData!) {
+        confirmInscription(input: $input) {
+          tbk_user
+          card_number
+        }
+      }
+    `;
+
+    return this.makeRequest(
+      document,
+      { input: { token, event_id: eventId } },
+      "ConfirmInscription",
+      true
+    );
+  }
+
+  async authorizeTransaction(paymentData: any): Promise<ApiResponse<any>> {
+    const document = graphql.gql`
+      mutation AuthorizeTransaction($input: AuthorizeTransactionData!) {
+        authorizeTransaction(input: $input) {
+          status
+          order_id
+        }
+      }
+    `;
+
+    return this.makeRequest(
+      document,
+      { input: paymentData },
+      "AuthorizeTransaction",
+      true
+    );
+  }
+
+  async getUserFirstUpcomingEvent(): Promise<ApiResponse<any>> {
+    const document = graphql.gql`
+      query GetUserFirstUpcomingEvent {
+        getUserFirstUpcomingEvent {
+          tickets {
             id
             base64
             event {
@@ -819,722 +814,194 @@ mutation Register($input: RegisterData!) {
           event_item {
             name
             type
+            cover
           }
         }
       }
-    }
-      `;
+    `;
 
-      const variables = {
-        input: {
-          event_id: eventId,
-        },
-      };
-
-      const requestHeaders = {
-        "X-User-Roles": "system",
-        Authorization: `Bearer ${this.accessToken}`,
-      };
-
-      const response = await fetch(`${MANGO_API_URL}`, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "x-user-platform": "mobile",
-          ...requestHeaders,
-        },
-        body: JSON.stringify({
-          query: document,
-          variables,
-          operationName: "getTicketsByUserAndEventID",
-        }),
-      });
-
-      if (response.status === 503) {
-        console.log("getTicketsByUserAndEventID Unavailable service");
-        return [];
-      } else if (response.status !== 200) {
-        console.log("getTicketsByUserAndEventID response", response);
-        return [];
-      }
-      const { data } = await response.json();
-
-      return data.getTickets;
-    } catch (error: any) {
-      console.log("error", error);
-      throw new Error(error);
-    }
+    return this.makeRequest(document, {}, "GetUserFirstUpcomingEvent", true);
   }
 
-  async createInscription(): Promise<any> {
-    try {
-      const document = graphql.gql`
-    mutation CreateInscription {
-      createInscription {
-        url
-        token
-      }
-    }
-      `;
-
-      const variables = {};
-
-      const requestHeaders = {
-        "X-User-Roles": "system",
-        Authorization: `Bearer ${this.accessToken}`,
-      };
-
-      console.log({
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "x-user-platform": "mobile",
-          ...requestHeaders,
-        },
-        body: JSON.stringify({
-          query: document,
-          variables,
-          operationName: "CreateInscription",
-        }),
-      });
-      const response = await fetch(`${MANGO_API_URL}`, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "x-user-platform": "mobile",
-          ...requestHeaders,
-        },
-        body: JSON.stringify({
-          query: document,
-          variables,
-          operationName: "CreateInscription",
-        }),
-      });
-
-      console.log("response", response);
-      if (response.status === 503) {
-        console.log("CreateInscription Unavailable service");
-        return [];
-      } else if (response.status !== 200) {
-        console.log("CreateInscription response", response);
-        return [];
-      }
-      const { data } = await response.json();
-      console.log("data", data);
-
-      return data.createInscription;
-    } catch (error: any) {
-      console.log("error", error);
-      throw new Error(error);
-    }
-  }
-
-  async confirmInscription(token: string): Promise<any> {
-    try {
-      const document = graphql.gql`
-    mutation ConfirmInscription($input: ConfirmInscriptionData!) {
-      confirmInscription(input: $input) {
-        tbk_user
-        card_number
-      }
-    }
-      `;
-
-      const variables = {
-        input: {
-          token,
-        },
-      };
-
-      const requestHeaders = {
-        "X-User-Roles": "system",
-        Authorization: `Bearer ${this.accessToken}`,
-      };
-
-      const response = await fetch(`${MANGO_API_URL}`, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "x-user-platform": "mobile",
-          ...requestHeaders,
-        },
-        body: JSON.stringify({
-          query: document,
-          variables,
-          operationName: "ConfirmInscription",
-        }),
-      });
-
-      if (response.status === 503) {
-        console.log("ConfirmInscription Unavailable service");
-        return [];
-      } else if (response.status !== 200) {
-        console.log("ConfirmInscription response", response);
-        return [];
-      }
-      const res = await response.json();
-      console.log("data", res);
-
-      return res?.data?.confirmInscription;
-    } catch (error: any) {
-      console.log("error", error);
-      throw new Error(error);
-    }
-  }
-
-  async authorizeTransaction(paymentData: any): Promise<any> {
-    try {
-      const document = graphql.gql`
-    mutation AuthorizeTransaction($input: AuthorizeTransactionData!) {
-      authorizeTransaction(input: $input) {
-        status
-        order_id
-      }
-    }
-      `;
-
-      const variables = {
-        input: {
-          ...paymentData,
-        },
-      };
-
-      const requestHeaders = {
-        "X-User-Roles": "system",
-        Authorization: `Bearer ${this.accessToken}`,
-      };
-
-      const response = await fetch(`${MANGO_API_URL}`, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "x-user-platform": "mobile",
-          ...requestHeaders,
-        },
-        body: JSON.stringify({
-          query: document,
-          variables,
-          operationName: "AuthorizeTransaction",
-        }),
-      });
-
-      if (response.status === 503) {
-        console.log("AuthorizeTransaction Unavailable service");
-        return [];
-      } else if (response.status !== 200) {
-        console.log("AuthorizeTransaction response", response);
-        return [];
-      }
-      const res = await response.json();
-      console.log("data", res);
-
-      return res?.data?.authorizeTransaction;
-    } catch (error: any) {
-      console.log("error", error);
-      throw new Error(error);
-    }
-  }
-
-  async getUserFirstUpcomingEvent(): Promise<any> {
-    try {
-      const document = graphql.gql`
-query GetUserFirstUpcomingEvent {
-  getUserFirstUpcomingEvent {
-    tickets {
-      id
-      base64
-      event {
-        id
-        name
-        start_at
-        place
-        description
-        image
-      }
-      is_validated
-    }
-    event {
-      id
-      name
-      start_at
-      place
-      image
-      end_hour
-      end_at
-      description
-    }
-    event_item {
-      name
-      type
-    }
-  }
-}
-      `;
-
-      const variables = {};
-
-      const requestHeaders = {
-        "X-User-Roles": "system",
-        Authorization: `Bearer ${this.accessToken}`,
-      };
-
-      const response = await fetch(`${MANGO_API_URL}`, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "x-user-platform": "mobile",
-          ...requestHeaders,
-        },
-        body: JSON.stringify({
-          query: document,
-          variables,
-          operationName: "GetUserFirstUpcomingEvent",
-        }),
-      });
-
-      if (response.status === 503) {
-        console.log("GetUserFirstUpcomingEvent Unavailable service");
-        return [];
-      } else if (response.status !== 200) {
-        if (response.status === 401) {
-          throw new Error("unauthorized");
-        }
-        console.log("GetUserFirstUpcomingEvent response", response);
-        return [];
-      }
-      const res = await response.json();
-
-      return res?.data?.getUserFirstUpcomingEvent;
-    } catch (error: any) {
-      console.log("error", error);
-      throw new Error(error);
-    }
-  }
-  async getUserUpcomingEvents(): Promise<any> {
-    try {
-      const document = graphql.gql`
-query GetUserUpcomingEvents {
-  getUserUpcomingEvents {
-    data {
-      tickets {
-        id
-        base64
-        event {
-          id
-          name
-          start_at
-          place
-          description
-          image
-        }
-        is_validated
-      }
-      event {
-        id
-        name
-        start_at
-        place
-        image
-        end_hour
-        end_at
-        description
-      }
-      event_item {
-        name
-        type
-      }
-    }
-  }
-}
-      `;
-
-      const variables = {};
-
-      const requestHeaders = {
-        "X-User-Roles": "system",
-        Authorization: `Bearer ${this.accessToken}`,
-      };
-
-      const response = await fetch(`${MANGO_API_URL}`, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "x-user-platform": "mobile",
-          ...requestHeaders,
-        },
-        body: JSON.stringify({
-          query: document,
-          variables,
-          operationName: "GetUserUpcomingEvents",
-        }),
-      });
-
-      if (response.status === 503) {
-        console.log("GetUserUpcomingEvents Unavailable service");
-        return [];
-      } else if (response.status !== 200) {
-        if (response.status === 401) {
-          throw new Error("unauthorized");
-        }
-        console.log("GetUserUpcomingEvents response", response);
-        return [];
-      }
-      const res = await response.json();
-
-      return res?.data?.getUserUpcomingEvents;
-    } catch (error: any) {
-      console.log("error", error);
-      throw new Error(error);
-    }
-  }
-
-  async getTicketById(id: string): Promise<any> {
-    try {
-      const document = graphql.gql`
-        query GetTicketById($id: ID!) {
-          getTicketById(id: $id) {
-            id
-            is_validated
-          }
-        }
-      `;
-
-      const variables = {
-        id,
-      };
-
-      const requestHeaders = {
-        "X-User-Roles": "system",
-        Authorization: `Bearer ${this.accessToken}`,
-      };
-
-      const response = await fetch(`${MANGO_API_URL}`, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "x-user-platform": "mobile",
-          ...requestHeaders,
-        },
-        body: JSON.stringify({
-          query: document,
-          variables,
-          operationName: "GetTicketById",
-        }),
-      });
-
-      if (response.status === 503) {
-        console.log("GetTicketById Unavailable service");
-        return [];
-      } else if (response.status !== 200) {
-        console.log("GetTicketById response", response);
-        return [];
-      }
-      const { data } = await response.json();
-
-      return data?.getTicketById;
-    } catch (error: any) {
-      console.log("error", error);
-      throw new Error(error);
-    }
-  }
-
-  async getOrderById(id: string): Promise<any> {
-    try {
-      const document = graphql.gql`
-        query GetOrderById($id: ID!) {
-          getOrderById(id: $id) {
-            order {
+  async getUserUpcomingEvents(): Promise<ApiResponse<any>> {
+    const document = graphql.gql`
+      query GetUserUpcomingEvents {
+        getUserUpcomingEvents {
+          data {
+            tickets {
               id
-              items {
-                type
+              base64
+              event {
+                id
                 name
-                price
-                quantity
+                start_at
+                place
+                description
+                image
               }
-            }
-            payment {
-              id
-              amount
-              status
-              invoice_href
-              created_at
+              is_validated
             }
             event {
               id
               name
               start_at
               place
-              description
               image
-              address
+              end_hour
+              end_at
+              description
+            }
+            event_item {
+              name
+              type
             }
           }
-        }`;
-
-      const variables = {
-        id,
-      };
-
-      const requestHeaders = {
-        "X-User-Roles": "system",
-        Authorization: `Bearer ${this.accessToken}`,
-      };
-
-      const response = await fetch(`${MANGO_API_URL}`, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "x-user-platform": "mobile",
-          ...requestHeaders,
-        },
-        body: JSON.stringify({
-          query: document,
-          variables,
-          operationName: "GetOrderById",
-        }),
-      });
-
-      console.log("response", response);
-      if (response.status === 503) {
-        console.log("GetOrderById Unavailable service");
-        return [];
-      } else if (response.status !== 200) {
-        console.log("GetOrderById response", response);
-        return [];
-      }
-      const { data } = await response.json();
-      console.log("data", data);
-
-      return data.getOrderById;
-    } catch (error: any) {
-      console.log("error", error);
-      throw new Error(error);
-    }
-  }
-
-  async requestPasswordReset(email: string): Promise<any> {
-    try {
-      const document = graphql.gql`
-       mutation ForgotPassword($input: String!) {
-          forgotPassword(email: $input) {
-              success
-              message
-          }
-      }
-      `;
-
-      const variables = {
-        input: email,
-      };
-
-      const requestHeaders = {
-        "X-User-Roles": "system",
-        Authorization: `Bearer ${this.accessToken}`,
-      };
-
-      const response = await fetch(`${MANGO_API_URL}`, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "x-user-platform": "mobile",
-          ...requestHeaders,
-        },
-        body: JSON.stringify({
-          query: document,
-          variables,
-          operationName: "ForgotPassword",
-        }),
-      });
-
-      if (response.status === 503) {
-        console.log("DeleteMe Unavailable service");
-        return [];
-      } else if (response.status !== 200) {
-        console.log("DeleteMe response", response);
-        return [];
-      }
-      const resp = await response.json();
-
-      console.log("resp?.data?.forgotPassword", resp?.data?.forgotPassword);
-      return [resp?.data?.forgotPassword, resp?.errors];
-    } catch (error: any) {
-      console.log("error", error);
-      throw new Error(error);
-    }
-  }
-
-  async resetPassword(code: string, newPassword: string): Promise<any> {
-    try {
-      const document = graphql.gql`
-       mutation ResetPassword($token: String!, $password: String!) {
-          resetPassword(token: $token, password: $password) {
-              success
-              message
-          }
-      }
-      `;
-
-      const variables = {
-        token: code,
-        password: newPassword,
-      };
-
-      const requestHeaders = {
-        "X-User-Roles": "system",
-        Authorization: `Bearer ${this.accessToken}`,
-      };
-
-      const response = await fetch(`${MANGO_API_URL}`, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "x-user-platform": "mobile",
-          ...requestHeaders,
-        },
-        body: JSON.stringify({
-          query: document,
-          variables,
-          operationName: "ResetPassword",
-        }),
-      });
-
-      if (response.status === 503) {
-        console.log("DeleteMe Unavailable service");
-        return [];
-      } else if (response.status !== 200) {
-        console.log("DeleteMe response", response);
-        return [];
-      }
-      const resp = await response.json();
-
-      console.log("resp?.data?.resetPassword", resp?.data?.resetPassword);
-      return [resp?.data?.resetPassword, resp?.errors];
-    } catch (error: any) {
-      console.log("error", error);
-      throw new Error(error);
-    }
-  }
-
-  async deleteMe(): Promise<any> {
-    try {
-      const document = graphql.gql`
-        mutation DeleteUser {
-            deleteUser {
-                success
-                message
-            }
         }
-      `;
-
-      const variables = {};
-
-      const requestHeaders = {
-        "X-User-Roles": "system",
-        Authorization: `Bearer ${this.accessToken}`,
-      };
-
-      const response = await fetch(`${MANGO_API_URL}`, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "x-user-platform": "mobile",
-          ...requestHeaders,
-        },
-        body: JSON.stringify({
-          query: document,
-          variables,
-          operationName: "DeleteUser",
-        }),
-      });
-
-      if (response.status === 503) {
-        console.log("DeleteMe Unavailable service");
-        return [];
-      } else if (response.status !== 200) {
-        console.log("DeleteMe response", response);
-        return [];
       }
-      const resp = await response.json();
+    `;
 
-      console.log("resp?.data?.deleteUser", resp?.data?.deleteUser);
-      return [resp?.data?.deleteUser, resp?.errors];
-    } catch (error: any) {
-      console.log("error", error);
-      throw new Error(error);
-    }
+    return this.makeRequest(document, {}, "GetUserUpcomingEvents", true);
   }
 
-  async updateUserExtra(user: any): Promise<any> {
-    console.log("user", user);
-    try {
-      const document = graphql.gql`
+  async getTicketById(id: string): Promise<ApiResponse<any>> {
+    const document = graphql.gql`
+      query GetTicketById($id: ID!) {
+        getTicketById(id: $id) {
+          id
+          is_validated
+        }
+      }
+    `;
+
+    return this.makeRequest(document, { id }, "GetTicketById", true);
+  }
+
+  async getOrderById(id: string): Promise<ApiResponse<any>> {
+    const document = graphql.gql`
+      query GetOrderById($id: ID!) {
+        getOrderById(id: $id) {
+          order {
+            id
+            items {
+              type
+              name
+              price
+              quantity
+            }
+          }
+          payment {
+            id
+            amount
+            status
+            invoice_href
+            created_at
+          }
+          event {
+            id
+            name
+            start_at
+            place
+            description
+            image
+            address
+          }
+        }
+      }
+    `;
+
+    return this.makeRequest(document, { id }, "GetOrderById", true);
+  }
+
+  async requestPasswordReset(email: string): Promise<ApiResponse<any>> {
+    const document = graphql.gql`
+      mutation ForgotPassword($input: String!) {
+        forgotPassword(email: $input) {
+          success
+          message
+        }
+      }
+    `;
+
+    return this.makeRequest(document, { input: email }, "ForgotPassword", true);
+  }
+
+  async resetPassword(
+    code: string,
+    newPassword: string
+  ): Promise<ApiResponse<any>> {
+    const document = graphql.gql`
+      mutation ResetPassword($token: String!, $password: String!) {
+        resetPassword(token: $token, password: $password) {
+          success
+          message
+        }
+      }
+    `;
+
+    return this.makeRequest(
+      document,
+      { token: code, password: newPassword },
+      "ResetPassword",
+      true
+    );
+  }
+
+  async deleteMe(): Promise<ApiResponse<any>> {
+    const document = graphql.gql`
+      mutation DeleteUser {
+        deleteUser {
+          success
+          message
+        }
+      }
+    `;
+
+    return this.makeRequest(document, {}, "DeleteUser", true);
+  }
+
+  async updateUserExtra(user: any): Promise<ApiResponse<any>> {
+    const document = graphql.gql`
       mutation UpdateUserExtra($input: UpdateUserProfileExtraInput!) {
         updateUserProfileExtra(input: $input) {
           success
           message
         }
       }
-      `;
+    `;
 
-      const variables = {
-        input: {
-          ...user,
-          dni: user?.dni?.toString().replaceAll(".", ""),
-        },
-      };
-      console.log("variables", variables);
+    const variables = {
+      input: {
+        ...user,
+        dni: user?.dni?.toString().replaceAll(".", ""),
+      },
+    };
 
-      const requestHeaders = {
-        "X-User-Roles": "system",
-        Authorization: `Bearer ${this.accessToken}`,
-      };
+    return this.makeRequest(document, variables, "UpdateUserExtra", true);
+  }
 
-      const response = await fetch(`${MANGO_API_URL}`, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "x-user-platform": "mobile",
-          ...requestHeaders,
-        },
-        body: JSON.stringify({
-          query: document,
-          variables,
-          operationName: "UpdateUserExtra",
-        }),
-      });
-
-      if (response.status === 503) {
-        console.log("UpdateUserExtra Unavailable service");
-        return [];
-      } else if (response.status !== 200) {
-        console.log("UpdateUserExtra response", response);
-        return [];
-      }
-      const resp = await response.json();
-      console.log("resp", resp);
-
-      console.log(
-        "resp?.data?.updateUserProfileExtra",
-        resp?.data?.updateUserProfileExtra
+  // Método para limpiar tokens (logout)
+  async clearTokens(): Promise<void> {
+    try {
+      this.accessToken = "";
+      this.refreshToken = "";
+      await AsyncStorage.removeItem("accessToken");
+      await AsyncStorage.removeItem("refreshToken");
+    } catch (error) {
+      const apiError = ApiErrorHandler.createError(
+        ApiErrorType.UNKNOWN_ERROR,
+        "Error al limpiar tokens",
+        undefined,
+        error
       );
-      return [resp?.data?.updateUserProfileExtra, resp?.errors];
-    } catch (error: any) {
-      console.log("error", error);
-      throw new Error(error);
+      ApiErrorHandler.logError(apiError, "clearTokens");
+      throw apiError;
     }
+  }
+
+  // Método para verificar si el usuario está autenticado
+  async isAuthenticated(): Promise<boolean> {
+    const token = await this.getAccessToken();
+    return !!token;
   }
 }
 

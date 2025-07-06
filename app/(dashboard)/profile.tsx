@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { UserInfoSkeleton } from "@/components/skeletons/home";
 import Colors from "@/constants/Colors";
 import useUserStore from "@/stores/useUser";
+import useEventStore from "@/stores/useEvent";
 import { CreditCard } from "@/components/CreditCard";
 import useCreateInscription from "@/hooks/useCreateInscription";
 import useMe from "@/hooks/useMe";
@@ -22,8 +23,9 @@ import { LinearGradient } from "expo-linear-gradient";
 
 const ProfilePage = () => {
   const { user } = useUserStore();
+  const { event } = useEventStore();
   const { me, loadingUserData } = useMe();
-  const { createInscription } = useCreateInscription();
+  const { createInscription } = useCreateInscription(event?.id);
 
   React.useEffect(() => {
     me();

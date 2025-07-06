@@ -11,16 +11,13 @@ const useLogin = () => {
     source: string
   ) => {
     try {
-      const [response, errors] = await client.signIn({
+      const response = await client.signIn({
         username,
         password,
         source,
       });
-      if (errors?.length > 0) {
-        throw errors;
-      }
 
-      return response;
+      return response.data?.login;
     } catch (err: any) {
       if (err?.response?.errors[0]?.message === "session has expired") {
         throw new Error("expired session");
@@ -32,13 +29,9 @@ const useLogin = () => {
 
   const me = async () => {
     try {
-      const [response, errors] = await client.me();
-      if (errors?.length > 0) {
-        throw errors;
-      }
-
-      setUser(response?.user);
-      return response;
+      const response = await client.me();
+      setUser(response.data?.me?.user);
+      return response.data?.me?.user;
     } catch (err: any) {
       if (err?.response?.errors[0]?.message === "session has expired") {
         throw new Error("expired session");
@@ -57,7 +50,7 @@ const useLogin = () => {
     source: string
   ) => {
     try {
-      const [response, errors] = await client.signUp({
+      const response = await client.signUp({
         firstname,
         lastname,
         email,
@@ -66,11 +59,8 @@ const useLogin = () => {
         source,
         reference_id: password,
       });
-      if (errors?.length > 0) {
-        throw errors;
-      }
 
-      return response;
+      return response.data?.register;
     } catch (err: any) {
       if (err?.response?.errors[0]?.message === "session has expired") {
         throw new Error("expired session");
@@ -82,11 +72,8 @@ const useLogin = () => {
 
   const requestPasswordReset = async (email: string) => {
     try {
-      const [response, errors] = await client.requestPasswordReset(email);
-      if (errors?.length > 0) {
-        throw errors;
-      }
-      return response.data;
+      const response = await client.requestPasswordReset(email);
+      return response.data?.requestPasswordReset;
     } catch (error) {
       throw error;
     }
@@ -94,11 +81,8 @@ const useLogin = () => {
 
   const resetPassword = async (code: string, newPassword: string) => {
     try {
-      const [response, errors] = await client.resetPassword(code, newPassword);
-      if (errors?.length > 0) {
-        throw errors;
-      }
-      return response.data;
+      const response = await client.resetPassword(code, newPassword);
+      return response.data?.resetPassword;
     } catch (error) {
       throw error;
     }
@@ -106,12 +90,8 @@ const useLogin = () => {
 
   const deleteMe = async () => {
     try {
-      const [response, errors] = await client.deleteMe();
-      if (errors?.length > 0) {
-        throw errors;
-      }
-
-      return response.data;
+      const response = await client.deleteMe();
+      return response.data?.deleteMe;
     } catch (err: any) {
       if (err?.response?.errors[0]?.message === "session has expired") {
         throw new Error("expired session");
@@ -123,11 +103,8 @@ const useLogin = () => {
 
   const updateUserExtra = async (user: any) => {
     try {
-      const [response, errors] = await client.updateUserExtra(user);
-      if (errors?.length > 0) {
-        throw errors;
-      }
-      return response.data;
+      const response = await client.updateUserExtra(user);
+      return response.data?.updateUserExtra;
     } catch (error) {
       throw error;
     }

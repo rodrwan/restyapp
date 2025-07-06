@@ -25,7 +25,7 @@ export default function HomePage() {
   }, [refetch]);
 
   const imageHeight = width - 32; // 16px padding on each side
-
+  console.log("data", data);
   const sortedEvents = data?.sort(sortByStartAt);
 
   return (
@@ -40,8 +40,8 @@ export default function HomePage() {
           )}
           ListEmptyComponent={() => (
             <EmptyState
-              title="Aún no hay eventos"
-              subtitle="No se han creado eventos"
+              title="El sistema aún no ha encontrado nuevos eventos"
+              subtitle="Próximamente acá aparecerán los eventos que disfrutarás"
             />
           )}
           refreshControl={

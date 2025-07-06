@@ -20,8 +20,8 @@ const useCreatePayment = () => {
 
     try {
       const response: any = await client.createPayment(body);
-
-      return response;
+      const data = response.data?.createPayment;
+      return data;
     } catch (err: any) {
       if (err?.response?.errors[0]?.message === "session has expired") {
         throw new Error("expired session");

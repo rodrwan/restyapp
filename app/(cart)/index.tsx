@@ -55,7 +55,6 @@ const Cart = () => {
         <TouchableOpacity
           onPress={() => {
             clearCart();
-            console.log("params?.goBackTo", params?.goBackTo);
             if (params?.goBackTo) return router.replace(`/${params?.goBackTo}`);
             return router.replace(`/(home)`);
           }}
@@ -141,7 +140,12 @@ const Cart = () => {
                   >
                     <View>
                       <Text className="text-white text-base font-bold mb-2">
-                        {item?.name}
+                        {`${item?.name} `}
+                        {item?.cover && (
+                          <Text className="py-1.5 text-xs text-secondary-200">
+                            (Con cover)
+                          </Text>
+                        )}
                       </Text>
                       <Text className="text-primary-500 text-base mb-2">
                         ${Number(item?.price).toLocaleString("es-CL")} c/u

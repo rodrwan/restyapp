@@ -12,6 +12,7 @@ const useCreateOrder = () => {
             event_id: item.event_id,
             item_id: item.id,
             quantity: 1,
+            with_cover: item?.cover || false,
           });
         }
 
@@ -25,7 +26,7 @@ const useCreateOrder = () => {
     try {
       const response: any = await client.createOrder(body);
 
-      return response;
+      return response.data?.createOrder;
     } catch (err: any) {
       console.log(">>> err", err);
       if (err?.response?.errors[0]?.message === "session has expired") {
