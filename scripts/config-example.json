@@ -1,0 +1,32 @@
+{
+  "auth": {
+    "username": "test06@mangoticket.com",
+    "password": "test0606",
+    "source": "mangoticket"
+  },
+  "items": [
+    {
+      "id": "ea65e8e3-8523-4bb2-87b1-f2afa1a49734",
+      "name": "General",
+      "type": "ENTRANCE",
+      "price": 10000,
+      "quantity": 2,
+      "cover": false,
+      "event_id": "667476e1-ef58-4011-96a6-337f3b412d5b"
+    },
+    {
+      "id": "3ab4c829-8fbe-4d8a-8566-4cdc43691f70",
+      "name": "Piscola",
+      "type": "DRINK",
+      "price": 1000,
+      "quantity": 3,
+      "event_id": "667476e1-ef58-4011-96a6-337f3b412d5b"
+    }
+  ],
+  "payment": {
+    "terms_and_conditions_signed": true,
+    "alcohol_signed": true,
+    "installments": 0,
+    "nominated_items": []
+  }
+}

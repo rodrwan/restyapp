@@ -11,7 +11,6 @@ import useGetEventsWithPagination from "@/hooks/useGetEvents";
 import { Event } from "./types";
 import { sortByStartAt } from "./utils";
 import EventCard from "./components/EventCard";
-import { Link } from "expo-router";
 
 export default function HomePage() {
   const { data, refetch } = useGetEventsWithPagination();

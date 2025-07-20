@@ -78,6 +78,7 @@ const Cart = () => {
         );
       }
 
+      console.log("itemsInCart", itemsInCart);
       const newOrder = await create(itemsInCart);
       console.log("newOrder", newOrder);
       if (newOrder?.length === 0) {

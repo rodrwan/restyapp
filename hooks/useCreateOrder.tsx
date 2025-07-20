@@ -24,6 +24,7 @@ const useCreateOrder = () => {
     };
 
     try {
+      console.log("body", body);
       const response: any = await client.createOrder(body);
 
       return response.data?.createOrder;
