@@ -12,24 +12,7 @@ import { NativeWindStyleSheet } from "nativewind";
 import Header from "@/components/Header";
 import { SessionProvider } from "@/context/AuthProvider";
 import { LinearGradient } from "expo-linear-gradient";
-import * as Sentry from "@sentry/react-native";
 import { isRunningInExpoGo } from "expo";
-
-// Construct a new integration instance. This is needed to communicate between the integration and React
-const navigationIntegration = Sentry.reactNavigationIntegration({
-  enableTimeToInitialDisplay: !isRunningInExpoGo(),
-});
-
-Sentry.init({
-  dsn: "https://e2842dcad510cf6a4ef20f5ef120a887:ec778e06d2e1ffc30e88106f2e0c59b3@o4508393889464320.ingest.us.sentry.io/4508438730702848",
-  debug: false, // If `true`, Sentry will try to print out useful debugging information if something goes wrong with sending the event. Set it to `false` in production
-  tracesSampleRate: 1.0, // Set tracesSampleRate to 1.0 to capture 100% of transactions for tracing. Adjusting this value in production.
-  integrations: [
-    // Pass integration
-    navigationIntegration,
-  ],
-  enableNativeFramesTracking: !isRunningInExpoGo(), // Tracks slow and frozen frames in the application
-});
 
 NativeWindStyleSheet.setOutput({
   default: "native",
@@ -39,15 +22,6 @@ NativeWindStyleSheet.setOutput({
 SplashScreen.preventAutoHideAsync();
 
 function RootLayout() {
-  // Capture the NavigationContainer ref and register it with the integration.
-  const ref = useNavigationContainerRef();
-
-  useEffect(() => {
-    if (ref?.current) {
-      navigationIntegration.registerNavigationContainer(ref);
-    }
-  }, [ref]);
-
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     ...FontAwesome.font,
@@ -115,4 +89,4 @@ function RootLayoutNav() {
   );
 }
 
-export default Sentry.wrap(RootLayout);
+export default RootLayout;

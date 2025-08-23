@@ -27,7 +27,6 @@
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="mangoticket"/>
-        <data android:scheme="com.mangoticketapp.mangoticketapp"/>
         <data android:scheme="exp+mangoticket"/>
       </intent-filter>
     </activity>

@@ -108,7 +108,7 @@ const Checkout = () => {
   React.useEffect(() => {
     if (user?.firstname === "") {
       // logout
-      router.replace("/(auth)/sign-in?redirectTo=(cart)06@");
+      router.replace("/(auth)/sign-in?redirectTo=(cart)");
     }
   }, [user?.firstname]);
 

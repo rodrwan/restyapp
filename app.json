@@ -29,18 +29,25 @@
         ],
         "CFBundleAllowMixedLocalizations": true,
         "NSFaceIDUsageDescription": "Autorizar Face ID.",
-        "NSAppTransportSecurity": { "NSAllowsArbitraryLoads": true }
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
       },
       "associatedDomains": [
         "applinks:spotlight.mangoticket.com"
-      ]
+      ],
+      "appleTeamId": "P98BMU72AA"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.mangoticketapp.mangoticketapp"
+      "package": "com.mangoticketapp.mangoticketapp",
+      "permissions": [
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -75,16 +82,7 @@
       ],
       "expo-font",
       "expo-secure-store",
-      "expo-apple-authentication",
-      [
-        "@sentry/react-native/expo",
-        {
-          "url": "https://sentry.io/",
-          "note": "Use SENTRY_AUTH_TOKEN env to authenticate with Sentry.",
-          "project": "react-native",
-          "organization": "mangoticket"
-        }
-      ]
+      "expo-apple-authentication"
     ],
     "experiments": {
       "typedRoutes": true

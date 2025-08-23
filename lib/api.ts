@@ -157,11 +157,11 @@ class Client {
       const headers: Record<string, string> = {
         Accept: "application/json",
         "Content-Type": "application/json",
-        "x-user-platform": "mobile",
         "X-User-Roles": "system",
       };
 
       if (requiresAuth) {
+        console.log("requiresAuth", requiresAuth);
         const token = await this.getAccessToken();
         if (!token) {
           const error = ApiErrorHandler.createError(
@@ -171,6 +171,7 @@ class Client {
           ApiErrorHandler.logError(error, operationName);
           return { error };
         }
+        console.log("token", token);
         headers.Authorization = `Bearer ${token}`;
       }
 
@@ -180,6 +181,7 @@ class Client {
         this.config.timeout
       );
 
+      headers.origin = "https://mangoticket.com";
       const response = await fetch(this.config.baseUrl, {
         method: "POST",
         headers,
@@ -191,6 +193,22 @@ class Client {
         signal: controller.signal,
       });
 
+      console.log(
+        JSON.stringify(
+          {
+            method: "POST",
+            headers,
+            body: JSON.stringify({
+              query,
+              variables,
+              operationName,
+            }),
+          },
+          null,
+          2
+        )
+      );
+
       clearTimeout(timeoutId);
 
       // Manejo de errores HTTP
@@ -200,6 +218,9 @@ class Client {
           response
         );
         ApiErrorHandler.logError(error, operationName);
+
+        const result = await response.text();
+        console.log("result", result);
 
         // Reintento automático para errores 5xx
         if (response.status >= 500 && retryCount < this.config.retryAttempts) {
@@ -219,6 +240,7 @@ class Client {
       }
 
       const result = await response.json();
+      console.log("result", result);
 
       // Manejo de errores GraphQL
       if (result.errors && result.errors.length > 0) {
