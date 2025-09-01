@@ -42,7 +42,9 @@ const Payment = () => {
               if (result) {
                 console.log("success");
                 router.dismissAll();
-                return router.push("/(cart)/success");
+                return router.push(
+                  `/(cart)/success?orderId=${params?.orderId}`
+                );
               }
               console.log("failure");
               router.dismissAll();

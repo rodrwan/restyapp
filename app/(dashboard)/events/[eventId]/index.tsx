@@ -84,14 +84,29 @@ const TicketPage = () => {
   const [activeItem, setActiveItem] = React.useState<any>(user?.tickets?.[0]);
 
   React.useEffect(() => {
-    if (!ticketFound?.is_validated) {
-      const la = setInterval(async () => {
-        await getTicket(activeItem?.item?.id);
-      }, 2000);
+    let intervalId: number | null = null;
 
-      return () => clearInterval(la);
+    if (!ticketFound?.is_validated && activeItem?.item?.id) {
+      // Limpiar cualquier intervalo existente antes de crear uno nuevo
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+
+      intervalId = setInterval(async () => {
+        try {
+          await getTicket(activeItem.item.id);
+        } catch (error) {
+          console.error("Error al obtener ticket:", error);
+        }
+      }, 10 * 1000);
     }
-  }, [activeItem, ticketFound]);
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [activeItem?.item?.id, ticketFound?.is_validated]);
 
   React.useEffect(() => {
     updateTicket(ticketFound as any);
@@ -267,7 +282,7 @@ const TicketPage = () => {
                 }
                 className="py-4 bg-success-100 justify-center items-center my-4 rounded-xl w-[45%]"
               >
-                <Text className="font-bold text-secondary-500">Consumo</Text>
+                <Text className="font-bold text-secondary-500">Barra</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() =>

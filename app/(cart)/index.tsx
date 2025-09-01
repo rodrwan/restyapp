@@ -21,7 +21,7 @@ const Cart = () => {
   } = useCartStore();
   const { session } = useSession();
   const params: any = useLocalSearchParams();
-  console.log("params", params);
+  console.log("cart params", params);
 
   React.useEffect(() => {
     if (!session) {
@@ -80,7 +80,12 @@ const Cart = () => {
 
       console.log("itemsInCart", itemsInCart);
       const newOrder = await create(itemsInCart);
-      console.log("newOrder", newOrder);
+      console.log("newOrder", newOrder, !newOrder);
+      if (!newOrder) {
+        return router.push(
+          `/(auth)/sign-in?redirectTo=(cart)?goBackTo=${params?.goBackTo}`
+        );
+      }
       if (newOrder?.length === 0) {
         return router.push(
           `/(auth)/sign-in?redirectTo=(cart)?goBackTo=${params?.goBackTo}`
@@ -291,7 +296,7 @@ const Cart = () => {
               onPress={() => onSubmit()}
               className="bg-primary-400 w-[90%] mx-auto left-0 right-0 p-4 rounded-3xl items-center justify-center border border-primary-700 content-center"
             >
-              <Text className="text-white font-bold">Ir a Pagar</Text>
+              <Text className="text-lg text-white font-bold">Ir a Pagar</Text>
             </TouchableOpacity>
           </View>
         ) : null}

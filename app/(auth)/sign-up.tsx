@@ -34,7 +34,6 @@ const SignUp = () => {
   const { setUser } = useUserStore();
   const { getUserFirstUpcomingEvent } = useGetUserFirstUpcomingEvent();
   const params: any = useLocalSearchParams();
-  console.log("params", params);
 
   const navigation = useNavigation();
   const [isSubmitting, setSubmitting] = useState(false);

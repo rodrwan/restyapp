@@ -37,7 +37,6 @@ const SignIn = () => {
 
   const navigation = useNavigation();
   const params: any = useLocalSearchParams();
-  console.log("params", params);
   const { setUser } = useUserStore();
 
   const [isSubmitting, setSubmitting] = useState(false);

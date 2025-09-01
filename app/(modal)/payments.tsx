@@ -5,18 +5,43 @@ import useUserStore from "@/stores/useUser";
 import useEventStore from "@/stores/useEvent";
 import { CreditCard } from "@/components/CreditCard";
 import useCreateInscription from "@/hooks/useCreateInscription";
-import { router } from "expo-router";
+import useDeleteInscription from "@/hooks/useDeleteInscription";
+import { router, useLocalSearchParams } from "expo-router";
+import useSession from "@/hooks/useSession";
 
 const payments = () => {
-  const { user }: any = useUserStore();
+  const params: any = useLocalSearchParams();
+  const { user, setTbkCardNumber }: any = useUserStore();
+  const { me } = useSession();
   const { event } = useEventStore();
   const { createInscription } = useCreateInscription(event?.id);
+  const { deleteInscription } = useDeleteInscription(event?.id);
+
+  const onDeleteInscription = async () => {
+    try {
+      await deleteInscription();
+      await me();
+      setTbkCardNumber("", "", "");
+
+      if (params?.redirectTo) {
+        return router.replace(
+          `/${params?.redirectTo}?orderId=${params?.orderId}`
+        );
+      }
+
+      router.back();
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const onSubmitRegisterCard = async () => {
     try {
       const newPayment = await createInscription();
       const { url, token } = newPayment;
-      return router.push(`/(cart)/inscription?url=${url}&token=${token}`);
+      return router.push(
+        `/(cart)/inscription?url=${url}&token=${token}&redirectTo=(cart)/checkout`
+      );
     } catch (error) {
       console.log(error);
     }
@@ -61,7 +86,7 @@ const payments = () => {
             }}
           >
             <Image
-              source={require("../../assets/images/transbank.png")}
+              source={require("../../assets/images/oneclick.png")}
               style={{
                 marginTop: 8,
                 height: 80,
@@ -71,7 +96,9 @@ const payments = () => {
         </View>
       </View>
       <View className="flex p-4 mt-8 mx-4 justify-center items-center">
-        <Text className="text-error-400">Eliminar tarjeta</Text>
+        <TouchableOpacity onPress={() => onDeleteInscription()}>
+          <Text className="text-error-400">Eliminar tarjeta</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );

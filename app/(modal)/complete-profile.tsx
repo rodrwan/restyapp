@@ -132,13 +132,13 @@ const CompleteProfile = () => {
             </Text>
 
             <Text className="text-base text-white mt-4 font-psemibold">
-              Completa tu DNI, género y fecha de nacimiento para que podamos
+              Completa tu RUT, género y fecha de nacimiento para que podamos
               recomendarte eventos que vayan contigo. 😉 ¡Personaliza tu
               experiencia al máximo!
             </Text>
 
             <FormField
-              title="DNI"
+              title="RUT"
               value={form.dni}
               handleChangeText={(e: string) =>
                 setForm({ ...form, dni: format(e) })
@@ -148,38 +148,40 @@ const CompleteProfile = () => {
             />
 
             <View className="mt-4">
-              <Text className="text-gray-100 mb-2">Género</Text>
+              <Text className="text-base text-gray-100 mb-2">Género</Text>
               <View className="flex-row gap-4">
                 {genderOptions.map((option) => (
                   <TouchableOpacity
                     key={option.value}
                     onPress={() => setForm({ ...form, gender: option.value })}
-                    className={`px-4 py-2 rounded-full ${
+                    className={`text-base px-4 py-2 rounded-full ${
                       form.gender === option.value
                         ? "bg-primary-500"
                         : "bg-gray-700"
                     }`}
                   >
-                    <Text className="text-white">{option.label}</Text>
+                    <Text className="text-base text-white">{option.label}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
             </View>
 
             <View className="mt-4">
-              <Text className="text-gray-100 mb-2">Fecha de nacimiento</Text>
+              <Text className="text-base text-gray-100 mb-2">
+                Fecha de nacimiento
+              </Text>
               <TouchableOpacity
                 onPress={() => setShowDatePicker(true)}
-                className="bg-gray-700 p-4 rounded-lg flex-row justify-between items-center"
+                className="text-base bg-gray-700 p-4 rounded-lg flex-row justify-between items-center"
               >
-                <Text className="text-white">
+                <Text className="text-lg text-white">
                   {form.birth_date.toLocaleDateString("es-ES", {
                     day: "2-digit",
                     month: "2-digit",
                     year: "numeric",
                   })}
                 </Text>
-                <Ionicons name="calendar-outline" size={20} color="white" />
+                <Ionicons name="calendar-outline" size={24} color="white" />
               </TouchableOpacity>
             </View>
 
@@ -189,15 +191,19 @@ const CompleteProfile = () => {
               className="m-0 justify-end"
             >
               <View className="bg-secondary-800 rounded-t-3xl p-4">
-                <View className="flex-row justify-between items-center mb-4">
+                <View className="flex-row justify-between items-center mb-4 ">
                   <TouchableOpacity onPress={() => setShowDatePicker(false)}>
-                    <Text className="text-primary-500">Cancelar</Text>
+                    <Text className="text-primary-500 text-base font-psemibold">
+                      Cancelar
+                    </Text>
                   </TouchableOpacity>
-                  <Text className="text-white font-psemibold">
+                  <Text className="text-white text-base font-psemibold">
                     Fecha de nacimiento
                   </Text>
                   <TouchableOpacity onPress={handleDateConfirm}>
-                    <Text className="text-primary-500">Confirmar</Text>
+                    <Text className="text-primary-500 text-base font-psemibold">
+                      Confirmar
+                    </Text>
                   </TouchableOpacity>
                 </View>
 

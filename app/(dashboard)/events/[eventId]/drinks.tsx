@@ -78,14 +78,29 @@ const drinks = () => {
   const [activeItem, setActiveItem] = React.useState<any>(user?.drinks?.[0]);
 
   React.useEffect(() => {
-    if (!ticketFound?.is_validated) {
-      const la = setInterval(async () => {
-        await getTicket(activeItem?.item?.id);
-      }, 2000);
+    let intervalId: number | null = null;
 
-      return () => clearInterval(la);
+    if (!ticketFound?.is_validated && activeItem?.item?.id) {
+      // Limpiar cualquier intervalo existente antes de crear uno nuevo
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+
+      intervalId = setInterval(async () => {
+        try {
+          await getTicket(activeItem.item.id);
+        } catch (error) {
+          console.error("Error al obtener ticket:", error);
+        }
+      }, 10 * 1000);
     }
-  }, [activeItem, ticketFound]);
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [activeItem?.item?.id, ticketFound?.is_validated]);
 
   React.useEffect(() => {
     updateTicket(ticketFound as any);

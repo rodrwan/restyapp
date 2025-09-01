@@ -113,7 +113,7 @@ const UpcomingEvent: React.FC<UpcomingEventProps> = React.memo(
             />
             <ActionButton
               icon={require("../../assets/images/glass.png")}
-              title="Consumo"
+              title="Barra"
               count={availableDrinks}
               onPress={handleDrinksPress}
             />

@@ -46,7 +46,11 @@ interface Store {
   setTickets: (tickets: Ticket[]) => void;
   setDrinks: (drinks: Drink[]) => void;
   setEvents: (events: Event[]) => void;
-  setTbkCardNumber: (userId: string, cardNumber: string) => void;
+  setTbkCardNumber: (
+    userId: string,
+    cardNumber: string,
+    cardType: string
+  ) => void;
   setUpcomingEvent: (event: any) => void;
   updateTicket: (ticket: Ticket) => void;
 }
@@ -64,6 +68,7 @@ const initialState = {
   events: null,
   tbk_user_id: null,
   tbk_card_number: null,
+  tbk_card_type: null,
 };
 
 const useUserStore = create<Store>((set) => ({
@@ -83,10 +88,20 @@ const useUserStore = create<Store>((set) => ({
     set((state) => ({ ...state, user: { ...state.user, drinks } })),
   setEvents: (events: Event[]) =>
     set((state) => ({ ...state, user: { ...state.user, events } })),
-  setTbkCardNumber: (userId: string, cardNumber: string) =>
+  setTbkCardNumber: (userId: string, cardNumber: string, cardType: string) =>
     set((state) => ({
       ...state,
-      user: { ...state.user, tbk_user_id: userId, tbk_card_number: cardNumber },
+      user: {
+        ...state.user,
+        tbk_user_id: userId,
+        tbk_card_number: cardNumber,
+        tbk_card_type: cardType,
+      },
+    })),
+  setTbkCardType: (cardType: string | null) =>
+    set((state) => ({
+      ...state,
+      user: { ...state.user, tbk_card_type: cardType },
     })),
   setUpcomingEvent: (event: any) => {
     set((state) => ({

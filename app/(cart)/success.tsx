@@ -111,7 +111,7 @@ const SuccessPage = () => {
       // Background Linear Gradient
       colors={["#04121A", "#092838"]}
     >
-      <ScrollView className="flex h-full bg-secondary-500 p-2 mt-4">
+      <ScrollView className="flex h-full bg-secondary-500 p-2 mt-16">
         <View className="flex py-2 bg-white rounded-xl mt-14">
           <Text className="self-center font-bold text-xl mb-4">
             Compra Exitosa

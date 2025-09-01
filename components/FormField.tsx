@@ -21,7 +21,7 @@ const FormField = ({
       </Text>
 
       <View
-        className={`w-full h-16 px-4 bg-black-400 bg-white rounded-2xl border-2 border-secondary-300 focus:border-secondary-50 flex flex-row items-center ${inputStyle}`}
+        className={`w-full py-4 px-4 bg-black-400 bg-white rounded-2xl border-2 border-secondary-300 focus:border-secondary-50 flex flex-row items-center ${inputStyle}`}
       >
         <TextInput
           className={`flex-1 bg-white font-psemibold text-base`}
@@ -36,9 +36,9 @@ const FormField = ({
         {title === "Password" && (
           <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
             {!showPassword ? (
-              <Ionicons mame="eye-outline" />
+              <Ionicons name="eye-outline" />
             ) : (
-              <Ionicons mame="eye-off-outline" />
+              <Ionicons name="eye-off-outline" />
             )}
           </TouchableOpacity>
         )}

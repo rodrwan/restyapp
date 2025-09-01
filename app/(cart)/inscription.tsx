@@ -10,12 +10,13 @@ import useEventStore from "@/stores/useEvent";
 
 const Payment = () => {
   const params: any = useLocalSearchParams();
+  console.log("inscription params", params);
   const router = useRouter();
   const { confirmInscription } = useConfirmInscription();
   const { setTbkCardNumber } = useUserStore();
   const { me } = useSession();
   const { event } = useEventStore();
-  console.log("params.url", params.url);
+
   return (
     <View className="flex flex-1">
       <WebView
@@ -48,17 +49,26 @@ const Payment = () => {
                 if (result) {
                   await me();
                   console.log("success");
-                  router.dismissAll();
-                  setTbkCardNumber(result?.tbk_user, result?.card_number);
-                  return router.replace(`/${params?.redirectTo ?? "(cart)"}`);
+                  // router.dismissAll();
+                  setTbkCardNumber(
+                    result?.tbk_user,
+                    result?.card_number,
+                    result?.card_type
+                  );
+                  let redirectTo =
+                    params?.redirectTo && params?.orderId
+                      ? `${params?.redirectTo}?orderId=${params?.orderId}`
+                      : "(cart)";
+                  return router.replace(`/${redirectTo}`);
                 }
+
                 console.log("failure");
-                router.dismissAll();
+                // router.dismissAll();
                 // rejected by other mean.
                 return router.push("/(cart)/failure");
               } catch (err) {
                 console.log("failure", err);
-                router.dismissAll();
+                // router.dismissAll();
                 // rejected by other mean.
                 return router.push("/(cart)/failure");
               }

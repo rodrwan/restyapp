@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useNavigation } from "expo-router";
 import Colors from "@/constants/Colors";
@@ -13,6 +13,7 @@ import { useSession } from "@/context/AuthProvider";
 interface MenuItemProps {
   label: string;
   onPress: () => void | Promise<void>;
+  icon?: React.ReactNode;
   className?: string;
 }
 
@@ -36,9 +37,15 @@ const HeaderIcon = ({
   </TouchableOpacity>
 );
 
-const MenuItem = ({ label, onPress, className }: MenuItemProps) => (
-  <TouchableOpacity onPress={onPress} className={`mb-8 ${className}`}>
-    <Text className="self-center text-white font-bold text-xl">{label}</Text>
+const MenuItem = ({ label, onPress, className, icon }: MenuItemProps) => (
+  <TouchableOpacity
+    onPress={onPress}
+    className={`flex flex-col items-center p-2 ${className}`}
+  >
+    <View className="flex flex-col items-center">
+      <View>{icon && icon}</View>
+      <Text className="text-white font-bold text-xl">{label}</Text>
+    </View>
   </TouchableOpacity>
 );
 
@@ -92,32 +99,85 @@ const MenuPage = () => {
   const menuItems: MenuItemProps[] = [
     {
       label: "Eventos",
+      icon: (
+        <Ionicons
+          name="location-outline"
+          size={32}
+          color={Colors.primary[500]}
+        />
+      ),
       onPress: () => router.replace("/"),
     },
     {
-      label: "Mis Eventos",
+      label: "Mis eventos",
+      icon: (
+        <Ionicons
+          name="calendar-outline"
+          size={32}
+          color={Colors.primary[500]}
+        />
+      ),
       onPress: () => router.replace("/(dashboard)"),
     },
     {
-      label: "Perfil",
+      label: "Mi cuenta",
+      icon: (
+        <Ionicons name="person-outline" size={32} color={Colors.primary[500]} />
+      ),
       onPress: () => router.replace("/(dashboard)/profile"),
-    },
-    {
-      label: "Terminos y Condiciones",
-      onPress: async () => {
-        await WebBrowser.openBrowserAsync(TERMS_URL);
-      },
-      className: "mt-auto pt-4",
     },
   ];
 
   return (
     <LinearGradient colors={["#04121A", "#092838"]} className="flex-1">
       <SafeAreaView className="flex h-full p-2 justify-between">
-        <View className="flex grow flex-col mt-12 border-b border-primary-400 rounded-lg pt-4 mb-8">
-          {menuItems?.map((item, index) => (
-            <MenuItem key={index} {...item} />
-          ))}
+        <View className="flex flex-col items-center justify-center mt-10 rounded-lg border border-primary-100">
+          {/* hero */}
+          <Image
+            source={require("../assets/images/hero.png")}
+            className={`w-full h-48  ${
+              session ? "rounded-lg" : "rounded-t-lg"
+            }`}
+            resizeMode="cover"
+          />
+
+          {!session && (
+            <View className="p-4 items-center justify-center w-full rounded-b-lg">
+              <Text className="text-white text-center text-base">
+                Inicia sesión para ver tus eventos
+              </Text>
+              <TouchableOpacity
+                onPress={() => router.replace("/(dashboard)/profile")}
+                className="bg-primary-400 rounded-lg p-2 mt-4 w-full"
+              >
+                <Text className="text-white text-center text-lg font-bold">
+                  Iniciar sesión
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+        <View className="flex grow flex-col mt-4 border-b border-primary-400 rounded-lg pt-4 mb-8">
+          {session && (
+            <View className="flex flex-row justify-between">
+              {menuItems?.map((item, index) => (
+                <MenuItem key={index} {...item} />
+              ))}
+            </View>
+          )}
+
+          <TouchableOpacity
+            onPress={async () => {
+              await WebBrowser.openBrowserAsync(TERMS_URL);
+            }}
+            className={`flex flex-col items-center p-2 mb-4 mt-auto pt-4 justify-center items-center`}
+          >
+            <View className="flex flex-col items-center">
+              <Text className="ml-4 self-center text-white font-bold text-xl">
+                Terminos y Condiciones
+              </Text>
+            </View>
+          </TouchableOpacity>
         </View>
 
         {session && (

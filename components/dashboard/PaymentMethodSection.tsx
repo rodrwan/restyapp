@@ -34,7 +34,7 @@ const PaymentMethodSection: React.FC<PaymentMethodSectionProps> = ({
               }}
             >
               <Image
-                source={require("../../assets/images/transbank.png")}
+                source={require("../../assets/images/oneclick.png")}
                 style={{
                   marginTop: 8,
                   height: 100,

@@ -29,7 +29,6 @@ export default function ResetPassword() {
     confirmPassword: "",
   });
   const params: any = useLocalSearchParams();
-  console.log("params", params);
 
   useLayoutEffect(() => {
     navigation.setOptions({

@@ -13,6 +13,7 @@ export default function CartLayoutNav() {
         <Stack.Screen
           name="payment"
           options={{
+            title: "Pagar",
             presentation: "modal",
           }}
         />

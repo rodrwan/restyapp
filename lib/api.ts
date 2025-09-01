@@ -158,6 +158,7 @@ class Client {
         Accept: "application/json",
         "Content-Type": "application/json",
         "X-User-Roles": "system",
+        "x-user-platform": "mobile",
       };
 
       if (requiresAuth) {
@@ -776,6 +777,7 @@ class Client {
         confirmInscription(input: $input) {
           tbk_user
           card_number
+          card_type
         }
       }
     `;
@@ -786,6 +788,18 @@ class Client {
       "ConfirmInscription",
       true
     );
+  }
+
+  async deleteInscription(eventId: string): Promise<ApiResponse<any>> {
+    const document = graphql.gql`
+      mutation DeleteInscription($eventId: String!) {
+        deleteInscription(eventId: $eventId) {
+          tbk_user
+        }
+      }
+    `;
+
+    return this.makeRequest(document, { eventId }, "DeleteInscription", true);
   }
 
   async authorizeTransaction(paymentData: any): Promise<ApiResponse<any>> {

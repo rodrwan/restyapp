@@ -25,7 +25,6 @@ export default function ForgotPassword() {
   const [isSubmitting, setSubmitting] = useState(false);
   const [email, setEmail] = useState("");
   const params: any = useLocalSearchParams();
-  console.log("params", params);
 
   useLayoutEffect(() => {
     navigation.setOptions({

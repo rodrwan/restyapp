@@ -30,10 +30,12 @@ import RadioButton from "@/components/RadioButton";
 import useCreateInscription from "@/hooks/useCreateInscription";
 import { LinearGradient } from "expo-linear-gradient";
 import * as LocalAuthentication from "expo-local-authentication";
+import useCreatePayment from "@/hooks/useCreatePayment";
 
 const Checkout = () => {
   const navigation = useNavigation();
   const params: any = useLocalSearchParams();
+  console.log("checkout params", params);
 
   const { orderId } = params;
   const { user }: any = useUserStore();
@@ -126,6 +128,7 @@ const Checkout = () => {
 
   const { authorizeTransaction } = useAuthorizeTransaction();
   const { createInscription } = useCreateInscription(event?.id);
+  const { createPayment } = useCreatePayment();
 
   const onSubmit = async () => {
     setLoadingSubmit(true);
@@ -144,6 +147,9 @@ const Checkout = () => {
         }
       }
 
+      console.log("NOT NOMINATED");
+      console.log("orderId", orderId);
+      console.log("installments", installments);
       const newPayment = await authorizeTransaction(orderId, [], installments);
       console.log("newPayment", newPayment);
       const { status } = newPayment;
@@ -163,7 +169,23 @@ const Checkout = () => {
       const { url, token } = newPayment;
 
       return router.push(
-        `/(cart)/inscription?url=${url}&token=${token}&redirectTo=(cart)/checkout`
+        `/(cart)/inscription?url=${url}&token=${token}&redirectTo=(cart)/checkout&orderId=${orderId}`
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const onSubmitWebpay = async () => {
+    try {
+      const newPayment = await createPayment(
+        orderId,
+        event.nominated ? nominees : []
+      );
+      const { url, token } = newPayment;
+
+      return router.push(
+        `/(cart)/payment?url=${url}&token=${token}&orderId=${orderId}`
       );
     } catch (error) {
       console.log(error);
@@ -184,7 +206,7 @@ const Checkout = () => {
 
   const total = items.reduce((acc: number, cur: any) => {
     if (cur.type === "ENTRANCE") {
-      return (acc + cur.price * cur.quantity) * (1 + MANGO_FEE);
+      return acc + cur.price * cur.quantity * (1 + MANGO_FEE);
     }
 
     return acc + cur.price * cur.quantity;
@@ -196,7 +218,9 @@ const Checkout = () => {
 
   console.log("installments", installments);
   console.log("user.tbk_card_type", user?.tbk_card_type);
-  console.log(["RedCompra", "PrePago"].includes(user.tbk_cart_type));
+  console.log("user.tbk_card_number", user?.tbk_card_number);
+  console.log("user.tbk_user_id", user?.tbk_user_id);
+  console.log(["RedCompra", "PrePago"].includes(user?.tbk_card_type));
   return (
     <LinearGradient
       // Background Linear Gradient
@@ -210,7 +234,7 @@ const Checkout = () => {
           style={{ flex: 1 }}
         >
           <ScrollView
-            className="flex grow relative mb-16"
+            className="flex grow relative"
             onScroll={(event) => {
               setScrollY(event.nativeEvent.contentOffset.y);
             }}
@@ -277,57 +301,33 @@ const Checkout = () => {
               </View>
             ) : null}
 
-            <View className="mt-6 rounded-lg">
+            <View className="w-full mt-6 rounded-lg">
+              <Text className="text-xl text-white font-bold mb-4">
+                Medios de pago
+              </Text>
               {user?.tbk_card_number === "" ? (
-                <View className="flex bg-secondary-50 p-4 rounded-lg">
-                  <Text className="text-lg text-black font-bold">
-                    Inscribir medio de pago
-                  </Text>
-                  <View className="self-center justify-center justify-center ">
-                    <View className="flex-row w-full h-[140px] items-center m-auto justify-center ">
-                      <TouchableOpacity
-                        onPress={() => onSubmitRegisterCard()}
-                        style={{
-                          marginTop: 8,
-                          alignSelf: "center",
-                          borderWidth: 1,
-                          paddingVertical: 4,
-                          paddingHorizontal: 8,
-                          borderRadius: 8,
-                          borderColor: "#9ba5aa",
-                          width: "100%",
-                        }}
-                      >
-                        <Image
-                          source={require("../../assets/images/transbank.png")}
-                          style={{
-                            marginTop: 8,
-                            height: 100,
-                          }}
-                          resizeMode="contain"
-                        />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                  <Text className="text-secondary-500 text-md font-regular mt-2">
-                    Realizaremos un cargo de $50 pesos de forma temporal que te
-                    devolveremos al confirmar tu tarjeta. El proceso es seguro y
-                    se realizará una sola vez.
-                  </Text>
+                <Text className="text-white text-base mb-4">
+                  Para continuar debes elegir un medio de pago.
+                </Text>
+              ) : (
+                <Text className="text-white text-base mb-4">
+                  Tienes tu tarjeta registrada, puedes continuar con el pago.
+                </Text>
+              )}
 
-                  <TouchableOpacity
-                    onPress={() => onSubmitRegisterCard()}
-                    className="bg-primary-400 rounded-full p-4 rounded-3xl items-center justify-center border border-primary-700 mt-4"
-                  >
-                    <Text className="text-white font-bold text-center">
-                      Inscribir tarjeta
-                    </Text>
-                  </TouchableOpacity>
-                </View>
+              {user?.tbk_card_number === "" ? (
+                <PaymentMethodSection
+                  onSubmitRegisterCard={onSubmitRegisterCard}
+                  onSubmitWebpay={onSubmitWebpay}
+                />
               ) : (
                 <View className="flex items-center ">
                   <TouchableOpacity
-                    onPress={() => router.push("/(modal)/payments")}
+                    onPress={() =>
+                      router.push(
+                        `/(modal)/payments?redirectTo=(cart)/checkout&orderId=${orderId}`
+                      )
+                    }
                     className="w-full backdrop-blur-lg bg-white/10 rounded-lg p-1"
                   >
                     <CreditCard
@@ -354,15 +354,20 @@ const Checkout = () => {
                 </View>
               )}
             </View>
-            {user?.tbk_card_number !== "" && (
-              <View className="items-center mb-8">
+
+            {user?.tbk_card_number !== "" ? (
+              <View className="items-center mb-20">
                 <View className="flex-row mb-2">
                   <TouchableOpacity
                     onPress={() => setTermAndConditions(!termAndConditions)}
                     className="flex flex-row items-center justify-center mt-4"
                   >
                     <RadioButton selected={termAndConditions} />
-                    <Text className="text-white font-base text-base ml-4">
+                    <Text
+                      className={`font-base text-base ml-4 ${
+                        termAndConditions ? "text-white" : "text-gray-400"
+                      }`}
+                    >
                       Términos y condiciones
                     </Text>
                   </TouchableOpacity>
@@ -382,14 +387,15 @@ const Checkout = () => {
                   </Text>
                 </View>
               </View>
-            )}
+            ) : null}
           </ScrollView>
+
           {!event.nominated && user?.tbk_card_number !== "" && (
-            <View className="flex w-full absolute bottom-8 items-center justify-center">
+            <View className="flex w-full absolute bottom-4 items-center justify-center">
               <TouchableOpacity
                 activeOpacity={0.9}
                 onPress={() => onAuthenticate()}
-                className={`flex-row w-[95%] ml-4 p-4 rounded-3xl items-center justify-center border border-primary-700 ${
+                className={`flex-row w-full p-4 rounded-3xl items-center justify-center border border-primary-700 ${
                   user?.tbk_card_number === "" || !termAndConditions
                     ? "bg-primary-200"
                     : "bg-primary-400"
@@ -400,7 +406,7 @@ const Checkout = () => {
                   !termAndConditions
                 }
               >
-                <Text className="text-white font-bold">Pagar</Text>
+                <Text className="text-lg text-white font-bold">Pagar</Text>
 
                 {loadingSubmit && (
                   <ActivityIndicator
@@ -432,7 +438,7 @@ const Checkout = () => {
                     !termAndConditions
                   }
                 >
-                  <Text className="text-white font-bold">Pagar</Text>
+                  <Text className="text-lg text-white font-bold">Pagar</Text>
 
                   {loadingSubmit && (
                     <ActivityIndicator
@@ -543,5 +549,160 @@ function AccordionView({ orderId, tickets, assignTicket }: any) {
       renderContent={_renderContent}
       onChange={_updateSections}
     />
+  );
+}
+
+function WebpayView({ onSubmitWebpay }: any) {
+  const [termAndConditions, setTermAndConditions] = useState(false);
+
+  return (
+    <View className="flex bg-secondary-700 p-4 rounded-xl w-full">
+      <View className="flex flex-col w-full">
+        <Text className="text-white text-xl sm:text-2xl lg:text-3xl mb-4">
+          ¡Último paso! 🎉
+        </Text>
+        <Text className="text-white mb-4 text-base">
+          ¡Ya casi tienes tus entradas! Te vamos a dirigir a Transbank para
+          procesar tu pago de forma segura.
+        </Text>
+        <Text className="text-white text-base">
+          Te avisamos que al continuar, estarás en la página de Transbank. Como
+          es un sitio externo, asegúrate de verificar que estés en la página
+          oficial antes de ingresar tus datos. ¡Tu seguridad es importante para
+          nosotros! 🔒
+        </Text>
+      </View>
+
+      <View className="items-center">
+        <View className="flex-row mb-2">
+          <TouchableOpacity
+            onPress={() => setTermAndConditions(!termAndConditions)}
+            className="flex flex-row items-center justify-center mt-4"
+          >
+            <RadioButton selected={termAndConditions} />
+            <Text
+              className={`font-base text-base ml-4 ${
+                termAndConditions ? "text-primary-500" : "text-gray-600"
+              }`}
+            >
+              Términos y condiciones
+            </Text>
+          </TouchableOpacity>
+        </View>
+        <View className="w-full flex-row mx-2 mb-2 items-center justify-center">
+          <Text className="text-center text-white">
+            Debes aceptar los términos y condiciones antes de continuar.
+            <TouchableWithoutFeedback
+              onPress={async () =>
+                await WebBrowser.openBrowserAsync(
+                  "https://mangoticket-legal.nyc3.cdn.digitaloceanspaces.com/1.%20TERMINOS%20Y%20CONDICIONES%20(1).pdf"
+                )
+              }
+            >
+              <Text className="text-white"> Ver más</Text>
+            </TouchableWithoutFeedback>
+          </Text>
+        </View>
+
+        <TouchableOpacity
+          onPress={() => onSubmitWebpay()}
+          className={`flex-row w-[100%] p-4 rounded-3xl items-center justify-center border border-primary-700 ${
+            !termAndConditions ? "bg-primary-200" : "bg-primary-400"
+          }`}
+          disabled={!termAndConditions}
+        >
+          <Text className="text-white font-bold text-center">Pagar</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+function OneClickView({ onSubmitRegisterCard }: any) {
+  return (
+    <View className="flex bg-secondary-700 p-4 rounded-xl w-full">
+      <View>
+        <Text className="text-white text-base mt-2">
+          Se realizará un cobro de $50 pesos de forma temporal que te será
+          devuelto al confirmar tu tarjeta. El proceso es seguro y se realizará
+          una sola vez.
+        </Text>
+        <TouchableOpacity
+          onPress={() => onSubmitRegisterCard()}
+          className="bg-primary-400 rounded-full p-4 rounded-3xl items-center justify-center border border-primary-700 mt-4"
+        >
+          <Text className="text-white font-bold text-center">
+            Inscribir tarjeta
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+function PaymentMethodSection({ onSubmitRegisterCard, onSubmitWebpay }: any) {
+  const [webpay, setWebpay] = useState(false);
+  const [inscription, setInscription] = useState(false);
+
+  return (
+    <View className="w-full">
+      <View className="flex flex-row w-full justify-between mb-4">
+        <TouchableOpacity
+          onPress={() => {
+            setInscription(!inscription);
+            setWebpay(false);
+          }}
+          style={{
+            borderWidth: 1,
+            borderRadius: 8,
+            borderColor: "#9ba5aa",
+            paddingVertical: 4,
+            width: "49%",
+            backgroundColor: inscription ? "#fff" : "#000",
+          }}
+        >
+          <Image
+            source={require("../../assets/images/oneclick.png")}
+            style={{
+              height: 50,
+              width: "100%",
+              opacity: inscription ? 1 : 0.5,
+            }}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => {
+            setWebpay(!webpay);
+            setInscription(false);
+          }}
+          style={{
+            borderWidth: 1,
+            borderRadius: 8,
+            borderColor: "#9ba5aa",
+            paddingVertical: 4,
+            width: "49%",
+            backgroundColor: webpay ? "#fff" : "#000",
+          }}
+        >
+          <Image
+            source={require("../../assets/images/webpay.png")}
+            style={{
+              height: 50,
+              width: "100%",
+              opacity: webpay ? 1 : 0.5,
+            }}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+      </View>
+
+      {inscription && (
+        <OneClickView onSubmitRegisterCard={onSubmitRegisterCard} />
+      )}
+
+      {webpay && <WebpayView onSubmitWebpay={onSubmitWebpay} />}
+    </View>
   );
 }
