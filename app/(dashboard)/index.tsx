@@ -68,7 +68,7 @@ const HomePage: React.FC<HomePageProps> = () => {
 
   return (
     <ScrollView
-      className="flex h-auto pb-8 bg-[#04121A]"
+      className="flex h-auto bg-[#04121A]"
       refreshControl={
         <RefreshControl
           refreshing={loadingUpcomingEvent}
@@ -76,12 +76,11 @@ const HomePage: React.FC<HomePageProps> = () => {
         />
       }
     >
-      <LinearGradient colors={["#04121A", "#092838"]} className="flex h-screen">
-        {profileIncomplete ? (
-          <ProfileBanner onPress={handleCompleteProfile} />
-        ) : (
-          <UserProfileCard user={user!} />
-        )}
+      <LinearGradient
+        colors={["#04121A", "#041e2b"]}
+        className="flex h-full pb-16"
+      >
+        <UserProfileCard user={user!} />
 
         {!hasUpcomingEvent ? (
           <EmptyEventsState />
@@ -90,6 +89,8 @@ const HomePage: React.FC<HomePageProps> = () => {
         )}
 
         <NextEventsSection events={nextEvents} />
+
+        {profileIncomplete && <ProfileBanner onPress={handleCompleteProfile} />}
       </LinearGradient>
     </ScrollView>
   );

@@ -51,7 +51,7 @@ export default function EventPage() {
   if (!Boolean(eventId) || loading) {
     return (
       <LinearGradient
-        colors={["#04121A", "#092838"]}
+        colors={["#04121A", "#041e2b"]}
         style={{ flex: 1, height: "100%" }}
       >
         <View className="h-full items-center justify-center">

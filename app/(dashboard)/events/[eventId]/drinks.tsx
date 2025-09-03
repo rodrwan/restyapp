@@ -127,7 +127,7 @@ const drinks = () => {
   return (
     <LinearGradient
       // Background Linear Gradient
-      colors={["#04121A", "#092838"]}
+      colors={["#04121A", "#041e2b"]}
     >
       <SafeAreaView className="flex h-full">
         <ScrollView className="flex h-full mt-16">

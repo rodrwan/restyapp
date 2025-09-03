@@ -101,7 +101,7 @@ const DeleteAccount = () => {
   };
 
   return (
-    <LinearGradient colors={["#04121A", "#092838"]} className="flex-1">
+    <LinearGradient colors={["#04121A", "#041e2b"]} className="flex-1">
       <SafeAreaView className="h-full">
         <ScrollView className="px-2">
           <View className="pb-6">

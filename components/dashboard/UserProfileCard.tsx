@@ -1,5 +1,12 @@
 import React from "react";
-import { View, Text, Image, StyleSheet, Platform } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  Platform,
+  ImageBackground,
+} from "react-native";
 import { User } from "./types";
 
 interface UserProfileCardProps {
@@ -8,20 +15,27 @@ interface UserProfileCardProps {
 
 const UserProfileCard: React.FC<UserProfileCardProps> = React.memo(
   ({ user }) => (
-    <View className="flex flex-row bg-white rounded-xl mx-4 py-6 px-8 justify-between my-4">
-      <View className="w-1/4">
+    <View className="flex flex-coljustify-center items-center align-center relative">
+      <Image
+        source={require("../../assets/images/hero_banner2.jpeg")}
+        resizeMode="cover"
+        className="w-full h-44 absolute top-0 left-0 rounded-b-xl"
+      />
+      <View className="flex flex-col rounded-b-xl items-center justify-center mb-4 bg-secondary-500/20 w-full h-44">
         <Image
           source={{ uri: user.picture }}
-          className="w-[80px] h-[80px] rounded-full shadow-2xl border border-secondary-500"
+          className="w-[80px] h-[80px] rounded-full"
           style={styles.elevationLow}
         />
-      </View>
-      <View className="w-3/4 justify-center ml-4">
-        <Text className="text-base" numberOfLines={1}>
-          {user.firstname} {user.lastname}
-        </Text>
-        <Text className="text-base">{user.dni}</Text>
-        <Text className="text-xs text-secondary-200">{user.email}</Text>
+
+        <View className="w-full justify-center items-center mt-2">
+          <Text className="text-base font-bold text-white" numberOfLines={1}>
+            {user.firstname} {user.lastname}
+          </Text>
+          <Text className="text-base text-secondary-200 text-white">
+            {user.email}
+          </Text>
+        </View>
       </View>
     </View>
   )
@@ -33,11 +47,11 @@ const styles = StyleSheet.create({
     height: 80,
     ...Platform.select({
       ios: {
-        shadowColor: "#171717",
-        shadowOffset: { width: 1, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 3,
-        elevation: 10,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+        elevation: 5,
       },
       android: {
         elevation: 5,

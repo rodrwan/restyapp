@@ -8,7 +8,7 @@ export default function EventsLayoutNav() {
       <Stack>
         <Stack.Screen name="[eventId]" />
       </Stack>
-      <StatusBar backgroundColor="#04121A" style="light" />
+      <StatusBar backgroundColor="#041e2b" style="light" />
     </View>
   );
 }

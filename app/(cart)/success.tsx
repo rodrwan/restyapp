@@ -85,7 +85,7 @@ const SuccessPage = () => {
     return (
       <LinearGradient
         // Background Linear Gradient
-        colors={["#04121A", "#092838"]}
+        colors={["#04121A", "#041e2b"]}
         className="flex h-full"
       >
         <View className="h-full items-center justify-center">
@@ -109,7 +109,7 @@ const SuccessPage = () => {
   return (
     <LinearGradient
       // Background Linear Gradient
-      colors={["#04121A", "#092838"]}
+      colors={["#04121A", "#041e2b"]}
     >
       <ScrollView className="flex h-full bg-secondary-500 p-2 mt-16">
         <View className="flex py-2 bg-white rounded-xl mt-14">

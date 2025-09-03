@@ -24,7 +24,7 @@ const NextEventsSection: React.FC<NextEventsSectionProps> = React.memo(
     }
 
     return (
-      <View className="flex mx-2">
+      <View className="flex">
         <View className="mb-4">
           <Text className="text-white font-bold text-xl mx-2">
             Próximamente

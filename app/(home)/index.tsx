@@ -28,7 +28,7 @@ export default function HomePage() {
   const sortedEvents = data?.sort(sortByStartAt);
 
   return (
-    <LinearGradient colors={["#04121A", "#092838"]} className="flex-1">
+    <LinearGradient colors={["#04121A", "#041e2b"]} className="flex-1">
       <View className="flex-1">
         <FlatList
           className="p-2"

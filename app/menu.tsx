@@ -129,7 +129,7 @@ const MenuPage = () => {
   ];
 
   return (
-    <LinearGradient colors={["#04121A", "#092838"]} className="flex-1">
+    <LinearGradient colors={["#04121A", "#041e2b"]} className="flex-1">
       <SafeAreaView className="flex h-full p-2 justify-between">
         <View className="flex flex-col items-center justify-center mt-10 rounded-lg border border-primary-100">
           {/* hero */}

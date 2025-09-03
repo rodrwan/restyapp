@@ -27,7 +27,7 @@ const ProfilePage = () => {
 
   if (loadingUserData) {
     return (
-      <LinearGradient colors={["#04121A", "#092838"]} className="flex h-full">
+      <LinearGradient colors={["#04121A", "#041e2b"]} className="flex h-full">
         <View className="h-full items-center justify-center">
           <ActivityIndicator size={"small"} />
         </View>
@@ -49,7 +49,7 @@ const ProfilePage = () => {
   };
 
   return (
-    <LinearGradient colors={["#04121A", "#092838"]} className="flex-1">
+    <LinearGradient colors={["#04121A", "#041e2b"]} className="flex-1">
       <View className="flex-1">
         <ScrollView className="flex-1">
           {/* Profile view */}

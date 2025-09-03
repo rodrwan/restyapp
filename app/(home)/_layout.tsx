@@ -12,7 +12,7 @@ export default function HomeLayoutNav() {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" />
       </Stack>
-      <StatusBar backgroundColor="#04121A" style="light" />
+      <StatusBar backgroundColor="#041e2b" style="light" />
     </View>
   );
 }

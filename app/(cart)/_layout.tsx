@@ -25,7 +25,7 @@ export default function CartLayoutNav() {
           }}
         />
       </Stack>
-      <StatusBar backgroundColor="#04121A" style="light" />
+      <StatusBar backgroundColor="#041e2b" style="light" />
     </View>
   );
 }

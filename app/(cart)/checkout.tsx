@@ -58,7 +58,10 @@ const Checkout = () => {
           <TouchableOpacity
             onPress={() => {
               clearTicketToNominate();
-              navigation?.goBack();
+              if (params?.goBackTo) {
+                return router.replace(`/${params?.goBackTo}`);
+              }
+              return router.replace(`/(home)`);
             }}
             className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2"
           >
@@ -224,7 +227,7 @@ const Checkout = () => {
   return (
     <LinearGradient
       // Background Linear Gradient
-      colors={["#04121A", "#092838"]}
+      colors={["#04121A", "#041e2b"]}
       style={{ flex: 1, height: "100%" }}
     >
       <SafeAreaView className="flex h-full p-2">
