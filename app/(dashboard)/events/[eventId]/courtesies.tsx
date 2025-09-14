@@ -7,8 +7,9 @@ import {
   FlatList,
   Image,
   Dimensions,
+  ActivityIndicator,
 } from "react-native";
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import { router, useNavigation, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -18,10 +19,12 @@ import Colors from "@/constants/Colors";
 import useUserStore from "@/stores/useUser";
 import EmptyState from "@/components/EmptyState";
 import ScalingDots from "@/components/ScalingDots";
-import useGetTicketById from "@/hooks/useGetTicketById";
 import Toast from "react-native-toast-message";
 import { LinearGradient } from "expo-linear-gradient";
+import useGetCourtesies from "@/hooks/useGetCourtesies";
+import { Courtesy, Event } from "@/components/dashboard/types";
 
+// Animaciones
 const zoomIn = {
   0: {
     scale: 0.9,
@@ -40,12 +43,67 @@ const zoomOut = {
   },
 };
 
-const drinks = () => {
-  const { eventId }: any = useLocalSearchParams();
+// Funciones helper
+const formatEventDate = (startAt: string): string => {
+  try {
+    const splittedStartAt = startAt.split(" ");
+    const joinedStartAt = splittedStartAt[0] + " " + splittedStartAt[1];
+    return new Date(joinedStartAt).toLocaleString("es-CL", {
+      weekday: "short",
+      month: "long",
+      day: "numeric",
+    });
+  } catch (error) {
+    console.error("Error formatting date:", error);
+    return "Fecha no disponible";
+  }
+};
+
+const filterCourtesiesByEvent = (
+  courtesies: Courtesy[] | null,
+  eventId: string
+): Courtesy[] => {
+  if (!courtesies) return [];
+  return courtesies.filter((courtesy) => courtesy.event?.id === eventId);
+};
+
+const filterValidatedCourtesies = (courtesies: Courtesy[]): Courtesy[] => {
+  return courtesies.filter((courtesy) => courtesy.is_validated);
+};
+
+const filterUnvalidatedCourtesies = (courtesies: Courtesy[]): Courtesy[] => {
+  return courtesies.filter((courtesy) => !courtesy.is_validated);
+};
+
+const Courtesies = () => {
+  const { eventId } = useLocalSearchParams();
   const navigation = useNavigation();
   const scrollX = React.useRef(new Animated.Value(0)).current;
   const { user, updateTicket } = useUserStore();
-  const { data: ticketFound, getTicket }: any = useGetTicketById();
+  const eventIdString = Array.isArray(eventId) ? eventId[0] : eventId;
+  const {
+    data: courtesies,
+    isLoadingGetCourtesies,
+    error,
+    getCourtesies,
+  } = useGetCourtesies(eventIdString || "");
+
+  // Memoizar las cortesías filtradas
+  const eventCourtesies = useMemo(() => {
+    return filterCourtesiesByEvent(user?.courtesies, eventIdString || "");
+  }, [user?.courtesies, eventIdString]);
+
+  const unvalidatedCourtesies = useMemo(() => {
+    return filterUnvalidatedCourtesies(eventCourtesies);
+  }, [eventCourtesies]);
+
+  const validatedCourtesies = useMemo(() => {
+    return filterValidatedCourtesies(eventCourtesies);
+  }, [eventCourtesies]);
+
+  const [activeItem, setActiveItem] = React.useState<Courtesy | null>(
+    unvalidatedCourtesies[0] || null
+  );
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -70,29 +128,45 @@ const drinks = () => {
         </TouchableOpacity>
       ),
     });
-  }, []);
-  if (!user?.drinks) {
-    return;
+  }, [navigation]);
+
+  // Early return si no hay cortesías
+  if (
+    !user?.courtesies ||
+    eventCourtesies.length === 0 ||
+    isLoadingGetCourtesies
+  ) {
+    return (
+      <LinearGradient colors={["#04121A", "#041e2b"]}>
+        <SafeAreaView className="flex h-full">
+          <View className="flex-1 justify-center items-center">
+            <EmptyState
+              title="No tienes cortesías"
+              subtitle="Aún no tienes cortesías disponibles para este evento"
+            />
+          </View>
+        </SafeAreaView>
+      </LinearGradient>
+    );
   }
 
-  const [activeItem, setActiveItem] = React.useState<any>(user?.drinks?.[0]);
+  // Callback para manejar la obtención de cortesías
+  const handleGetCourtesies = useCallback(async () => {
+    try {
+      await getCourtesies();
+    } catch (error) {
+      console.error("Error al obtener cortesía:", error);
+    }
+  }, [getCourtesies]);
 
+  // Effect para el polling de cortesías
   React.useEffect(() => {
-    let intervalId: number | null = null;
+    let intervalId: NodeJS.Timeout | null = null;
 
-    if (!ticketFound?.is_validated && activeItem?.item?.id) {
-      // Limpiar cualquier intervalo existente antes de crear uno nuevo
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
-
-      intervalId = setInterval(async () => {
-        try {
-          await getTicket(activeItem.item.id);
-        } catch (error) {
-          console.error("Error al obtener ticket:", error);
-        }
-      }, 10 * 1000);
+    if (!courtesies?.is_validated && activeItem?.id) {
+      intervalId = setInterval(() => {
+        handleGetCourtesies();
+      }, 10 * 1000) as unknown as NodeJS.Timeout;
     }
 
     return () => {
@@ -100,29 +174,83 @@ const drinks = () => {
         clearInterval(intervalId);
       }
     };
-  }, [activeItem?.item?.id, ticketFound?.is_validated]);
+  }, [activeItem?.id, courtesies?.is_validated, handleGetCourtesies]);
 
+  // Effect para actualizar el ticket cuando cambia la cortesía
   React.useEffect(() => {
-    updateTicket(ticketFound as any);
-    if (ticketFound?.is_validated) {
-      Toast.show({
-        type: "success",
-        text1: "QR validado con éxito",
-      });
+    if (courtesies) {
+      updateTicket(courtesies as any);
+      if (courtesies.is_validated) {
+        Toast.show({
+          type: "success",
+          text1: "QR validado con éxito",
+        });
+      }
     }
-  }, [ticketFound, activeItem]);
+  }, [courtesies, updateTicket]);
 
-  const viewableItemsChanged = ({ viewableItems }: any) => {
-    if (viewableItems.length > 0) {
-      setActiveItem(viewableItems[0]);
+  const viewableItemsChanged = useCallback(
+    ({ viewableItems }: { viewableItems: any[] }) => {
+      if (viewableItems.length > 0) {
+        setActiveItem(viewableItems[0].item);
+      }
+    },
+    []
+  );
+
+  // Callback para navegar a comprar
+  const handleBuyPress = useCallback(() => {
+    if (eventId) {
+      router.push(`/(dashboard)/events/${eventId}/buy`);
     }
-  };
+  }, [eventId]);
 
-  const validatedDrinks = user?.drinks
-    ?.filter((drink) => drink?.event?.id === eventId)
-    .filter((drink) => {
-      return drink?.is_validated;
-    });
+  // Mostrar loading si está cargando
+  if (isLoadingGetCourtesies) {
+    return (
+      <LinearGradient colors={["#04121A", "#041e2b"]}>
+        <SafeAreaView className="flex h-full">
+          <View className="flex-1 justify-center items-center">
+            <ActivityIndicator size="large" color={Colors.primary[500]} />
+            <Text className="text-white mt-4">Cargando cortesías...</Text>
+          </View>
+        </SafeAreaView>
+      </LinearGradient>
+    );
+  }
+
+  // Mostrar error si hay un error
+  if (error) {
+    return (
+      <LinearGradient colors={["#04121A", "#041e2b"]}>
+        <SafeAreaView className="flex h-full">
+          <View className="flex-1 justify-center items-center px-4">
+            <Ionicons
+              name="alert-circle"
+              size={64}
+              color={Colors.secondary[400]}
+            />
+            <Text className="text-white text-lg font-bold mt-4 text-center">
+              Error al cargar cortesías
+            </Text>
+            <Text className="text-gray-400 text-center mt-2">{error}</Text>
+            <TouchableOpacity
+              onPress={() => {
+                // Refetch data
+                if (eventId) {
+                  // Trigger refetch
+                  router.replace(`/(dashboard)/events/${eventId}/courtesies`);
+                }
+              }}
+              className="mt-4 bg-primary-500 px-6 py-3 rounded-lg"
+            >
+              <Text className="text-white font-semibold">Reintentar</Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      </LinearGradient>
+    );
+  }
 
   return (
     <LinearGradient
@@ -148,32 +276,18 @@ const drinks = () => {
                   }
                 )}
                 className="p-2"
-                data={user?.drinks
-                  ?.filter((drink) => drink.event?.id === eventId)
-                  .filter((drink) => {
-                    return !drink.is_validated;
-                  })}
+                data={unvalidatedCourtesies}
                 onViewableItemsChanged={viewableItemsChanged}
                 contentOffset={{ x: 0, y: 0 }}
                 viewabilityConfig={{
                   itemVisiblePercentThreshold: 70,
                 }}
-                keyExtractor={(item: any) => item.id}
+                keyExtractor={(item: Courtesy) => item.id}
                 contentContainerStyle={{
                   alignItems: "stretch",
                 }}
-                renderItem={({ item }: any) => {
-                  const splittedStartAt = item.event.start_at.split(" ");
-                  const joinedStartAt =
-                    splittedStartAt[0] + " " + splittedStartAt[1];
-                  const startAt = new Date(joinedStartAt).toLocaleString(
-                    "es-CL",
-                    {
-                      weekday: "short",
-                      month: "long",
-                      day: "numeric",
-                    }
-                  );
+                renderItem={({ item }: { item: Courtesy }) => {
+                  const startAt = formatEventDate(item.event.start_at);
 
                   return (
                     <Animatable.View
@@ -226,18 +340,14 @@ const drinks = () => {
                 }}
                 ListEmptyComponent={() => (
                   <EmptyState
-                    title="No tienes tragos"
-                    subtitle="No has comprado nuevos tragos"
+                    title="No tienes cortesías"
+                    subtitle="Aún no tienes cortesías disponibles"
                   />
                 )}
               />
             </View>
             <ScalingDots
-              data={user?.drinks
-                ?.filter((drink) => drink.event?.id === eventId)
-                .filter((drink) => {
-                  return !drink.is_validated;
-                })}
+              data={unvalidatedCourtesies}
               scrollX={scrollX}
               inActiveDotColor={Colors.secondary[400]}
               activeDotColor={Colors.secondary[500]}
@@ -245,24 +355,24 @@ const drinks = () => {
           </View>
           <View className="flex flex-row justify-between mt-4 mx-4">
             <TouchableOpacity
-              onPress={() => router.push(`/(dashboard)/events/${eventId}/buy`)}
+              onPress={handleBuyPress}
               className="py-4 bg-success-100 justify-center items-center my-4 rounded-xl w-full"
             >
               <Text className="font-bold text-secondary-500">Comprar</Text>
             </TouchableOpacity>
           </View>
 
-          {validatedDrinks?.length > 0 && (
+          {validatedCourtesies?.length > 0 && (
             <View className="mt-4 mx-4">
               <Text className="text-white font-bold text-xl">
-                Tus compras validadas
+                Tus cortesías validadas
               </Text>
               <View className="bg-white rounded-xl mt-2">
                 <FlatList
                   scrollEnabled={false}
-                  data={validatedDrinks}
-                  keyExtractor={(item: any) => item.id}
-                  renderItem={({ item }: any) => {
+                  data={validatedCourtesies}
+                  keyExtractor={(item: Courtesy) => item.id}
+                  renderItem={({ item }: { item: Courtesy }) => {
                     return (
                       <View className="flex flex-row bg-white rounded-xl p-2">
                         <View className="flex w-1/4 justify-center items-start">
@@ -291,9 +401,7 @@ const drinks = () => {
                         </View>
                         <View className="w-1/4 ml-4">
                           <TouchableOpacity
-                            onPress={() =>
-                              router.push(`/(dashboard)/events/${eventId}/buy`)
-                            }
+                            onPress={handleBuyPress}
                             className="flex bg-primary-500 w-full h-[70px] items-center justify-center rounded-lg p-1"
                           >
                             <Text className="text-white font-semibold text-center">
@@ -306,8 +414,8 @@ const drinks = () => {
                   }}
                   ListEmptyComponent={() => (
                     <EmptyState
-                      title="No tienes eventos"
-                      subtitle="No tienes próximos eventos"
+                      title="No tienes cortesías"
+                      subtitle="Aún no tienes cortesías disponibles"
                     />
                   )}
                 />
@@ -321,4 +429,4 @@ const drinks = () => {
   );
 };
 
-export default drinks;
+export default Courtesies;

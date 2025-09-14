@@ -232,7 +232,7 @@ const TicketPage = () => {
                             <Text className="font-bold mb-4 text-base">
                               {item.name}
                             </Text>
-                            {item.isValidated ? (
+                            {item.is_validated ? (
                               <View className="w-full py-2 bg-primary-400 justify-center items-center rounded-xl mb-4">
                                 <Text className="font-bold">Validado</Text>
                               </View>

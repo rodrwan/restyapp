@@ -3,7 +3,7 @@ import { View, Text, Image, ActivityIndicator } from "react-native";
 import { router, Href } from "expo-router";
 import { UpcomingEvent as UpcomingEventType, User } from "./types";
 import { formatEventDate } from "./utils";
-import ActionButton from "./ActionButton";
+import ActionButtonsCarousel from "./ActionButtonsCarousel";
 
 interface UpcomingEventProps {
   upcomingEvent: UpcomingEventType;
@@ -40,21 +40,29 @@ const UpcomingEvent: React.FC<UpcomingEventProps> = React.memo(
       [event.start_at]
     );
 
-    const availableTickets = useMemo(() => {
-      return (
-        user.tickets
-          ?.filter((ticket) => ticket.event.id === event.id)
-          ?.filter((ticket) => !ticket.isValidated)?.length ?? 0
-      );
-    }, [user.tickets, event.id]);
+    const getAvailableCount = useCallback(
+      (items: any[] | null) => {
+        return (
+          items
+            ?.filter((item) => item.event.id === event.id)
+            ?.filter((item) => !item.is_validated)?.length ?? 0
+        );
+      },
+      [event.id]
+    );
 
-    const availableDrinks = useMemo(() => {
-      return (
-        user.drinks
-          ?.filter((drink) => drink.event.id === event.id)
-          ?.filter((drink) => !drink.isValidated)?.length ?? 0
-      );
-    }, [user.drinks, event.id]);
+    const availableTickets = useMemo(
+      () => getAvailableCount(user.tickets),
+      [getAvailableCount, user.tickets]
+    );
+    const availableDrinks = useMemo(
+      () => getAvailableCount(user.drinks),
+      [getAvailableCount, user.drinks]
+    );
+    const availableCourtesies = useMemo(
+      () => getAvailableCount(user.courtesies),
+      [getAvailableCount, user.courtesies]
+    );
 
     const handleTicketsPress = useCallback(() => {
       const url = `/(dashboard)/events/${event.id}`;
@@ -66,9 +74,55 @@ const UpcomingEvent: React.FC<UpcomingEventProps> = React.memo(
       router.push(url as Href);
     }, [event.id]);
 
+    const handleCourtesiesPress = useCallback(() => {
+      const url = `/(dashboard)/events/${event.id}/courtesies`;
+      router.push(url as Href);
+    }, []);
+
     const eventAddress = useMemo(() => {
       return event.place;
     }, [event.place]);
+
+    const actionButtons = useMemo(
+      () => [
+        {
+          icon: require("../../assets/images/ticket.png"),
+          title: "Entradas",
+          count: availableTickets,
+          onPress: handleTicketsPress,
+          width: 32,
+          height: 32,
+        },
+        {
+          icon: require("../../assets/images/glass.png"),
+          title: "Barra",
+          count: availableDrinks,
+          onPress: handleDrinksPress,
+          width: 32,
+          height: 32,
+        },
+        ...(availableCourtesies > 0
+          ? [
+              {
+                icon: require("../../assets/images/gift.png"),
+                title: "Cortesías",
+                count: availableCourtesies,
+                onPress: handleCourtesiesPress,
+                width: 48,
+                height: 32,
+              },
+            ]
+          : []),
+      ],
+      [
+        availableTickets,
+        availableDrinks,
+        availableCourtesies,
+        handleTicketsPress,
+        handleDrinksPress,
+        handleCourtesiesPress,
+      ]
+    );
 
     return (
       <View className="flex">
@@ -104,20 +158,7 @@ const UpcomingEvent: React.FC<UpcomingEventProps> = React.memo(
             </View>
           </View>
 
-          <View className="flex flex-row justify-between mt-4">
-            <ActionButton
-              icon={require("../../assets/images/ticket.png")}
-              title="Entradas"
-              count={availableTickets}
-              onPress={handleTicketsPress}
-            />
-            <ActionButton
-              icon={require("../../assets/images/glass.png")}
-              title="Barra"
-              count={availableDrinks}
-              onPress={handleDrinksPress}
-            />
-          </View>
+          <ActionButtonsCarousel buttons={actionButtons} />
         </View>
       </View>
     );

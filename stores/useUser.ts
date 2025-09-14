@@ -4,14 +4,23 @@ interface Ticket {
   id: string;
   base64: string;
   event: Event;
-  isValidated: boolean;
+  is_validated: boolean;
 }
 
 interface Drink {
   id: string;
   base64: string;
   event: Event;
-  isValidated: boolean;
+  is_validated: boolean;
+}
+
+interface Courtesies {
+  id: string;
+  name: string;
+  description?: string;
+  base64: string;
+  event: Event;
+  is_validated: boolean;
 }
 
 interface Event {
@@ -34,6 +43,7 @@ interface User {
   tickets: Ticket[] | null;
   drinks: Drink[] | null;
   events: Event[] | null;
+  courtesies: Courtesies[] | null;
   tbk_user_id: string | null;
   tbk_card_number: string | null;
 }
@@ -53,6 +63,7 @@ interface Store {
   ) => void;
   setUpcomingEvent: (event: any) => void;
   updateTicket: (ticket: Ticket) => void;
+  setCourtesies: (courtesies: Courtesies[]) => void;
 }
 
 const initialState = {
@@ -65,6 +76,7 @@ const initialState = {
   birth_date: new Date(),
   tickets: null,
   drinks: null,
+  courtesies: null,
   events: null,
   tbk_user_id: null,
   tbk_card_number: null,
@@ -86,6 +98,8 @@ const useUserStore = create<Store>((set) => ({
     set((state) => ({ ...state, user: { ...state.user, tickets } })),
   setDrinks: (drinks: Drink[]) =>
     set((state) => ({ ...state, user: { ...state.user, drinks } })),
+  setCourtesies: (courtesies: Courtesies[]) =>
+    set((state) => ({ ...state, user: { ...state.user, courtesies } })),
   setEvents: (events: Event[]) =>
     set((state) => ({ ...state, user: { ...state.user, events } })),
   setTbkCardNumber: (userId: string, cardNumber: string, cardType: string) =>
@@ -118,7 +132,7 @@ const useUserStore = create<Store>((set) => ({
       if (ticketIndex > -1) {
         tickets[ticketIndex] = {
           ...tickets[ticketIndex],
-          isValidated: ticket?.is_validated,
+          is_validated: ticket?.is_validated,
         };
 
         return { ...state, user: { ...state.user, tickets } };
@@ -129,7 +143,7 @@ const useUserStore = create<Store>((set) => ({
       if (drinkIndex > -1) {
         drinks[drinkIndex] = {
           ...drinks[drinkIndex],
-          isValidated: ticket?.is_validated,
+          is_validated: ticket?.is_validated,
         };
 
         return { ...state, user: { ...state.user, drinks } };

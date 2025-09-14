@@ -1,4 +1,4 @@
-import * as graphql from "graphql-request/build/entrypoints/main";
+import { gql } from "graphql-request";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { MANGO_API_URL } from "@/constants";
@@ -325,7 +325,7 @@ class Client {
 
   // Initialize session
   async signIn(input: LoginInput): Promise<ApiResponse<{ login: any }>> {
-    const document = graphql.gql`
+    const document = gql`
       mutation Login($input: LoginData!) {
         login(input: $input) {
           user {
@@ -383,7 +383,7 @@ class Client {
   }
 
   async signUp(input: RegisterInput): Promise<ApiResponse<{ register: any }>> {
-    const document = graphql.gql`
+    const document = gql`
       mutation Register($input: RegisterData!) {
         register(input: $input) {
           user {
@@ -427,7 +427,7 @@ class Client {
   }
 
   async me(): Promise<ApiResponse<any>> {
-    const document = graphql.gql`
+    const document = gql`
       query Me {
         me {
           user {
@@ -529,7 +529,7 @@ class Client {
   }
 
   async getEvents(): Promise<ApiResponse<any>> {
-    const document = graphql.gql`
+    const document = gql`
       query GetEvents {
         getEvents {
           id
@@ -551,7 +551,7 @@ class Client {
   }
 
   async getEventById(id: string): Promise<ApiResponse<any>> {
-    const document = graphql.gql`
+    const document = gql`
       query GetEventById($id: String!) {
         getEventById(id: $id) {
           event {
@@ -589,7 +589,7 @@ class Client {
   }
 
   async createOrder(orderData: any): Promise<ApiResponse<any>> {
-    const document = graphql.gql`
+    const document = gql`
       mutation CreateOrder($input: CreateOrderData!) {
         createOrder(input: $input) {
           id
@@ -611,8 +611,8 @@ class Client {
   }
 
   async createPayment(paymentData: any): Promise<ApiResponse<any>> {
-    const document = graphql.gql`
-      mutation CreatePayment($input: CreatePaymentData!) {
+    const document = gql`
+      mutation CreatePayment($input: CreatePaymentData) {
         createPayment(input: $input) {
           url
           token
@@ -629,7 +629,7 @@ class Client {
   }
 
   async getPaymentByToken(token: string): Promise<ApiResponse<any>> {
-    const document = graphql.gql`
+    const document = gql`
       query GetPaymentByToken($token: String!) {
         getPaymentByToken(token: $token) {
           id
@@ -641,7 +641,7 @@ class Client {
   }
 
   async confirmNewPayment(paymentId: string): Promise<ApiResponse<any>> {
-    const document = graphql.gql`
+    const document = gql`
       mutation ConfirmPayment($paymentId: String!) {
         confirmPayment(paymentId: $paymentId) {
           status
@@ -654,7 +654,7 @@ class Client {
   }
 
   async getEventsByIds(ids: string[]): Promise<ApiResponse<any>> {
-    const document = graphql.gql`
+    const document = gql`
       query getEventsByIds($ids: GetEventsByIdsInput) {
         getEventsByIds(input: $ids) {
           events {
@@ -683,7 +683,7 @@ class Client {
   }
 
   async getOrderItemsByUser(): Promise<ApiResponse<any>> {
-    const document = graphql.gql`
+    const document = gql`
       query getOrdersByUser($input: GetOrderItemsByUserIdInput!) {
         getOrderItemsByUser(input: $input) {
           id
@@ -709,7 +709,7 @@ class Client {
   }
 
   async getTicketsByUserAndEventID(eventId: string): Promise<ApiResponse<any>> {
-    const document = graphql.gql`
+    const document = gql`
       query getTicketsByUserAndEventID($input: GetTicketsInput!) {
         getTickets(input: $input) {
           data {
@@ -756,7 +756,7 @@ class Client {
   }
 
   async createInscription(eventId: string): Promise<ApiResponse<any>> {
-    const document = graphql.gql`
+    const document = gql`
       mutation CreateInscription($eventId: String!) {
         createInscription(eventId: $eventId) {
           url
@@ -772,7 +772,7 @@ class Client {
     token: string,
     eventId: string
   ): Promise<ApiResponse<any>> {
-    const document = graphql.gql`
+    const document = gql`
       mutation ConfirmInscription($input: ConfirmInscriptionData!) {
         confirmInscription(input: $input) {
           tbk_user
@@ -791,7 +791,7 @@ class Client {
   }
 
   async deleteInscription(eventId: string): Promise<ApiResponse<any>> {
-    const document = graphql.gql`
+    const document = gql`
       mutation DeleteInscription($eventId: String!) {
         deleteInscription(eventId: $eventId) {
           tbk_user
@@ -803,7 +803,7 @@ class Client {
   }
 
   async authorizeTransaction(paymentData: any): Promise<ApiResponse<any>> {
-    const document = graphql.gql`
+    const document = gql`
       mutation AuthorizeTransaction($input: AuthorizeTransactionData!) {
         authorizeTransaction(input: $input) {
           status
@@ -821,7 +821,7 @@ class Client {
   }
 
   async getUserFirstUpcomingEvent(): Promise<ApiResponse<any>> {
-    const document = graphql.gql`
+    const document = gql`
       query GetUserFirstUpcomingEvent {
         getUserFirstUpcomingEvent {
           tickets {
@@ -860,7 +860,7 @@ class Client {
   }
 
   async getUserUpcomingEvents(): Promise<ApiResponse<any>> {
-    const document = graphql.gql`
+    const document = gql`
       query GetUserUpcomingEvents {
         getUserUpcomingEvents {
           data {
@@ -900,7 +900,7 @@ class Client {
   }
 
   async getTicketById(id: string): Promise<ApiResponse<any>> {
-    const document = graphql.gql`
+    const document = gql`
       query GetTicketById($id: ID!) {
         getTicketById(id: $id) {
           id
@@ -913,7 +913,7 @@ class Client {
   }
 
   async getOrderById(id: string): Promise<ApiResponse<any>> {
-    const document = graphql.gql`
+    const document = gql`
       query GetOrderById($id: ID!) {
         getOrderById(id: $id) {
           order {
@@ -949,7 +949,7 @@ class Client {
   }
 
   async requestPasswordReset(email: string): Promise<ApiResponse<any>> {
-    const document = graphql.gql`
+    const document = gql`
       mutation ForgotPassword($input: String!) {
         forgotPassword(email: $input) {
           success
@@ -965,7 +965,7 @@ class Client {
     code: string,
     newPassword: string
   ): Promise<ApiResponse<any>> {
-    const document = graphql.gql`
+    const document = gql`
       mutation ResetPassword($token: String!, $password: String!) {
         resetPassword(token: $token, password: $password) {
           success
@@ -983,7 +983,7 @@ class Client {
   }
 
   async deleteMe(): Promise<ApiResponse<any>> {
-    const document = graphql.gql`
+    const document = gql`
       mutation DeleteUser {
         deleteUser {
           success
@@ -996,7 +996,7 @@ class Client {
   }
 
   async updateUserExtra(user: any): Promise<ApiResponse<any>> {
-    const document = graphql.gql`
+    const document = gql`
       mutation UpdateUserExtra($input: UpdateUserProfileExtraInput!) {
         updateUserProfileExtra(input: $input) {
           success
@@ -1013,6 +1013,38 @@ class Client {
     };
 
     return this.makeRequest(document, variables, "UpdateUserExtra", true);
+  }
+
+  async getCourtesies(eventId: string): Promise<ApiResponse<any>> {
+    const document = gql`
+      query GetCourtesies($input: GetCourtesiesInput!) {
+        getCourtesies(input: $input) {
+          data {
+            courtesy {
+              id
+              base64
+              is_validated
+              cover
+            }
+            event {
+              id
+              name
+              start_at
+              place
+              description
+              image
+            }
+          }
+        }
+      }
+    `;
+
+    return this.makeRequest(
+      document,
+      { input: { event_id: eventId } },
+      "GetCourtesies",
+      true
+    );
   }
 
   // Método para limpiar tokens (logout)

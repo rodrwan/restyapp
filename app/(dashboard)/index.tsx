@@ -19,6 +19,7 @@ import {
   isProfileIncomplete,
   isEventPast,
 } from "@/components/dashboard";
+import useGetCourtesies from "@/hooks/useGetCourtesies";
 
 interface HomePageProps {}
 
@@ -29,11 +30,15 @@ const HomePage: React.FC<HomePageProps> = () => {
     useGetUserFirstUpcomingEvent();
   const { user, upcomingEvent } = useUserStore();
   const { loadingGetEvents, getEvents } = useGetEventsFromUser();
+  const { isLoadingGetCourtesies, getCourtesies } = useGetCourtesies(
+    upcomingEvent?.event?.id || ""
+  );
 
   // Effects - Removed problematic dependencies to prevent infinite loop
   React.useEffect(() => {
     getEvents();
     getUserFirstUpcomingEvent();
+    getCourtesies();
   }, []); // Empty dependency array to run only once on mount
 
   // Callbacks
@@ -71,7 +76,7 @@ const HomePage: React.FC<HomePageProps> = () => {
       className="flex h-auto bg-[#04121A]"
       refreshControl={
         <RefreshControl
-          refreshing={loadingUpcomingEvent}
+          refreshing={loadingUpcomingEvent || isLoadingGetCourtesies}
           onRefresh={handleRefresh}
         />
       }

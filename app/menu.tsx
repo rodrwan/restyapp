@@ -37,25 +37,21 @@ const HeaderIcon = ({
   </TouchableOpacity>
 );
 
-const MenuItem = ({ label, onPress, className, icon }: MenuItemProps) => (
-  <TouchableOpacity
-    onPress={onPress}
-    className={`flex flex-col items-center p-2 ${className}`}
-  >
-    <View className="flex flex-col items-center">
-      <View>{icon && icon}</View>
-      <Text className="text-white font-bold text-xl">{label}</Text>
-    </View>
-  </TouchableOpacity>
-);
-
-const LogoutButton = ({ onPress }: { onPress: () => Promise<void> }) => (
-  <TouchableOpacity onPress={onPress}>
-    <Text className="self-center text-white font-base text-base">
-      Cerrar session
-    </Text>
-  </TouchableOpacity>
-);
+const LogoutButton = ({
+  session,
+  onPress,
+}: {
+  session: string | null | undefined;
+  onPress: () => Promise<void>;
+}) => {
+  return session ? (
+    <TouchableOpacity onPress={onPress}>
+      <Text className="self-center text-white font-base text-base">
+        Cerrar session
+      </Text>
+    </TouchableOpacity>
+  ) : null;
+};
 
 // Hooks
 function useHeaderConfiguration() {
@@ -88,10 +84,74 @@ function useAuthActions() {
   return { handleLogout };
 }
 
+const MenuWithSession = ({
+  session,
+  menuItems,
+}: {
+  session: string | null | undefined;
+  menuItems: MenuItemProps[];
+}) => {
+  return session ? (
+    <View className="flex flex-row flex-wrap gap-4 justify-between py-2 mx-2 items-center">
+      {menuItems?.map((item, index) => (
+        <MenuItem key={index} {...item} />
+      ))}
+    </View>
+  ) : null;
+};
+
+const MenuItem = ({ label, onPress, className, icon }: MenuItemProps) => (
+  <TouchableOpacity onPress={onPress} className={`p-2 ${className}`}>
+    <View className="items-center">
+      <View>{icon && icon}</View>
+      <Text className="text-white font-bold text-xl">{label}</Text>
+    </View>
+  </TouchableOpacity>
+);
+
+const TermsAndConditions = () => {
+  return (
+    <TouchableOpacity
+      onPress={async () => {
+        await WebBrowser.openBrowserAsync(TERMS_URL);
+      }}
+      className={`flex flex-col items-center p-2 mb-4 mt-auto pt-4 justify-center items-center`}
+    >
+      <View className="flex flex-col items-center">
+        <Text className="ml-4 self-center text-white font-bold text-xl">
+          Terminos y Condiciones
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+const MenuHero = ({ session }: { session: string | null | undefined }) => {
+  return !session ? (
+    <View className="p-4 items-center justify-center w-full rounded-b-lg">
+      <Text className="text-white text-center text-base">
+        Inicia sesión para ver tus eventos
+      </Text>
+      <TouchableOpacity
+        onPress={() => router.replace("/(dashboard)/profile")}
+        className="bg-primary-400 rounded-lg p-2 mt-4 w-full"
+      >
+        <Text className="text-white text-center text-lg font-bold">
+          Iniciar sesión
+        </Text>
+      </TouchableOpacity>
+    </View>
+  ) : null;
+};
 const MenuPage = () => {
   const { configureHeader } = useHeaderConfiguration();
   const { handleLogout } = useAuthActions();
-  const { session } = useSession();
+  const { session, healhCheck } = useSession();
+
+  React.useEffect(() => {
+    healhCheck();
+  }, []);
+
   React.useLayoutEffect(() => {
     configureHeader();
   }, []);
@@ -141,50 +201,15 @@ const MenuPage = () => {
             resizeMode="cover"
           />
 
-          {!session && (
-            <View className="p-4 items-center justify-center w-full rounded-b-lg">
-              <Text className="text-white text-center text-base">
-                Inicia sesión para ver tus eventos
-              </Text>
-              <TouchableOpacity
-                onPress={() => router.replace("/(dashboard)/profile")}
-                className="bg-primary-400 rounded-lg p-2 mt-4 w-full"
-              >
-                <Text className="text-white text-center text-lg font-bold">
-                  Iniciar sesión
-                </Text>
-              </TouchableOpacity>
-            </View>
-          )}
+          <MenuHero session={session} />
         </View>
         <View className="flex grow flex-col mt-4 border-b border-primary-400 rounded-lg pt-4 mb-8">
-          {session && (
-            <View className="flex flex-row justify-between">
-              {menuItems?.map((item, index) => (
-                <MenuItem key={index} {...item} />
-              ))}
-            </View>
-          )}
-
-          <TouchableOpacity
-            onPress={async () => {
-              await WebBrowser.openBrowserAsync(TERMS_URL);
-            }}
-            className={`flex flex-col items-center p-2 mb-4 mt-auto pt-4 justify-center items-center`}
-          >
-            <View className="flex flex-col items-center">
-              <Text className="ml-4 self-center text-white font-bold text-xl">
-                Terminos y Condiciones
-              </Text>
-            </View>
-          </TouchableOpacity>
+          <MenuWithSession session={session} menuItems={menuItems} />
+          <TermsAndConditions />
         </View>
-
-        {session && (
-          <View>
-            <LogoutButton onPress={handleLogout} />
-          </View>
-        )}
+        <View>
+          <LogoutButton session={session} onPress={handleLogout} />
+        </View>
       </SafeAreaView>
     </LinearGradient>
   );

@@ -7,7 +7,12 @@ import { useSession } from "@/context/AuthProvider";
 import { Text } from "react-native";
 
 const DashboardLayoutNav = () => {
-  const { session, isLoading } = useSession();
+  const { session, isLoading, healhCheck } = useSession();
+
+  // Check if session is still valid
+  React.useEffect(() => {
+    healhCheck();
+  }, []);
 
   // You can keep the splash screen open, or render a loading screen like we do here.
   if (isLoading) {
@@ -28,6 +33,10 @@ const DashboardLayoutNav = () => {
         <Stack.Screen name="tickets" />
         <Stack.Screen name="drinks" />
         <Stack.Screen name="profile" options={{ header: () => <Header /> }} />
+        <Stack.Screen
+          name="courtesies"
+          options={{ header: () => <Header /> }}
+        />
       </Stack>
       <StatusBar backgroundColor="#041e2b" style="light" />
     </>

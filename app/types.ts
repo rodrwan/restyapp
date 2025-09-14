@@ -6,7 +6,7 @@ export interface Item {
   stock: number;
   max_per_sale: number;
   description?: string;
-  isValidated?: boolean;
+  is_validated?: boolean;
   base64?: string;
   event?: Event;
   cover?: boolean;

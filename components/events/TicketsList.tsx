@@ -29,7 +29,7 @@ export function TicketsList({
   if (!items?.length) return null;
 
   return (
-    <View className="bg-secondary-700 py-8 mb-8 mx-1 rounded-3xl">
+    <View className="bg-secondary-700 py-4 mb-8 mx-1 rounded-3xl">
       <FlatList
         scrollEnabled={false}
         data={items}

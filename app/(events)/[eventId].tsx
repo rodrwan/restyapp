@@ -4,6 +4,7 @@ import {
   Image,
   ActivityIndicator,
   TouchableOpacity,
+  ImageBackground,
 } from "react-native";
 import React, { useLayoutEffect } from "react";
 import { useLocalSearchParams, useNavigation } from "expo-router";
@@ -70,15 +71,34 @@ export default function EventPage() {
       <ParallaxScrollView
         backgroundColor={Colors.secondary[500]}
         style={{ flex: 1 }}
-        parallaxHeaderHeight={450}
+        parallaxHeaderHeight={400}
         stickyHeaderHeight={100}
         contentBackgroundColor={Colors.secondary[500]}
         renderBackground={() => (
-          <Image
-            source={{ uri: event?.image }}
-            resizeMode="stretch"
-            style={{ width: "100%", height: undefined, aspectRatio: 4 / 4 }}
-          />
+          <View className="">
+            <ImageBackground
+              source={{ uri: event?.image }}
+              resizeMode="stretch"
+              style={{ width: "100%", height: undefined, aspectRatio: 4 / 4 }}
+            >
+              <LinearGradient
+                colors={["transparent", Colors.secondary[500]]} // Example: dark to transparent
+                className="absolute bottom-0 left-0 right-0 py-8 px-4"
+              >
+                <Text className="text-white font-bold text-2xl mb-2">
+                  {event?.name}
+                </Text>
+                <View className="flex-row items-center gap-2">
+                  <Ionicons
+                    name="calendar-outline"
+                    size={20}
+                    color={Colors.white}
+                  />
+                  <Text className="text-base text-white">{startAt}</Text>
+                </View>
+              </LinearGradient>
+            </ImageBackground>
+          </View>
         )}
         renderStickyHeader={() => (
           <View className="mx-auto h-[90px] w-full justify-end items-center">
@@ -89,11 +109,21 @@ export default function EventPage() {
         )}
         className="flex"
       >
-        <View className="-mt-4">
+        <View className="pt-2">
+          {/* About Section */}
+          <View className="px-4 gap-4 mb-8">
+            <Text className="text-white font-bold text-2xl">
+              Acerca del evento
+            </Text>
+            <Text className="text-white font-bold text-xl">{event?.name}</Text>
+            <Text className="text-secondary-100 text-base">
+              {event?.description}
+            </Text>
+          </View>
           <TicketsList
             items={tickets}
             type="ENTRANCE"
-            title="Tickets"
+            title="Entradas"
             itemsInCart={itemsInCart}
             addToCart={addToCart}
             removeFromCart={removeFromCart}
@@ -122,7 +152,11 @@ export default function EventPage() {
             </Text>
 
             <View className="flex-row">
-              <Text className="text-base text-secondary-300">Cuando: </Text>
+              <Ionicons
+                name="calendar-outline"
+                size={24}
+                color={Colors.primary[500]}
+              />
               <Text className="text-base text-primary-500">{startAt}</Text>
             </View>
             <View className="flex-row">
