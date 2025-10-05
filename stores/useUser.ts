@@ -13,13 +13,16 @@ interface Drink {
   event: Event;
   is_validated: boolean;
 }
+interface CourtesyEvent {
+  courtesy: Courtesy;
+  event: Event;
+}
 
-interface Courtesies {
+interface Courtesy {
   id: string;
   name: string;
   description?: string;
   base64: string;
-  event: Event;
   is_validated: boolean;
 }
 
@@ -43,7 +46,7 @@ interface User {
   tickets: Ticket[] | null;
   drinks: Drink[] | null;
   events: Event[] | null;
-  courtesies: Courtesies[] | null;
+  courtesies: CourtesyEvent[] | null;
   tbk_user_id: string | null;
   tbk_card_number: string | null;
 }
@@ -62,8 +65,9 @@ interface Store {
     cardType: string
   ) => void;
   setUpcomingEvent: (event: any) => void;
+  setTodayEvent: (event: any) => void;
   updateTicket: (ticket: Ticket) => void;
-  setCourtesies: (courtesies: Courtesies[]) => void;
+  setCourtesies: (courtesies: CourtesyEvent[]) => void;
 }
 
 const initialState = {
@@ -85,8 +89,10 @@ const initialState = {
 
 const useUserStore = create<Store>((set) => ({
   user: initialState,
-  upcomingEventFetched: false,
   upcomingEvent: {},
+  upcomingEventFetched: false,
+  todayEvent: {},
+  todayEventFetched: false,
   setUser: (user: User | null) => {
     if (user) {
       set((state) => ({ ...state, user: { ...state.user, ...user } }));
@@ -98,7 +104,7 @@ const useUserStore = create<Store>((set) => ({
     set((state) => ({ ...state, user: { ...state.user, tickets } })),
   setDrinks: (drinks: Drink[]) =>
     set((state) => ({ ...state, user: { ...state.user, drinks } })),
-  setCourtesies: (courtesies: Courtesies[]) =>
+  setCourtesies: (courtesies: CourtesyEvent[]) =>
     set((state) => ({ ...state, user: { ...state.user, courtesies } })),
   setEvents: (events: Event[]) =>
     set((state) => ({ ...state, user: { ...state.user, events } })),
@@ -122,6 +128,13 @@ const useUserStore = create<Store>((set) => ({
       ...state,
       upcomingEvent: event,
       upcomingEventFetched: true,
+    }));
+  },
+  setTodayEvent: (event: any) => {
+    set((state) => ({
+      ...state,
+      todayEvent: event,
+      todayEventFetched: true,
     }));
   },
   updateTicket: (ticket: Ticket) => {

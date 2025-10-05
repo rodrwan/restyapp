@@ -23,14 +23,14 @@ import useUserStore from "@/stores/useUser";
 import Toast from "react-native-toast-message";
 import { LinearGradient } from "expo-linear-gradient";
 import useGetUserFirstUpcomingEvent from "@/hooks/useGetUserFirstUpcomingEvent";
-import { useSession as useSessionContext } from "@/context/AuthProvider";
+import { useAuthContext } from "@/context/AuthProvider";
 import { POLICY_URL } from "@/constants";
 import * as WebBrowser from "expo-web-browser";
 
 const SignUp = () => {
   const { createUser } = useSession();
   const { getEvents } = useGetEventsFromUser();
-  const { signIn } = useSessionContext();
+  const { signIn } = useAuthContext();
   const { setUser } = useUserStore();
   const { getUserFirstUpcomingEvent } = useGetUserFirstUpcomingEvent();
   const params: any = useLocalSearchParams();
@@ -49,6 +49,7 @@ const SignUp = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
+      headerShown: Platform.OS === "ios",
       headerTransparent: true,
       headerTitle: "",
       headerTintColor: Colors.primary[500],
@@ -68,7 +69,7 @@ const SignUp = () => {
           <View />
         ),
     });
-  }, [scrollY]);
+  }, [navigation, scrollY]);
 
   const submit = async () => {
     setSubmitting(true);
@@ -113,7 +114,6 @@ const SignUp = () => {
       getUserFirstUpcomingEvent();
       return router.replace(`/${params?.redirectTo}`);
     } catch (err: any) {
-      console.log(err);
       Toast.show({
         type: "error",
         text1: "Error",

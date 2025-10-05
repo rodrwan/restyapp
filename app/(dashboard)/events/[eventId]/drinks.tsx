@@ -7,6 +7,7 @@ import {
   FlatList,
   Image,
   Dimensions,
+  Platform,
 } from "react-native";
 import React from "react";
 import { router, useNavigation, useLocalSearchParams } from "expo-router";
@@ -40,7 +41,7 @@ const zoomOut = {
   },
 };
 
-const drinks = () => {
+const Drinks = () => {
   const { eventId }: any = useLocalSearchParams();
   const navigation = useNavigation();
   const scrollX = React.useRef(new Animated.Value(0)).current;
@@ -49,6 +50,7 @@ const drinks = () => {
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
+      headerShown: Platform.OS === "ios",
       headerTransparent: true,
       headerTitle: "",
       headerTintColor: Colors.primary[500],
@@ -70,10 +72,7 @@ const drinks = () => {
         </TouchableOpacity>
       ),
     });
-  }, []);
-  if (!user?.drinks) {
-    return;
-  }
+  }, [navigation]);
 
   const [activeItem, setActiveItem] = React.useState<any>(user?.drinks?.[0]);
 
@@ -111,6 +110,10 @@ const drinks = () => {
       });
     }
   }, [ticketFound, activeItem]);
+
+  if (!user?.drinks) {
+    return;
+  }
 
   const viewableItemsChanged = ({ viewableItems }: any) => {
     if (viewableItems.length > 0) {
@@ -321,4 +324,4 @@ const drinks = () => {
   );
 };
 
-export default drinks;
+export default Drinks;

@@ -7,6 +7,7 @@ import {
   Image,
   Dimensions,
   Animated,
+  Platform,
 } from "react-native";
 import React, { useLayoutEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -44,6 +45,7 @@ const TicketsPage = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
+      headerShown: Platform.OS === "ios",
       headerTransparent: true,
       headerTitle: "",
       headerTintColor: Colors.primary[500],
@@ -65,7 +67,9 @@ const TicketsPage = () => {
         </TouchableOpacity>
       ),
     });
-  }, []);
+  }, [navigation]);
+
+  const [activeItem, setActiveItem] = useState(user?.tickets?.[0] ?? null);
 
   if (!user?.tickets) {
     return (
@@ -80,11 +84,9 @@ const TicketsPage = () => {
     );
   }
 
-  const [activeItem, setActiveItem] = useState(user?.tickets[0]);
-
   const viewableItemsChanged = ({ viewableItems }: any) => {
     if (viewableItems.length > 0) {
-      setActiveItem(viewableItems[0].key);
+      setActiveItem(viewableItems[0].key ?? null);
     }
   };
 

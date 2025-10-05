@@ -8,25 +8,25 @@
 
 /* Begin PBXBuildFile section */
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
-		28E82333526DBBC8B2CDE5BC /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD5BF905603D9DA8555DA3EB /* ExpoModulesProvider.swift */; };
+		23F49B9DD3F5FBEFD8DAB437 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = DFA475DEEDB93C676BEA4432 /* PrivacyInfo.xcprivacy */; };
+		294A180EFA673EF8DCD0CC90 /* libPods-Mangoticket.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 875C6575C6B5CF1778AFCDC3 /* libPods-Mangoticket.a */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
-		B5F4C93F5FB8331F06740968 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 76A78562EA216B129C8FAB33 /* PrivacyInfo.xcprivacy */; };
+		85960D61236A55B46AA4A920 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF7FE23E673714929EFD26AB /* ExpoModulesProvider.swift */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
-		F29D5F0A282B9E3E637F1C90 /* libPods-Mangoticket.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C0365CCBDC130519462D1230 /* libPods-Mangoticket.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		13B07F961A680F5B00A75B9A /* Mangoticket.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mangoticket.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Mangoticket/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Mangoticket/Info.plist; sourceTree = "<group>"; };
-		19B939B647066C5C5868A9C1 /* Pods-Mangoticket.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Mangoticket.release.xcconfig"; path = "Target Support Files/Pods-Mangoticket/Pods-Mangoticket.release.xcconfig"; sourceTree = "<group>"; };
-		76A78562EA216B129C8FAB33 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = Mangoticket/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		157F9B4CC92D21F0C4E357AF /* Pods-Mangoticket.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Mangoticket.release.xcconfig"; path = "Target Support Files/Pods-Mangoticket/Pods-Mangoticket.release.xcconfig"; sourceTree = "<group>"; };
+		875C6575C6B5CF1778AFCDC3 /* libPods-Mangoticket.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Mangoticket.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = Mangoticket/SplashScreen.storyboard; sourceTree = "<group>"; };
-		AD5BF905603D9DA8555DA3EB /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-Mangoticket/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
-		BBA6A0CB206B0F458346AF00 /* Pods-Mangoticket.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Mangoticket.debug.xcconfig"; path = "Target Support Files/Pods-Mangoticket/Pods-Mangoticket.debug.xcconfig"; sourceTree = "<group>"; };
-		C0365CCBDC130519462D1230 /* libPods-Mangoticket.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Mangoticket.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		BF7FE23E673714929EFD26AB /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-Mangoticket/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		C6CF4ED3982FF1EC87639E9F /* Pods-Mangoticket.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Mangoticket.debug.xcconfig"; path = "Target Support Files/Pods-Mangoticket/Pods-Mangoticket.debug.xcconfig"; sourceTree = "<group>"; };
+		DFA475DEEDB93C676BEA4432 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = Mangoticket/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = Mangoticket/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* Mangoticket-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "Mangoticket-Bridging-Header.h"; path = "Mangoticket/Mangoticket-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -37,7 +37,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F29D5F0A282B9E3E637F1C90 /* libPods-Mangoticket.a in Frameworks */,
+				294A180EFA673EF8DCD0CC90 /* libPods-Mangoticket.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -53,28 +53,26 @@
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				76A78562EA216B129C8FAB33 /* PrivacyInfo.xcprivacy */,
+				DFA475DEEDB93C676BEA4432 /* PrivacyInfo.xcprivacy */,
 			);
 			name = Mangoticket;
-			sourceTree = "<group>";
-		};
-		2CBBC00B9693E51DADC229C8 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				BBA6A0CB206B0F458346AF00 /* Pods-Mangoticket.debug.xcconfig */,
-				19B939B647066C5C5868A9C1 /* Pods-Mangoticket.release.xcconfig */,
-			);
-			name = Pods;
-			path = Pods;
 			sourceTree = "<group>";
 		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				C0365CCBDC130519462D1230 /* libPods-Mangoticket.a */,
+				875C6575C6B5CF1778AFCDC3 /* libPods-Mangoticket.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		4511F5077F48A185D9277FD5 /* ExpoModulesProviders */ = {
+			isa = PBXGroup;
+			children = (
+				AD2E69CEC57934343314DB45 /* Mangoticket */,
+			);
+			name = ExpoModulesProviders;
 			sourceTree = "<group>";
 		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
@@ -91,8 +89,8 @@
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
-				2CBBC00B9693E51DADC229C8 /* Pods */,
-				CA3ADC0C8BDA0899C8113EEA /* ExpoModulesProviders */,
+				F3B449CA9DA9E07D15F50248 /* Pods */,
+				4511F5077F48A185D9277FD5 /* ExpoModulesProviders */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -107,10 +105,10 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		92F12AE27E520A7C2FD36BE1 /* Mangoticket */ = {
+		AD2E69CEC57934343314DB45 /* Mangoticket */ = {
 			isa = PBXGroup;
 			children = (
-				AD5BF905603D9DA8555DA3EB /* ExpoModulesProvider.swift */,
+				BF7FE23E673714929EFD26AB /* ExpoModulesProvider.swift */,
 			);
 			name = Mangoticket;
 			sourceTree = "<group>";
@@ -124,12 +122,14 @@
 			path = Mangoticket/Supporting;
 			sourceTree = "<group>";
 		};
-		CA3ADC0C8BDA0899C8113EEA /* ExpoModulesProviders */ = {
+		F3B449CA9DA9E07D15F50248 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				92F12AE27E520A7C2FD36BE1 /* Mangoticket */,
+				C6CF4ED3982FF1EC87639E9F /* Pods-Mangoticket.debug.xcconfig */,
+				157F9B4CC92D21F0C4E357AF /* Pods-Mangoticket.release.xcconfig */,
 			);
-			name = ExpoModulesProviders;
+			name = Pods;
+			path = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -140,13 +140,13 @@
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "Mangoticket" */;
 			buildPhases = (
 				08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */,
-				6122BC939AB90D11D83D0835 /* [Expo] Configure project */,
+				B63349AD81650F9E15F64329 /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
-				68FCE6E956980242003AB47C /* [CP] Embed Pods Frameworks */,
+				219258B295E9EAC234CF5F09 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -196,7 +196,7 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				B5F4C93F5FB8331F06740968 /* PrivacyInfo.xcprivacy in Resources */,
+				23F49B9DD3F5FBEFD8DAB437 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -240,26 +240,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		6122BC939AB90D11D83D0835 /* [Expo] Configure project */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "[Expo] Configure project";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-Mangoticket/expo-configure-project.sh\"\n";
-		};
-		68FCE6E956980242003AB47C /* [CP] Embed Pods Frameworks */ = {
+		219258B295E9EAC234CF5F09 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -329,6 +310,25 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Mangoticket/Pods-Mangoticket-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
+		B63349AD81650F9E15F64329 /* [Expo] Configure project */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "[Expo] Configure project";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-Mangoticket/expo-configure-project.sh\"\n";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -337,7 +337,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
-				28E82333526DBBC8B2CDE5BC /* ExpoModulesProvider.swift in Sources */,
+				85960D61236A55B46AA4A920 /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -346,7 +346,7 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BBA6A0CB206B0F458346AF00 /* Pods-Mangoticket.debug.xcconfig */;
+			baseConfigurationReference = C6CF4ED3982FF1EC87639E9F /* Pods-Mangoticket.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -383,7 +383,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 19B939B647066C5C5868A9C1 /* Pods-Mangoticket.release.xcconfig */;
+			baseConfigurationReference = 157F9B4CC92D21F0C4E357AF /* Pods-Mangoticket.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;

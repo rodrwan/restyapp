@@ -1,5 +1,12 @@
 import React from "react";
-import { View, Text, TouchableOpacity, Image } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  Platform,
+  StatusBar,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useNavigation } from "expo-router";
 import Colors from "@/constants/Colors";
@@ -7,7 +14,9 @@ import { Ionicons } from "@expo/vector-icons";
 
 import * as WebBrowser from "expo-web-browser";
 import { LinearGradient } from "expo-linear-gradient";
-import { useSession } from "@/context/AuthProvider";
+import { useAuthContext } from "@/context/AuthProvider";
+import { useSession as useSessionStore } from "@/stores/useSession";
+import { TERMS_URL } from "@/constants";
 
 // Tipos
 interface MenuItemProps {
@@ -16,10 +25,6 @@ interface MenuItemProps {
   icon?: React.ReactNode;
   className?: string;
 }
-
-// Constantes
-const TERMS_URL =
-  "https://mangoticket-legal.nyc3.cdn.digitaloceanspaces.com/1.%20TERMINOS%20Y%20CONDICIONES%20(1).pdf";
 
 // Componentes
 const HeaderIcon = ({
@@ -57,11 +62,14 @@ const LogoutButton = ({
 function useHeaderConfiguration() {
   const navigation = useNavigation<any>();
 
-  const configureHeader = () => {
+  const configureHeader = React.useCallback(() => {
     navigation.setOptions({
-      headerTransparent: true,
+      headerShown: Platform.OS === "ios",
       headerTitle: "Menu",
       headerTintColor: Colors.primary[500],
+      headerStyle: {
+        backgroundColor: "#04121A",
+      },
       headerLeft: () => (
         <HeaderIcon name="chevron-back-outline" onPress={navigation?.goBack} />
       ),
@@ -69,17 +77,17 @@ function useHeaderConfiguration() {
         <HeaderIcon name="close-outline" onPress={navigation?.goBack} />
       ),
     });
-  };
+  }, [navigation]);
 
   return { configureHeader };
 }
 
 function useAuthActions() {
-  const { signOut } = useSession();
+  const { signOut } = useAuthContext();
 
-  const handleLogout = async () => {
+  const handleLogout = React.useCallback(async () => {
     signOut();
-  };
+  }, [signOut]);
 
   return { handleLogout };
 }
@@ -87,11 +95,13 @@ function useAuthActions() {
 const MenuWithSession = ({
   session,
   menuItems,
+  isAuthenticated,
 }: {
   session: string | null | undefined;
   menuItems: MenuItemProps[];
+  isAuthenticated: boolean;
 }) => {
-  return session ? (
+  return isAuthenticated ? (
     <View className="flex flex-row flex-wrap gap-4 justify-between py-2 mx-2 items-center">
       {menuItems?.map((item, index) => (
         <MenuItem key={index} {...item} />
@@ -126,8 +136,14 @@ const TermsAndConditions = () => {
   );
 };
 
-const MenuHero = ({ session }: { session: string | null | undefined }) => {
-  return !session ? (
+const MenuHero = ({
+  session,
+  isAuthenticated,
+}: {
+  session: string | null | undefined;
+  isAuthenticated: boolean;
+}) => {
+  return !isAuthenticated ? (
     <View className="p-4 items-center justify-center w-full rounded-b-lg">
       <Text className="text-white text-center text-base">
         Inicia sesión para ver tus eventos
@@ -146,15 +162,12 @@ const MenuHero = ({ session }: { session: string | null | undefined }) => {
 const MenuPage = () => {
   const { configureHeader } = useHeaderConfiguration();
   const { handleLogout } = useAuthActions();
-  const { session, healhCheck } = useSession();
-
-  React.useEffect(() => {
-    healhCheck();
-  }, []);
+  const { session } = useAuthContext();
+  const { isAuthenticated } = useSessionStore();
 
   React.useLayoutEffect(() => {
     configureHeader();
-  }, []);
+  }, [configureHeader]);
 
   const menuItems: MenuItemProps[] = [
     {
@@ -189,22 +202,26 @@ const MenuPage = () => {
   ];
 
   return (
-    <LinearGradient colors={["#04121A", "#041e2b"]} className="flex-1">
-      <SafeAreaView className="flex h-full p-2 justify-between">
-        <View className="flex flex-col items-center justify-center mt-10 rounded-lg border border-primary-100">
+    <LinearGradient colors={["#04121A", "#041e2b"]}>
+      <SafeAreaView className="flex h-full px-2 justify-between">
+        <View className="flex flex-col items-center justify-center rounded-lg border border-primary-100">
           {/* hero */}
           <Image
             source={require("../assets/images/hero.png")}
             className={`w-full h-48  ${
-              session ? "rounded-lg" : "rounded-t-lg"
+              isAuthenticated ? "rounded-lg" : "rounded-t-lg"
             }`}
             resizeMode="cover"
           />
 
-          <MenuHero session={session} />
+          <MenuHero session={session} isAuthenticated={isAuthenticated} />
         </View>
         <View className="flex grow flex-col mt-4 border-b border-primary-400 rounded-lg pt-4 mb-8">
-          <MenuWithSession session={session} menuItems={menuItems} />
+          <MenuWithSession
+            session={session}
+            menuItems={menuItems}
+            isAuthenticated={isAuthenticated}
+          />
           <TermsAndConditions />
         </View>
         <View>

@@ -1,4 +1,3 @@
-import { Alert } from "react-native";
 import { router } from "expo-router";
 
 import HTTPClient from "@/lib/api";
@@ -7,30 +6,24 @@ import React from "react";
 
 const client = HTTPClient.getInstance();
 
-const getUserFirstUpcomingEvent = () => {
+const GetUserFirstUpcomingEvent = () => {
   const [loadingUpcomingEvent, setLoadingUpcomingEvent] = React.useState(false);
   const { setUpcomingEvent } = useUserStore();
 
-  const getUserFirstUpcomingEvent = async () => {
+  const getUserFirstUpcomingEvent = React.useCallback(async () => {
     setLoadingUpcomingEvent(true);
     try {
       const result = await client.getUserFirstUpcomingEvent();
-      setUpcomingEvent(result.data?.getUserFirstUpcomingEvent);
+      setUpcomingEvent(result?.data?.getUserFirstUpcomingEvent);
       setLoadingUpcomingEvent(false);
       return result;
     } catch (err: any) {
-      console.log(">>> getUserFirstUpcomingEvent error", err);
-      if (String(err).includes("unauthorized")) {
-        console.log("getUserFirstUpcomingEvent error", err);
-        return router.replace("/(auth)/sign-in?redirectTo=(dashboard)");
-      }
-
       setLoadingUpcomingEvent(false);
       throw err;
     }
-  };
+  }, [setUpcomingEvent]);
 
   return { loadingUpcomingEvent, getUserFirstUpcomingEvent };
 };
 
-export default getUserFirstUpcomingEvent;
+export default GetUserFirstUpcomingEvent;

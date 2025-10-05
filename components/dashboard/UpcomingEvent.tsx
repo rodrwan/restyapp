@@ -52,15 +52,15 @@ const UpcomingEvent: React.FC<UpcomingEventProps> = React.memo(
     );
 
     const availableTickets = useMemo(
-      () => getAvailableCount(user.tickets),
+      () => getAvailableCount(user?.tickets || []),
       [getAvailableCount, user.tickets]
     );
     const availableDrinks = useMemo(
-      () => getAvailableCount(user.drinks),
+      () => getAvailableCount(user?.drinks || []),
       [getAvailableCount, user.drinks]
     );
     const availableCourtesies = useMemo(
-      () => getAvailableCount(user.courtesies),
+      () => getAvailableCount(user?.courtesies || []),
       [getAvailableCount, user.courtesies]
     );
 
@@ -75,7 +75,7 @@ const UpcomingEvent: React.FC<UpcomingEventProps> = React.memo(
     }, [event.id]);
 
     const handleCourtesiesPress = useCallback(() => {
-      const url = `/(dashboard)/events/${event.id}/courtesies`;
+      const url = `/(dashboard)/events/${event.id}/courtesy`;
       router.push(url as Href);
     }, []);
 
@@ -131,8 +131,8 @@ const UpcomingEvent: React.FC<UpcomingEventProps> = React.memo(
             Tu próximo evento
           </Text>
         </View>
-        <View className="bg-white rounded-xl mx-2 mb-4">
-          <View className="flex p-4 pb-0 flex-col bg-white rounded-xl">
+        <View className="border border-white/20 rounded-xl mx-2 mb-4">
+          <View className="flex pb-0 flex-col rounded-xl ">
             <View className="flex w-full">
               <Image
                 source={{ uri: event.image }}
@@ -140,10 +140,10 @@ const UpcomingEvent: React.FC<UpcomingEventProps> = React.memo(
                 resizeMode="cover"
               />
             </View>
-            <View className="flex flex-col w-3/4 mt-2">
+            <View className="flex flex-col w-3/4 mt-2 px-2">
               <Text
                 numberOfLines={1}
-                className="overflow-hidden font-bold text-lg"
+                className="text-white overflow-hidden font-bold text-lg"
               >
                 {event.name}
               </Text>
@@ -151,7 +151,7 @@ const UpcomingEvent: React.FC<UpcomingEventProps> = React.memo(
                 {formattedDate}
               </Text>
               <View className="flex flex-row items-center gap-2">
-                <Text numberOfLines={1} className="text-secondary-300 text-sm">
+                <Text numberOfLines={1} className="text-secondary-100 text-sm">
                   {eventAddress}
                 </Text>
               </View>

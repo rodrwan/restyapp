@@ -1,30 +1,34 @@
-import { useContext, createContext, type PropsWithChildren } from "react";
-import { useStorageState } from "./useStorageState";
+import React, {
+  useContext,
+  createContext,
+  type PropsWithChildren,
+} from "react";
 import useUserStore from "@/stores/useUser";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
-import useMe from "@/hooks/useMe";
+import { useSession as useSessionStore } from "@/stores/useSession";
 
 const AuthContext = createContext<{
-  signIn: (accessToken: string) => void;
+  signIn: (accessToken: string) => Promise<void>;
   signOut: () => void;
   session?: string | null;
   isLoading: boolean;
-  healhCheck: () => void;
+  healhCheck: () => Promise<void>;
 }>({
-  signIn: () => null,
+  signIn: async () => {},
   signOut: () => null,
   session: null,
   isLoading: false,
-  healhCheck: () => null,
+  healhCheck: async () => {},
 });
 
 // This hook can be used to access the user info.
-export function useSession() {
+export function useAuthContext() {
   const value = useContext(AuthContext);
   if (process.env.NODE_ENV !== "production") {
     if (!value) {
-      throw new Error("useSession must be wrapped in a <SessionProvider />");
+      throw new Error(
+        "useAuthContext must be wrapped in a <SessionProvider />"
+      );
     }
   }
 
@@ -32,43 +36,45 @@ export function useSession() {
 }
 
 export function SessionProvider({ children }: PropsWithChildren) {
-  const [[isLoading, session], setSession] = useStorageState("session");
-  const { me } = useMe();
+  const {
+    session,
+    isLoading,
+    signIn: sessionSignIn,
+    signOut: sessionSignOut,
+    verifySession,
+  } = useSessionStore();
   const { setUser, setTickets, setDrinks, setEvents } = useUserStore();
+
+  const signIn = React.useCallback(
+    async (accessToken: string) => {
+      sessionSignIn(accessToken);
+      // Verificar la sesión inmediatamente después de establecer el token
+      await verifySession();
+    },
+    [sessionSignIn, verifySession]
+  );
+
+  const signOut = React.useCallback(async () => {
+    sessionSignOut();
+    setUser(null);
+    setTickets([]);
+    setDrinks([]);
+    setEvents([]);
+    router.replace("/(home)");
+  }, [sessionSignOut, setUser, setTickets, setDrinks, setEvents]);
+
+  const healhCheck = React.useCallback(async () => {
+    await verifySession();
+  }, [verifySession]);
 
   return (
     <AuthContext.Provider
       value={{
-        signIn: (accessToken: string) => {
-          setSession(accessToken);
-        },
-        signOut: async () => {
-          setSession(null);
-          setUser(null);
-          setTickets([]);
-          setDrinks([]);
-          setEvents([]);
-          AsyncStorage.removeItem("accessToken");
-          router.replace("/(home)");
-        },
+        signIn,
+        signOut,
         session,
         isLoading,
-        healhCheck: async () => {
-          try {
-            await me();
-          } catch (err: any) {
-            console.log("SessionProvider err", err);
-            if (err?.response?.errors[0]?.message === "session has expired") {
-              setSession(null);
-              setUser(null);
-              setTickets([]);
-              setDrinks([]);
-              setEvents([]);
-              AsyncStorage.removeItem("accessToken");
-              router.replace("/(home)");
-            }
-          }
-        },
+        healhCheck,
       }}
     >
       {children}

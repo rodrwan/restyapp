@@ -14,6 +14,7 @@ const FailurePage = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
+      headerShown: Platform.OS === "ios",
       headerTransparent: true,
       headerTitle: "Error",
       headerTintColor: Colors.primary[500],

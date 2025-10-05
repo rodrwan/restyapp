@@ -11,7 +11,7 @@ export function formatEventDate(startAt: string): string {
 
 export function parseEventDateTime(event: Event): string {
   const splittedStartAt = event?.start_at?.split(" ");
-  const startHour = event?.start_hour?.split("T")[1];
+  const startHour = event?.start_hour;
   return `${splittedStartAt?.[0]} ${startHour?.replace("Z", "")}`;
 }
 

@@ -8,7 +8,7 @@ import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import useCreateOrder from "@/hooks/useCreateOrder";
 import useCartStore from "@/stores/useCart";
 import { LinearGradient } from "expo-linear-gradient";
-import { useSession } from "@/context/AuthProvider";
+import { useAuthContext } from "@/context/AuthProvider";
 
 const Cart = () => {
   const navigation = useNavigation();
@@ -19,9 +19,8 @@ const Cart = () => {
     setTicketToNominate,
     clearCart,
   } = useCartStore();
-  const { session } = useSession();
+  const { session } = useAuthContext();
   const params: any = useLocalSearchParams();
-  console.log("cart params", params);
 
   React.useEffect(() => {
     if (!session) {
@@ -33,6 +32,7 @@ const Cart = () => {
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
+      headerShown: Platform.OS === "ios",
       headerTransparent: true,
       headerTitle: "",
       headerTintColor: Colors.primary[500],

@@ -5,8 +5,9 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   ImageBackground,
+  Platform,
 } from "react-native";
-import React, { useLayoutEffect } from "react";
+import React, { useLayoutEffect, useRef } from "react";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { LinearGradient } from "expo-linear-gradient";
@@ -23,6 +24,8 @@ import useEventStore from "@/stores/useEvent";
 export default function EventPage() {
   const { setEvent } = useEventStore();
   const navigation = useNavigation<any>();
+  const scrollViewRef = useRef<any>(null);
+  const [descriptionY, setDescriptionY] = React.useState(0);
   const {
     items: itemsInCart,
     addToCart,
@@ -32,6 +35,7 @@ export default function EventPage() {
 
   useLayoutEffect(() => {
     navigation.setOptions({
+      headerShown: Platform.OS === "ios",
       headerTransparent: true,
       headerTitle: "",
       headerTintColor: Colors.primary[500],
@@ -46,10 +50,9 @@ export default function EventPage() {
   }: any = useGetEventById(eventId);
 
   React.useEffect(() => {
-    console.log("event", event);
     setEvent(event);
   }, [event]);
-  if (!Boolean(eventId) || loading) {
+  if (!eventId || loading) {
     return (
       <LinearGradient
         colors={["#04121A", "#041e2b"]}
@@ -66,14 +69,25 @@ export default function EventPage() {
   const drinks = event?.items.filter((elem: any) => elem.type === "DRINK");
   const { startAt, startHour, endAt } = formatEventDates(event);
 
+  const scrollToDescription = () => {
+    const ref = scrollViewRef.current;
+    if (ref) {
+      ref.scrollTo({ y: descriptionY, animated: true });
+    }
+  };
+
   return (
     <>
       <ParallaxScrollView
+        ref={scrollViewRef}
         backgroundColor={Colors.secondary[500]}
         style={{ flex: 1 }}
         parallaxHeaderHeight={400}
         stickyHeaderHeight={100}
         contentBackgroundColor={Colors.secondary[500]}
+        scrollViewProps={{
+          showsHorizontalScrollIndicator: false,
+        }}
         renderBackground={() => (
           <View className="">
             <ImageBackground
@@ -112,13 +126,16 @@ export default function EventPage() {
         <View className="pt-2">
           {/* About Section */}
           <View className="px-4 gap-4 mb-8">
-            <Text className="text-white font-bold text-2xl">
-              Acerca del evento
-            </Text>
-            <Text className="text-white font-bold text-xl">{event?.name}</Text>
-            <Text className="text-secondary-100 text-base">
-              {event?.description}
-            </Text>
+            <Text className="text-white font-bold text-2xl">{event?.name}</Text>
+            <TouchableOpacity
+              onPress={scrollToDescription}
+              activeOpacity={0.7}
+              className="self-start"
+            >
+              <Text className="text-primary-400 text-base font-semibold">
+                Ver Más
+              </Text>
+            </TouchableOpacity>
           </View>
           <TicketsList
             items={tickets}
@@ -141,8 +158,11 @@ export default function EventPage() {
             removeFromCart={removeFromCart}
           />
 
-          {/* About Section */}
-          <View className="bg-secondary-700 py-8 px-4 gap-4 mb-32">
+          {/* About Section (Descripción completa) */}
+          <View
+            className="bg-secondary-700 py-8 px-4 gap-4 mb-32"
+            onLayout={(e) => setDescriptionY(e.nativeEvent.layout.y)}
+          >
             <Text className="text-white font-bold text-2xl">
               Acerca del evento
             </Text>

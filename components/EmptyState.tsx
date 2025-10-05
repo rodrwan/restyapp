@@ -6,17 +6,54 @@ import CustomButton from "./CustomButton";
 
 const EmptyState = ({ title, subtitle, withButton }: any) => {
   return (
-    <View className="flex justify-start items-center px-4 h-screen">
-      <View className="flex justify-center items-center">
-        <Text className="text-sm font-medium text-gray-100">{title}</Text>
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "flex-start",
+        alignItems: "center",
+        paddingHorizontal: 16,
+        minHeight: 400,
+      }}
+    >
+      <View
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+          marginTop: 50,
+        }}
+      >
+        <Text style={{ fontSize: 14, fontWeight: "500", color: "#f3f4f6" }}>
+          {title}
+        </Text>
       </View>
-      <View className="flex justify-center items-center">
-        <Text className="text-xl text-center font-semibold text-white mt-4">
+      <View
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+          marginTop: 16,
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 20,
+            textAlign: "center",
+            fontWeight: "600",
+            color: "white",
+          }}
+        >
           {subtitle}
         </Text>
       </View>
 
-      <View className="flex justify-start items-center w-full h-full">
+      <View
+        style={{
+          justifyContent: "flex-start",
+          alignItems: "center",
+          width: "100%",
+          flex: 1,
+          marginTop: 50,
+        }}
+      >
         <Image
           source={require("../assets/images/splash.png")}
           style={{

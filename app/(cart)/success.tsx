@@ -44,6 +44,7 @@ const SuccessPage = () => {
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
+      headerShown: Platform.OS === "ios",
       headerTransparent: true,
       headerTitle: "Pago exitoso",
       headerTintColor: Colors.primary[500],

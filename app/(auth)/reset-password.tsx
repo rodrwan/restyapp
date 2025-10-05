@@ -32,6 +32,7 @@ export default function ResetPassword() {
 
   useLayoutEffect(() => {
     navigation.setOptions({
+      headerShown: Platform.OS === "ios",
       headerTransparent: true,
       headerTitle: "",
       headerTintColor: Colors.primary[500],
@@ -51,7 +52,7 @@ export default function ResetPassword() {
           <View />
         ),
     });
-  }, []);
+  }, [navigation]);
 
   const handleSubmit = async () => {
     if (!form.code || !form.password || !form.confirmPassword) {

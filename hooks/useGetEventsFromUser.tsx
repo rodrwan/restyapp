@@ -10,12 +10,20 @@ const client = HTTPClient.getInstance();
 const useGetEventsFromUser = () => {
   const [loadingGetEvents, setLoadingGetEvents] = React.useState(false);
   const { setTickets, setDrinks, setEvents } = useUserStore();
-  const getEvents = async () => {
+  const getEvents = React.useCallback(async () => {
+    console.log("useGetEventsFromUser: Starting getEvents");
     setLoadingGetEvents(true);
     try {
       const orders = await client.getOrderItemsByUser();
       const orderData = orders.data?.getOrderItemsByUser;
       if ((orderData?.length ?? 0) === 0) {
+        console.log(
+          "useGetEventsFromUser: No orders found, setting loading to false"
+        );
+        setTickets([]);
+        setDrinks([]);
+        setEvents([]);
+        setLoadingGetEvents(false);
         return {
           orders: [],
           tickets: [],
@@ -32,6 +40,13 @@ const useGetEventsFromUser = () => {
       const response = await client.getEventsByIds(events);
       const eventsData = response.data?.getEventsByIds;
       if (!response.data?.getEventsByIds?.events) {
+        console.log(
+          "useGetEventsFromUser: No events found, setting loading to false"
+        );
+        setTickets([]);
+        setDrinks([]);
+        setEvents([]);
+        setLoadingGetEvents(false);
         return {
           orders: [],
           tickets: [],
@@ -94,19 +109,19 @@ const useGetEventsFromUser = () => {
       setDrinks(result?.drinks);
       setEvents(result?.events);
 
+      console.log("useGetEventsFromUser: Success, setting loading to false");
       setLoadingGetEvents(false);
       return result;
     } catch (error: any) {
-      console.log(">>> useGetEventsFromUser getEvents error", error);
-      if (String(error).includes("unauthorized")) {
-        console.log("useGetEventsFromUser getEvents unauthorized error", error);
-        return router.replace("/(auth)/sign-in?redirectTo=(dashboard)");
-      }
+      console.log(
+        "useGetEventsFromUser: Error occurred, setting loading to false",
+        error
+      );
       setLoadingGetEvents(false);
       Alert.alert(">> Error", error.message);
       throw new Error(error);
     }
-  };
+  }, [setTickets, setDrinks, setEvents]);
 
   return { getEvents, loadingGetEvents };
 };

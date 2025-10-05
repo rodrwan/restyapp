@@ -2,7 +2,7 @@
   "expo": {
     "name": "Mangoticket",
     "slug": "mangoticket",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "orientation": "portrait",
     "scheme": "mangoticket",
     "icon": "./assets/images/icon.png",
@@ -72,12 +72,6 @@
         "expo-local-authentication",
         {
           "faceIDPermission": "Allow Mangoticket to use Face ID."
-        }
-      ],
-      [
-        "expo-dev-launcher",
-        {
-          "launchMode": "most-recent"
         }
       ],
       "expo-font",

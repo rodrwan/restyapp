@@ -1,4 +1,11 @@
-import { Text, TouchableOpacity, View, FlatList } from "react-native";
+import {
+  Text,
+  TouchableOpacity,
+  View,
+  FlatList,
+  Image,
+  Platform,
+} from "react-native";
 import React from "react";
 import { router, useNavigation, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -9,8 +16,9 @@ import useUserStore from "@/stores/useUser";
 import useCartStore from "@/stores/useCart";
 import useGetEventById from "@/hooks/useGetEventById";
 import { LinearGradient } from "expo-linear-gradient";
+import LoadingScreen from "@/components/LoadingScreen";
 
-const drinks = () => {
+const Buy = () => {
   const { eventId }: any = useLocalSearchParams();
   const navigation = useNavigation<any>();
   const { user } = useUserStore();
@@ -22,10 +30,12 @@ const drinks = () => {
   } = useCartStore();
   const {
     data: { event },
+    loading: loadingEvent,
   }: any = useGetEventById(eventId);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
+      headerShown: Platform.OS === "ios",
       headerTransparent: true,
       headerTitle: "",
       headerTintColor: Colors.primary[500],
@@ -51,13 +61,40 @@ const drinks = () => {
       ),
     });
   }, []);
-  if (!user?.drinks) {
-    return;
+
+  // Mostrar loading mientras se carga el evento
+  if (loadingEvent) {
+    return <LoadingScreen message="Cargando evento..." />;
   }
 
+  // Verificar si hay drinks disponibles en el evento
   const drinks =
     event?.items?.filter((elem: any) => elem.type === "DRINK") || [];
 
+  if (!event) {
+    return (
+      <LinearGradient colors={["#04121A", "#041e2b"]}>
+        <SafeAreaView className="flex h-full">
+          <View className="flex justify-center items-center h-full">
+            <Text className="text-white">No event data available</Text>
+          </View>
+        </SafeAreaView>
+      </LinearGradient>
+    );
+  }
+
+  const startAt = event?.start_at
+    ? (() => {
+        // Limpiar el formato de fecha removiendo "+0000 UTC"
+        const cleanDate = event.start_at.replace(" +0000 UTC", "");
+        const date = new Date(cleanDate);
+        return date.toLocaleString("es-CL", {
+          weekday: "short",
+          month: "long",
+          day: "numeric",
+        });
+      })()
+    : "";
   return (
     <LinearGradient
       // Background Linear Gradient
@@ -65,6 +102,23 @@ const drinks = () => {
     >
       <SafeAreaView className="flex h-full">
         <View className="flex mt-16 h-full">
+          {/* event resumen details */}
+          <View className="flex flex-row gap-2 mx-2 bg-white rounded-lg p-2 mb-4">
+            <Image
+              source={{ uri: event?.image }}
+              style={{ aspectRatio: 1 }}
+              className="rounded-lg w-[100px] h-[100px]"
+            />
+            <View>
+              <Text className="text-secondary-500 font-bold text-2xl">
+                {event?.name}
+              </Text>
+              <Text className="text-primary-500 text-base">{startAt}</Text>
+              <Text numberOfLines={1} className="text-secondary-300 text-sm">
+                {event?.place?.trim()}
+              </Text>
+            </View>
+          </View>
           {/* Drinks */}
           {drinks.length ? (
             <View className="bg-secondary-700 py-4 mb-8 mx-1 rounded-3xl">
@@ -190,4 +244,4 @@ const drinks = () => {
   );
 };
 
-export default drinks;
+export default Buy;

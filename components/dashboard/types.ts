@@ -21,12 +21,16 @@ export interface Drink {
   is_validated: boolean;
 }
 
+export interface CourtesyEvent {
+  courtesy: Courtesy;
+  event: Event;
+}
+
 export interface Courtesy {
   id: string;
   name: string;
   description?: string;
   base64: string;
-  event: Event;
   is_validated: boolean;
 }
 
@@ -41,7 +45,7 @@ export interface User {
   events: Event[] | null;
   tickets: Ticket[] | null;
   drinks: Drink[] | null;
-  courtesies: Courtesy[] | null;
+  courtesies: CourtesyEvent[] | null;
   tbk_user_id: string | null;
   tbk_card_number: string | null;
 }

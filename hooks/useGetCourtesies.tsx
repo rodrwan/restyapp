@@ -16,21 +16,25 @@ interface UseGetCourtesiesReturn {
 
 const useGetCourtesies = (eventId: string): UseGetCourtesiesReturn => {
   const [data, setData] = useState<Courtesy | null>(null);
-  const [isLoadingGetCourtesies, setLoading] = useState(true);
+  const [isLoadingGetCourtesies, setLoading] = useState(false); // Start with false
   const [error, setError] = useState<string | null>(null);
   const { setCourtesies } = useUserStore();
 
   const getCourtesies = useCallback(async () => {
+    console.log("getCourtesies called with eventId:", eventId);
     setLoading(true);
     try {
       const res = await client.getCourtesies(eventId);
+      console.log("getCourtesies response:", res);
       if (res?.error?.message === "session has expired") {
         throw new Error("expired session");
       }
-      setData(res.data);
-      setCourtesies(res.data);
+      setData(res.data.getCourtesies.data);
+      // console.log(">>>> res.data", res.data.getCourtesies.data);
+      setCourtesies(res.data.getCourtesies.data);
     } catch (err: any) {
-      console.error("Error getting courtesy:", err);
+      console.log("getCourtesies error:", err);
+      // console.error("Error getting courtesy:", err);
       const errorMessage =
         err?.response?.errors?.[0]?.message === "session has expired"
           ? "expired session"
@@ -47,17 +51,31 @@ const useGetCourtesies = (eventId: string): UseGetCourtesiesReturn => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [eventId, setCourtesies]);
 
   useEffect(() => {
-    if (eventId) {
+    if (eventId && eventId.trim() !== "" && eventId !== "default") {
+      console.log(
+        "useGetCourtesies: Valid eventId found, calling getCourtesies"
+      );
       getCourtesies();
+    } else {
+      console.log("useGetCourtesies: No valid eventId, skipping call");
+      // Si no hay eventId válido, no hacer nada y limpiar loading
+      setLoading(false);
+      setError(null);
     }
   }, [eventId, getCourtesies]);
 
-  const refetch = useCallback(() => getCourtesies(), [eventId, getCourtesies]);
+  const refetch = useCallback(() => getCourtesies(), [getCourtesies]);
 
-  return { data, isLoadingGetCourtesies, error, refetch, getCourtesies };
+  return {
+    data,
+    isLoadingGetCourtesies,
+    error,
+    refetch,
+    getCourtesies,
+  };
 };
 
 export default useGetCourtesies;

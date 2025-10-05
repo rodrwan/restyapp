@@ -7,16 +7,11 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFonts } from "expo-font";
 import { Slot, Stack, useNavigationContainerRef } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { NativeWindStyleSheet } from "nativewind";
 
 import Header from "@/components/Header";
 import { SessionProvider } from "@/context/AuthProvider";
 import { LinearGradient } from "expo-linear-gradient";
 import { isRunningInExpoGo } from "expo";
-
-NativeWindStyleSheet.setOutput({
-  default: "native",
-});
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();

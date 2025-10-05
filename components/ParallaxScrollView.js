@@ -51,11 +51,13 @@ class ParallaxScrollView extends Component {
   constructor(props) {
     super(props);
     if (props.renderStickyHeader && !props.stickyHeaderHeight) {
+      // eslint-disable-next-line no-console
       console.warn(
         "Property `stickyHeaderHeight` must be set if `renderStickyHeader` is used."
       );
     }
     if (props.renderParallaxHeader !== renderEmpty && !props.renderForeground) {
+      // eslint-disable-next-line no-console
       console.warn(
         "Property `renderParallaxHeader` is deprecated. Use `renderForeground` instead."
       );
@@ -141,6 +143,7 @@ class ParallaxScrollView extends Component {
             ref: this.scrollViewRef,
             style: [styles.scrollView, scrollElement.props.style],
             scrollEventThrottle: 1,
+            showsHorizontalScrollIndicator: false,
             // Using Native Driver greatly optimizes performance
             onScroll: Animated.event(
               [{ nativeEvent: { contentOffset: { y: this.scrollY } } }],
@@ -161,19 +164,37 @@ class ParallaxScrollView extends Component {
    * Expose `ScrollView` API so this component is composable with any component that expects a `ScrollView`.
    */
   getScrollResponder() {
-    return this.scrollViewRef._component.getScrollResponder();
+    const ref = this.scrollViewRef?.current || this.scrollViewRef;
+    if (!ref) return null;
+    const node = typeof ref.getNode === "function" ? ref.getNode() : ref;
+    return typeof node?.getScrollResponder === "function"
+      ? node.getScrollResponder()
+      : node;
   }
   getScrollableNode() {
-    return this.getScrollResponder().getScrollableNode();
+    const responder = this.getScrollResponder();
+    return typeof responder?.getScrollableNode === "function"
+      ? responder.getScrollableNode()
+      : responder;
   }
   getInnerViewNode() {
-    return this.getScrollResponder().getInnerViewNode();
+    const responder = this.getScrollResponder();
+    return typeof responder?.getInnerViewNode === "function"
+      ? responder.getInnerViewNode()
+      : responder;
   }
   scrollTo(...args) {
-    this.getScrollResponder().scrollTo(...args);
+    const responder = this.getScrollResponder();
+    if (responder && typeof responder.scrollTo === "function") {
+      responder.scrollTo(...args);
+    }
   }
   setNativeProps(props) {
-    this.scrollViewRef.setNativeProps(props);
+    const ref = this.scrollViewRef?.current || this.scrollViewRef;
+    const node = typeof ref?.getNode === "function" ? ref.getNode() : ref;
+    if (node && typeof node.setNativeProps === "function") {
+      node.setNativeProps(props);
+    }
   }
 
   /*

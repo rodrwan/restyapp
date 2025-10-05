@@ -9,4 +9,5 @@ export interface Event {
 
 interface EventItem {
   price: number;
+  type: string;
 }

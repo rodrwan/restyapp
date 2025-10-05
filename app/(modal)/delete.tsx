@@ -16,16 +16,17 @@ import { LinearGradient } from "expo-linear-gradient";
 import Toast from "react-native-toast-message";
 import * as LocalAuthentication from "expo-local-authentication";
 import useSession from "@/hooks/useSession";
-import { useSession as useSessionContext } from "@/context/AuthProvider";
+import { useAuthContext } from "@/context/AuthProvider";
 const DeleteAccount = () => {
   const navigation = useNavigation();
   const [isSubmitting, setSubmitting] = useState(false);
   const [hasConfirmed, setHasConfirmed] = useState(false);
   const { deleteMe } = useSession();
-  const { signOut } = useSessionContext();
+  const { signOut } = useAuthContext();
 
   useLayoutEffect(() => {
     navigation.setOptions({
+      headerShown: Platform.OS === "ios",
       headerTitle: "Eliminar cuenta",
       headerTintColor: Colors.primary[500],
       headerStyle: {

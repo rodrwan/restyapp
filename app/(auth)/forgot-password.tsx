@@ -28,6 +28,7 @@ export default function ForgotPassword() {
 
   useLayoutEffect(() => {
     navigation.setOptions({
+      headerShown: Platform.OS === "ios",
       headerTransparent: true,
       headerTitle: "",
       headerTintColor: Colors.primary[500],
@@ -47,7 +48,7 @@ export default function ForgotPassword() {
           <View />
         ),
     });
-  }, []);
+  }, [navigation]);
 
   const handleSubmit = async () => {
     if (!email) {

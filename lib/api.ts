@@ -162,7 +162,6 @@ class Client {
       };
 
       if (requiresAuth) {
-        console.log("requiresAuth", requiresAuth);
         const token = await this.getAccessToken();
         if (!token) {
           const error = ApiErrorHandler.createError(
@@ -172,7 +171,6 @@ class Client {
           ApiErrorHandler.logError(error, operationName);
           return { error };
         }
-        console.log("token", token);
         headers.Authorization = `Bearer ${token}`;
       }
 
@@ -194,21 +192,22 @@ class Client {
         signal: controller.signal,
       });
 
-      console.log(
-        JSON.stringify(
-          {
-            method: "POST",
-            headers,
-            body: JSON.stringify({
-              query,
-              variables,
-              operationName,
-            }),
-          },
-          null,
-          2
-        )
-      );
+      console.log(">>> Operation Name", operationName);
+      // console.log(
+      //   JSON.stringify(
+      //     {
+      //       method: "POST",
+      //       headers,
+      //       body: JSON.stringify({
+      //         query,
+      //         variables,
+      //         operationName,
+      //       }),
+      //     },
+      //     null,
+      //     2
+      //   )
+      // );
 
       clearTimeout(timeoutId);
 
@@ -221,7 +220,7 @@ class Client {
         ApiErrorHandler.logError(error, operationName);
 
         const result = await response.text();
-        console.log("result", result);
+        // console.log("result", result);
 
         // Reintento automático para errores 5xx
         if (response.status >= 500 && retryCount < this.config.retryAttempts) {
@@ -241,7 +240,7 @@ class Client {
       }
 
       const result = await response.json();
-      console.log("result", result);
+      // console.log("result", result);
 
       // Manejo de errores GraphQL
       if (result.errors && result.errors.length > 0) {
@@ -541,6 +540,7 @@ class Client {
           end_hour
           nominated
           items {
+            type
             price
           }
         }
@@ -568,13 +568,14 @@ class Client {
             address
             items {
               id
-              type
+              event_id
               name
-              price
+              description
+              type
+              priority
               stock
               max_per_sale
-              event_id
-              priority
+              price
               end_at
               end_hour
               out_of_stock
@@ -859,6 +860,45 @@ class Client {
     return this.makeRequest(document, {}, "GetUserFirstUpcomingEvent", true);
   }
 
+  async getUserFirstTodayEvent(): Promise<ApiResponse<any>> {
+    const document = gql`
+      query GetUserFirstUpcomingEvent {
+        getUserFirstUpcomingEvent {
+          tickets {
+            id
+            base64
+            event {
+              id
+              name
+              start_at
+              place
+              description
+              image
+            }
+            is_validated
+          }
+          event {
+            id
+            name
+            start_at
+            place
+            image
+            end_hour
+            end_at
+            description
+          }
+          event_item {
+            name
+            type
+            cover
+          }
+        }
+      }
+    `;
+
+    return this.makeRequest(document, {}, "GetUserFirstUpcomingEvent", true);
+  }
+
   async getUserUpcomingEvents(): Promise<ApiResponse<any>> {
     const document = gql`
       query GetUserUpcomingEvents {
@@ -1023,8 +1063,8 @@ class Client {
             courtesy {
               id
               base64
+              name
               is_validated
-              cover
             }
             event {
               id

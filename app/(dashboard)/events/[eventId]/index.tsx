@@ -20,8 +20,10 @@ import ScalingDots from "@/components/ScalingDots";
 import EmptyState from "@/components/EmptyState";
 import * as Animatable from "react-native-animatable";
 import useGetTicketById from "@/hooks/useGetTicketById";
+import useGetUserTickets from "@/hooks/useGetUserTickets";
 import Toast from "react-native-toast-message";
 import { LinearGradient } from "expo-linear-gradient";
+import LoadingScreen from "@/components/LoadingScreen";
 
 const zoomIn = {
   0: {
@@ -44,20 +46,35 @@ const zoomOut = {
 const TicketPage = () => {
   const { eventId }: any = useLocalSearchParams();
   const navigation = useNavigation();
-  const { user, updateTicket } = useUserStore();
+  const { updateTicket } = useUserStore();
+  const {
+    loading: loadingTickets,
+    tickets,
+    error,
+  } = useGetUserTickets(eventId);
   const scrollX = React.useRef(new Animated.Value(0)).current;
   const { data: ticketFound, getTicket }: any = useGetTicketById();
   const [scrollY, setScrollY] = React.useState(0);
+  const [activeItem, setActiveItem] = React.useState<any>(null);
+  const intervalRef = React.useRef<number | null>(null);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
+      headerShown: Platform.OS === "ios",
       headerTransparent: true,
       headerTitle: "",
       headerTintColor: Colors.primary[500],
       headerLeft: () =>
         Platform.OS === "ios" && scrollY <= 30 ? (
           <TouchableOpacity
-            onPress={() => router.replace("/(dashboard)")}
+            onPress={() => {
+              // Limpiar interval antes de navegar
+              if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+                intervalRef.current = null;
+              }
+              router.replace("/(dashboard)");
+            }}
             className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2"
           >
             <Ionicons
@@ -75,42 +92,83 @@ const TicketPage = () => {
         </TouchableOpacity>
       ),
     });
+
+    // Cleanup cuando el componente se desmonta
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
   }, []);
 
-  if (!user?.tickets) {
-    return;
-  }
-
-  const [activeItem, setActiveItem] = React.useState<any>(user?.tickets?.[0]);
+  // Set activeItem cuando se cargan los tickets
+  React.useEffect(() => {
+    if (tickets && tickets.length > 0 && !activeItem) {
+      setActiveItem(tickets[0]);
+    }
+  }, [tickets, activeItem]);
 
   React.useEffect(() => {
-    let intervalId: number | null = null;
-
-    if (!ticketFound?.is_validated && activeItem?.item?.id) {
-      // Limpiar cualquier intervalo existente antes de crear uno nuevo
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
-
-      intervalId = setInterval(async () => {
+    // Solo crear interval si el ticket no está validado y tenemos un activeItem
+    if (!ticketFound?.is_validated && activeItem?.id) {
+      intervalRef.current = setInterval(async () => {
         try {
-          await getTicket(activeItem.item.id);
+          await getTicket(activeItem.id);
         } catch (error) {
-          console.error("Error al obtener ticket:", error);
+          // console.error("Error al obtener ticket:", error);
         }
       }, 10 * 1000);
     }
 
+    // Cleanup function - esto se ejecuta cuando el componente se desmonta
     return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
       }
     };
-  }, [activeItem?.item?.id, ticketFound?.is_validated]);
+  }, [activeItem?.id, ticketFound?.is_validated, getTicket]); // Added getTicket back
 
   React.useEffect(() => {
-    updateTicket(ticketFound as any);
-  }, [ticketFound, activeItem]);
+    if (ticketFound) {
+      updateTicket(ticketFound as any);
+    }
+  }, [ticketFound, updateTicket]);
+
+  // Mostrar loading mientras se cargan los datos
+  if (loadingTickets) {
+    return <LoadingScreen message="Cargando tickets..." />;
+  }
+
+  // Si hay error, mostrarlo
+  if (error) {
+    return (
+      <LinearGradient colors={["#04121A", "#041e2b"]}>
+        <SafeAreaView className="flex h-full">
+          <View className="flex justify-center items-center h-full mt-16">
+            <EmptyState title="Error al cargar tickets" subtitle={error} />
+          </View>
+        </SafeAreaView>
+      </LinearGradient>
+    );
+  }
+
+  // Si no hay tickets, mostrar estado vacío
+  if (!tickets || tickets.length === 0) {
+    return (
+      <LinearGradient colors={["#04121A", "#041e2b"]}>
+        <SafeAreaView className="flex h-full">
+          <View className="flex justify-center items-center h-full mt-16">
+            <EmptyState
+              title="No tienes tickets para este evento"
+              subtitle="Los tickets aparecerán aquí una vez que los compres"
+            />
+          </View>
+        </SafeAreaView>
+      </LinearGradient>
+    );
+  }
 
   const viewableItemsChanged = ({ viewableItems }: any) => {
     if (viewableItems.length > 0) {
@@ -134,8 +192,7 @@ const TicketPage = () => {
                 </Text>
               </View>
               <View className="rounded-xl">
-                {user?.tickets.filter((item: any) => item.event.id === eventId)
-                  .length > 0 ? (
+                {tickets.length > 0 ? (
                   <FlatList
                     horizontal={true}
                     pagingEnabled={true}
@@ -147,9 +204,7 @@ const TicketPage = () => {
                       }
                     )}
                     className="p-2 h-full"
-                    data={user?.tickets.filter(
-                      (item: any) => item.event.id === eventId
-                    )}
+                    data={tickets}
                     onViewableItemsChanged={viewableItemsChanged}
                     contentOffset={{ x: 0, y: 0 }}
                     viewabilityConfig={{
@@ -245,6 +300,9 @@ const TicketPage = () => {
                               />
                             )}
                           </View>
+                          <Text className="mb-4 text-xs text-center">
+                            {item.id}
+                          </Text>
                           <View className="py-4 bg-error-100 justify-center items-center rounded-xl mb-8">
                             <Text className="font-bold text-error-500">
                               Válido hasta {endAt} - {endHour}
@@ -267,9 +325,7 @@ const TicketPage = () => {
                 )}
               </View>
               <ScalingDots
-                data={user?.tickets.filter(
-                  (item: any) => item.event.id === eventId
-                )}
+                data={tickets}
                 scrollX={scrollX}
                 inActiveDotColor={Colors.secondary[400]}
                 activeDotColor={Colors.secondary[500]}

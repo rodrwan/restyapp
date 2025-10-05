@@ -24,14 +24,14 @@ import useGetEventsFromUser from "@/hooks/useGetEventsFromUser";
 import Toast from "react-native-toast-message";
 import useGetUserFirstUpcomingEvent from "@/hooks/useGetUserFirstUpcomingEvent";
 import { LinearGradient } from "expo-linear-gradient";
-import { useSession as useSessionContext } from "@/context/AuthProvider";
+import { useAuthContext } from "@/context/AuthProvider";
 import SignWithApple from "@/components/SignWithApple";
 import * as WebBrowser from "expo-web-browser";
 import { POLICY_URL, TERMS_URL } from "@/constants";
 
 const SignIn = () => {
   const { createSession } = useSession();
-  const { signIn } = useSessionContext();
+  const { signIn } = useAuthContext();
   const { getEvents } = useGetEventsFromUser();
   const { getUserFirstUpcomingEvent } = useGetUserFirstUpcomingEvent();
 
@@ -48,6 +48,7 @@ const SignIn = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
+      headerShown: Platform.OS === "ios",
       headerTransparent: true,
       headerTitle: "",
       headerTintColor: Colors.primary[500],
@@ -67,7 +68,7 @@ const SignIn = () => {
           <View />
         ),
     });
-  }, []);
+  }, [navigation]);
 
   const submit = async () => {
     setSubmitting(true);
@@ -90,7 +91,7 @@ const SignIn = () => {
         form.password,
         "mangoticket"
       );
-      console.log("sessionResp", sessionResp);
+
       if (!sessionResp) {
         throw new Error("Error al iniciar sesión");
       }
@@ -101,11 +102,9 @@ const SignIn = () => {
       signIn(sessionResp.access_token);
       getEvents();
       getUserFirstUpcomingEvent();
-      console.log(params?.redirectTo);
 
       return router.replace(`/${params?.redirectTo ?? "(dashboard)"}`);
     } catch (err: any) {
-      console.log(err);
       Toast.show({
         type: "error",
         text1: "Error",
@@ -160,26 +159,27 @@ const SignIn = () => {
               </Text>
             </View>
 
-            {Platform.OS === "ios" ? (
-              <View className="flex flex-row items-center justify-between mt-6 rounded-xl">
-                <SignWithGoogle
-                  setUser={setUser}
-                  redirectTo={params?.redirectTo ?? "(dashboard)"}
-                />
+            {
+              Platform.OS === "ios" ? (
+                <View className="flex flex-row items-center justify-between mt-6 rounded-xl">
+                  <SignWithGoogle
+                    setUser={setUser}
+                    redirectTo={params?.redirectTo ?? "(dashboard)"}
+                  />
 
-                <SignWithApple
+                  {/* <SignWithApple
                   setUser={setUser}
                   redirectTo={params?.redirectTo ?? "(dashboard)"}
-                />
-              </View>
-            ) : (
-              <View className="flex flex-row items-center justify-between mt-6 rounded-xl">
-                <SignWithGoogle
-                  setUser={setUser}
-                  redirectTo={params?.redirectTo ?? "(dashboard)"}
-                />
-              </View>
-            )}
+                /> */}
+                </View>
+              ) : null
+              // <View className="flex flex-row items-center justify-between mt-6 rounded-xl">
+              //   <SignWithGoogle
+              //     setUser={setUser}
+              //     redirectTo={params?.redirectTo ?? "(dashboard)"}
+              //   />
+              // </View>
+            }
 
             <View className="flex flex-row items-center justify-center mt-6">
               <Text className="text-sm text-gray-100 font-pregular text-center">

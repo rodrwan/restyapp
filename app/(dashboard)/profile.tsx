@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import {
   View,
   Text,
@@ -9,20 +9,34 @@ import {
 import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 
-import { UserProfileCard, PaymentMethodSection } from "@/components/dashboard";
+import {
+  UserProfileCard,
+  PaymentMethodSection,
+  isProfileIncomplete,
+  ProfileBanner,
+} from "@/components/dashboard";
 import useUserStore from "@/stores/useUser";
 import useEventStore from "@/stores/useEvent";
 import useCreateInscription from "@/hooks/useCreateInscription";
-import useMe from "@/hooks/useMe";
+import useAuth from "@/hooks/useAuth";
 
 const ProfilePage = () => {
   const { user } = useUserStore();
   const { event } = useEventStore();
-  const { me, loadingUserData } = useMe();
+  const { loadingUserData, checkAuth } = useAuth();
   const { createInscription } = useCreateInscription(event?.id);
 
   React.useEffect(() => {
-    me();
+    // Solo hacer la llamada si no tenemos datos del usuario
+    if (!user) {
+      checkAuth();
+    }
+  }, [user]); // Removed checkAuth from dependencies to prevent infinite loop
+
+  const profileIncomplete = useMemo(() => isProfileIncomplete(user), [user]);
+
+  const handleCompleteProfile = useCallback(() => {
+    router.push("/(modal)/complete-profile");
   }, []);
 
   if (loadingUserData) {
@@ -74,6 +88,8 @@ const ProfilePage = () => {
             </Text>
           </TouchableOpacity>
         </View>
+
+        {profileIncomplete && <ProfileBanner onPress={handleCompleteProfile} />}
       </View>
     </LinearGradient>
   );

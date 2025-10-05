@@ -9,8 +9,8 @@ import {
   Dimensions,
   ActivityIndicator,
 } from "react-native";
-import React, { useCallback, useMemo } from "react";
-import { router, useNavigation, useLocalSearchParams } from "expo-router";
+import { useCallback, useMemo, useEffect, useState } from "react";
+import { router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as Animatable from "react-native-animatable";
@@ -18,16 +18,16 @@ import * as Animatable from "react-native-animatable";
 import Colors from "@/constants/Colors";
 import useUserStore from "@/stores/useUser";
 import EmptyState from "@/components/EmptyState";
-import ScalingDots from "@/components/ScalingDots";
 import Toast from "react-native-toast-message";
 import { LinearGradient } from "expo-linear-gradient";
 import useGetCourtesies from "@/hooks/useGetCourtesies";
-import { Courtesy, Event } from "@/components/dashboard/types";
+import { CourtesyEvent } from "@/components/dashboard/types";
 
+const POLLING_INTERVAL = 30 * 1000; // 30 seconds
 // Animaciones
 const zoomIn = {
   0: {
-    scale: 0.9,
+    scale: 1,
   },
   1: {
     scale: 1,
@@ -39,7 +39,7 @@ const zoomOut = {
     scale: 1,
   },
   1: {
-    scale: 0.9,
+    scale: 1,
   },
 };
 
@@ -60,27 +60,39 @@ const formatEventDate = (startAt: string): string => {
 };
 
 const filterCourtesiesByEvent = (
-  courtesies: Courtesy[] | null,
+  courtesies: CourtesyEvent[] | null,
   eventId: string
-): Courtesy[] => {
+): CourtesyEvent[] => {
   if (!courtesies) return [];
   return courtesies.filter((courtesy) => courtesy.event?.id === eventId);
 };
 
-const filterValidatedCourtesies = (courtesies: Courtesy[]): Courtesy[] => {
-  return courtesies.filter((courtesy) => courtesy.is_validated);
+const filterValidatedCourtesies = (
+  courtesies: CourtesyEvent[]
+): CourtesyEvent[] => {
+  return courtesies.filter((courtesy) => courtesy.courtesy.is_validated);
 };
 
-const filterUnvalidatedCourtesies = (courtesies: Courtesy[]): Courtesy[] => {
-  return courtesies.filter((courtesy) => !courtesy.is_validated);
+const filterUnvalidatedCourtesies = (
+  courtesies: CourtesyEvent[]
+): CourtesyEvent[] => {
+  return courtesies.filter((courtesy) => !courtesy.courtesy.is_validated);
 };
 
+// Componente principal con patrón estable
 const Courtesies = () => {
+  // Estado local para controlar el renderizado
+  const [isReady, setIsReady] = useState(false);
+  const [activeItem, setActiveItem] = useState<CourtesyEvent | null>(null);
+
+  // Hooks básicos
   const { eventId } = useLocalSearchParams();
-  const navigation = useNavigation();
-  const scrollX = React.useRef(new Animated.Value(0)).current;
   const { user, updateTicket } = useUserStore();
+
+  // Procesar eventId
   const eventIdString = Array.isArray(eventId) ? eventId[0] : eventId;
+
+  // Hook personalizado
   const {
     data: courtesies,
     isLoadingGetCourtesies,
@@ -88,9 +100,19 @@ const Courtesies = () => {
     getCourtesies,
   } = useGetCourtesies(eventIdString || "");
 
+  // Efecto para establecer ready state
+  useEffect(() => {
+    if (eventIdString) {
+      setIsReady(true);
+    }
+  }, [eventIdString]);
+
   // Memoizar las cortesías filtradas
   const eventCourtesies = useMemo(() => {
-    return filterCourtesiesByEvent(user?.courtesies, eventIdString || "");
+    return filterCourtesiesByEvent(
+      user?.courtesies as CourtesyEvent[],
+      eventIdString || ""
+    );
   }, [user?.courtesies, eventIdString]);
 
   const unvalidatedCourtesies = useMemo(() => {
@@ -101,56 +123,14 @@ const Courtesies = () => {
     return filterValidatedCourtesies(eventCourtesies);
   }, [eventCourtesies]);
 
-  const [activeItem, setActiveItem] = React.useState<Courtesy | null>(
-    unvalidatedCourtesies[0] || null
-  );
+  // Actualizar activeItem cuando cambien las cortesías
+  useEffect(() => {
+    if (unvalidatedCourtesies.length > 0 && !activeItem) {
+      setActiveItem(unvalidatedCourtesies[0]);
+    }
+  }, [unvalidatedCourtesies, activeItem]);
 
-  React.useLayoutEffect(() => {
-    navigation.setOptions({
-      headerTransparent: true,
-      headerTitle: "",
-      headerTintColor: Colors.primary[500],
-      headerLeft: () => (
-        <TouchableOpacity
-          onPress={() => navigation?.goBack()}
-          className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2"
-        >
-          <Ionicons
-            name="chevron-back-outline"
-            size={20}
-            color={Colors.primary[500]}
-          />
-        </TouchableOpacity>
-      ),
-      headerRight: () => (
-        <TouchableOpacity onPress={() => router.push("/menu")}>
-          <Ionicons name="menu" size={32} color={Colors.primary[500]} />
-        </TouchableOpacity>
-      ),
-    });
-  }, [navigation]);
-
-  // Early return si no hay cortesías
-  if (
-    !user?.courtesies ||
-    eventCourtesies.length === 0 ||
-    isLoadingGetCourtesies
-  ) {
-    return (
-      <LinearGradient colors={["#04121A", "#041e2b"]}>
-        <SafeAreaView className="flex h-full">
-          <View className="flex-1 justify-center items-center">
-            <EmptyState
-              title="No tienes cortesías"
-              subtitle="Aún no tienes cortesías disponibles para este evento"
-            />
-          </View>
-        </SafeAreaView>
-      </LinearGradient>
-    );
-  }
-
-  // Callback para manejar la obtención de cortesías
+  // Callbacks
   const handleGetCourtesies = useCallback(async () => {
     try {
       await getCourtesies();
@@ -159,25 +139,23 @@ const Courtesies = () => {
     }
   }, [getCourtesies]);
 
-  // Effect para el polling de cortesías
-  React.useEffect(() => {
-    let intervalId: NodeJS.Timeout | null = null;
-
-    if (!courtesies?.is_validated && activeItem?.id) {
-      intervalId = setInterval(() => {
-        handleGetCourtesies();
-      }, 10 * 1000) as unknown as NodeJS.Timeout;
+  const handleBuyPress = useCallback(() => {
+    if (eventIdString) {
+      router.push(`/(dashboard)/events/${eventIdString}/buy`);
     }
+  }, [eventIdString]);
 
-    return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
+  const viewableItemsChanged = useCallback(
+    ({ viewableItems }: { viewableItems: any[] }) => {
+      if (viewableItems.length > 0) {
+        setActiveItem(viewableItems[0].item);
       }
-    };
-  }, [activeItem?.id, courtesies?.is_validated, handleGetCourtesies]);
+    },
+    []
+  );
 
-  // Effect para actualizar el ticket cuando cambia la cortesía
-  React.useEffect(() => {
+  // Efectos
+  useEffect(() => {
     if (courtesies) {
       updateTicket(courtesies as any);
       if (courtesies.is_validated) {
@@ -189,23 +167,37 @@ const Courtesies = () => {
     }
   }, [courtesies, updateTicket]);
 
-  const viewableItemsChanged = useCallback(
-    ({ viewableItems }: { viewableItems: any[] }) => {
-      if (viewableItems.length > 0) {
-        setActiveItem(viewableItems[0].item);
-      }
-    },
-    []
-  );
+  // Polling effect
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout | null = null;
 
-  // Callback para navegar a comprar
-  const handleBuyPress = useCallback(() => {
-    if (eventId) {
-      router.push(`/(dashboard)/events/${eventId}/buy`);
+    if (!courtesies?.is_validated && activeItem?.courtesy.id) {
+      intervalId = setInterval(() => {
+        handleGetCourtesies();
+      }, POLLING_INTERVAL) as unknown as NodeJS.Timeout;
     }
-  }, [eventId]);
 
-  // Mostrar loading si está cargando
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [activeItem?.courtesy.id, courtesies?.is_validated, handleGetCourtesies]);
+
+  // Early returns
+  if (!isReady || !eventIdString) {
+    return (
+      <LinearGradient colors={["#04121A", "#041e2b"]}>
+        <SafeAreaView className="flex h-full">
+          <View className="flex-1 justify-center items-center">
+            <ActivityIndicator size="large" color={Colors.primary[500]} />
+            <Text className="text-white mt-4">Cargando...</Text>
+          </View>
+        </SafeAreaView>
+      </LinearGradient>
+    );
+  }
+
   if (isLoadingGetCourtesies) {
     return (
       <LinearGradient colors={["#04121A", "#041e2b"]}>
@@ -219,7 +211,6 @@ const Courtesies = () => {
     );
   }
 
-  // Mostrar error si hay un error
   if (error) {
     return (
       <LinearGradient colors={["#04121A", "#041e2b"]}>
@@ -236,10 +227,10 @@ const Courtesies = () => {
             <Text className="text-gray-400 text-center mt-2">{error}</Text>
             <TouchableOpacity
               onPress={() => {
-                // Refetch data
-                if (eventId) {
-                  // Trigger refetch
-                  router.replace(`/(dashboard)/events/${eventId}/courtesies`);
+                if (eventIdString) {
+                  router.replace(
+                    `/(dashboard)/events/${eventIdString}/courtesies`
+                  );
                 }
               }}
               className="mt-4 bg-primary-500 px-6 py-3 rounded-lg"
@@ -252,17 +243,29 @@ const Courtesies = () => {
     );
   }
 
+  if (!user?.courtesies || eventCourtesies.length === 0) {
+    return (
+      <LinearGradient colors={["#04121A", "#041e2b"]}>
+        <SafeAreaView className="flex h-full">
+          <View className="flex-1 justify-center items-center">
+            <EmptyState
+              title="No tienes cortesías"
+              subtitle="Aún no tienes cortesías disponibles para este evento"
+            />
+          </View>
+        </SafeAreaView>
+      </LinearGradient>
+    );
+  }
+
+  // Renderizado principal
   return (
-    <LinearGradient
-      // Background Linear Gradient
-      colors={["#04121A", "#041e2b"]}
-    >
+    <LinearGradient colors={["#04121A", "#041e2b"]}>
       <SafeAreaView className="flex h-full">
         <ScrollView className="flex h-full mt-16">
-          {/* next events */}
           <View className="flex mx-2">
             <Text className="text-white font-bold text-xl mx-2">
-              Tus Tragos
+              Tu cortesía
             </Text>
             <View className="rounded-xl">
               <FlatList
@@ -270,10 +273,14 @@ const Courtesies = () => {
                 pagingEnabled={true}
                 showsHorizontalScrollIndicator={false}
                 onScroll={Animated.event(
-                  [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-                  {
-                    useNativeDriver: false,
-                  }
+                  [
+                    {
+                      nativeEvent: {
+                        contentOffset: { x: new Animated.Value(0) },
+                      },
+                    },
+                  ],
+                  { useNativeDriver: false }
                 )}
                 className="p-2"
                 data={unvalidatedCourtesies}
@@ -282,11 +289,12 @@ const Courtesies = () => {
                 viewabilityConfig={{
                   itemVisiblePercentThreshold: 70,
                 }}
-                keyExtractor={(item: Courtesy) => item.id}
+                keyExtractor={(item: CourtesyEvent) => item.courtesy.id}
                 contentContainerStyle={{
                   alignItems: "stretch",
                 }}
-                renderItem={({ item }: { item: Courtesy }) => {
+                renderItem={({ item }: { item: CourtesyEvent }) => {
+                  console.log("item", JSON.stringify(item, null, 2));
                   const startAt = formatEventDate(item.event.start_at);
 
                   return (
@@ -294,7 +302,9 @@ const Courtesies = () => {
                       style={{ width: Dimensions.get("window").width - 30 }}
                       className="mr-4 bg-white rounded-xl p-4"
                       animation={
-                        activeItem?.id !== item.id ? zoomIn : (zoomOut as any)
+                        activeItem?.courtesy.id !== item.courtesy.id
+                          ? zoomIn
+                          : (zoomOut as any)
                       }
                       duration={500}
                     >
@@ -320,16 +330,18 @@ const Courtesies = () => {
                       </View>
                       <View className="flex p-2 flex-col bg-white rounded-xl items-center justify-center mb-4">
                         <Text className="font-bold text-base mb-4 ">
-                          {item.name}
+                          {item.courtesy.name}
                         </Text>
-                        {item.is_validated ? (
+                        {item.courtesy.is_validated ? (
                           <View className="w-full py-2 bg-primary-400 justify-center items-center rounded-xl mb-4">
                             <Text className="font-bold">Validado</Text>
                           </View>
                         ) : (
                           <Image
                             source={{
-                              uri: `data:image/png;base64,${item.base64}`,
+                              uri: `data:image/png;base64,${
+                                item.courtesy.base64 || ""
+                              }`,
                             }}
                             className="w-[200px] h-[200px] mb-4"
                           />
@@ -346,13 +358,8 @@ const Courtesies = () => {
                 )}
               />
             </View>
-            <ScalingDots
-              data={unvalidatedCourtesies}
-              scrollX={scrollX}
-              inActiveDotColor={Colors.secondary[400]}
-              activeDotColor={Colors.secondary[500]}
-            />
           </View>
+
           <View className="flex flex-row justify-between mt-4 mx-4">
             <TouchableOpacity
               onPress={handleBuyPress}
@@ -371,8 +378,8 @@ const Courtesies = () => {
                 <FlatList
                   scrollEnabled={false}
                   data={validatedCourtesies}
-                  keyExtractor={(item: Courtesy) => item.id}
-                  renderItem={({ item }: { item: Courtesy }) => {
+                  keyExtractor={(item: CourtesyEvent) => item.courtesy.id}
+                  renderItem={({ item }: { item: CourtesyEvent }) => {
                     return (
                       <View className="flex flex-row bg-white rounded-xl p-2">
                         <View className="flex w-1/4 justify-center items-start">
@@ -387,14 +394,14 @@ const Courtesies = () => {
                               numberOfLines={1}
                               className="overflow-hidden font-bold text-md "
                             >
-                              {item.name}
+                              {item.courtesy.name}
                             </Text>
-                            {item?.description && (
+                            {item?.courtesy.description && (
                               <Text
                                 numberOfLines={2}
                                 className="text-secondary-300 text-sm"
                               >
-                                {item.description}
+                                {item.courtesy.description}
                               </Text>
                             )}
                           </View>

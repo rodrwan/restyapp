@@ -21,8 +21,8 @@ const ActionButton: React.FC<ActionButtonProps> = React.memo(
         <Image source={icon} style={{ width, height }} />
       </View>
       <View className="ml-2">
-        <Text className="text-xs text-secondary-300">{count} Disponibles</Text>
-        <Text className="font-bold">{title}</Text>
+        <Text className="text-xs text-white">{count} Disponibles</Text>
+        <Text className="font-bold text-white">{title}</Text>
       </View>
     </TouchableOpacity>
   )

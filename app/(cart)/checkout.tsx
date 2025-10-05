@@ -19,7 +19,7 @@ import * as WebBrowser from "expo-web-browser";
 import Colors from "@/constants/Colors";
 import FormField from "@/components/FormField";
 import CustomButton from "@/components/CustomButton";
-import { MANGO_FEE } from "@/constants";
+import { MANGO_FEE, TERMS_URL } from "@/constants";
 import { validate, format } from "rut.js";
 import useUserStore from "@/stores/useUser";
 import useCartStore from "@/stores/useCart";
@@ -50,6 +50,7 @@ const Checkout = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
+      headerShown: Platform.OS === "ios",
       headerTransparent: true,
       headerTitle: "",
       headerTintColor: Colors.primary[500],
@@ -380,9 +381,7 @@ const Checkout = () => {
                     Debes aceptar los términos y condiciones antes de continuar.
                     <TouchableWithoutFeedback
                       onPress={async () =>
-                        await WebBrowser.openBrowserAsync(
-                          "https://mangoticket-legal.nyc3.cdn.digitaloceanspaces.com/1.%20TERMINOS%20Y%20CONDICIONES%20(1).pdf"
-                        )
+                        await WebBrowser.openBrowserAsync(TERMS_URL)
                       }
                     >
                       <Text className="text-white"> Ver más</Text>
@@ -596,11 +595,7 @@ function WebpayView({ onSubmitWebpay }: any) {
           <Text className="text-center text-white">
             Debes aceptar los términos y condiciones antes de continuar.
             <TouchableWithoutFeedback
-              onPress={async () =>
-                await WebBrowser.openBrowserAsync(
-                  "https://mangoticket-legal.nyc3.cdn.digitaloceanspaces.com/1.%20TERMINOS%20Y%20CONDICIONES%20(1).pdf"
-                )
-              }
+              onPress={async () => await WebBrowser.openBrowserAsync(TERMS_URL)}
             >
               <Text className="text-white"> Ver más</Text>
             </TouchableWithoutFeedback>

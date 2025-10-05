@@ -17,12 +17,12 @@ import Colors from "@/constants/Colors";
 import { router } from "expo-router";
 import useSession from "@/hooks/useSession";
 import useGetEventsFromUser from "@/hooks/useGetEventsFromUser";
-import { useSession as useSessionContext } from "@/context/AuthProvider";
+import { useAuthContext } from "@/context/AuthProvider";
 
 const SignWithGoogle = ({ setUser, redirectTo }: any) => {
   const [isSubmitting, setSubmitting] = useState(false);
   const { createSession, createUser } = useSession();
-  const { signIn } = useSessionContext();
+  const { signIn } = useAuthContext();
   const { getEvents } = useGetEventsFromUser();
 
   useEffect(() => {
@@ -110,7 +110,7 @@ const SignWithGoogle = ({ setUser, redirectTo }: any) => {
 
   return (
     <TouchableOpacity
-      className={`flex flex-row w-[48%] min-h-[60px] bg-white justify-center items-center rounded-xl ${
+      className={`flex flex-row w-full min-h-[60px] bg-white justify-center items-center rounded-xl ${
         Platform.OS !== "ios" ? "w-full" : ""
       }`}
       onPress={() => {

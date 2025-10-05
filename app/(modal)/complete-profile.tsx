@@ -69,11 +69,12 @@ const CompleteProfile = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
+      headerShown: Platform.OS === "ios",
       headerTransparent: true,
       headerTitle: "Completa tu perfil",
       headerTintColor: Colors.primary[500],
     });
-  }, [scrollY]);
+  }, [scrollY, navigation]);
 
   const submit = async () => {
     setSubmitting(true);
@@ -140,11 +141,23 @@ const CompleteProfile = () => {
             <FormField
               title="RUT"
               value={form.dni}
-              handleChangeText={(e: string) =>
-                setForm({ ...form, dni: format(e) })
-              }
+              handleChangeText={(e: string) => {
+                try {
+                  // Solo formatear si el input contiene caracteres válidos para RUT
+                  const cleanInput = e.replace(/[^0-9kK.]/g, "");
+                  if (cleanInput.length <= 15) {
+                    // Límite para RUT con formato (ej: 12.345.678-9)
+                    const formatted = format(cleanInput);
+                    setForm({ ...form, dni: formatted });
+                  }
+                } catch (error) {
+                  // Si hay error en el formateo, usar el valor sin formatear
+                  console.log("Error formatting RUT:", error);
+                  setForm({ ...form, dni: e });
+                }
+              }}
               otherStyles="mt-7"
-              keyboardType="numeric"
+              keyboardType="default"
             />
 
             <View className="mt-4">
