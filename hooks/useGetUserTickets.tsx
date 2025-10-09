@@ -7,7 +7,7 @@ const client = HTTPClient.getInstance();
 const useGetUserTickets = (eventId: string) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { setTickets, user } = useUserStore();
+  const { setTickets, setDrinks, user } = useUserStore();
 
   const getUserTickets = async () => {
     if (!eventId) return;
@@ -26,9 +26,11 @@ const useGetUserTickets = (eventId: string) => {
           event: item.event,
           name: item.event_item.name,
           cover: item.ticket.cover,
+          type: item.event_item.type,
         }));
 
-        setTickets(tickets);
+        setTickets(tickets.filter((ticket: any) => ticket.type === "ENTRANCE"));
+        setDrinks(tickets.filter((ticket: any) => ticket.type === "DRINK"));
         return tickets;
       }
 

@@ -61,13 +61,23 @@
         {
           "iosUrlScheme": "com.googleusercontent.apps.769679276829-og604t40g8f121sikec8vtpogmkq6iie",
           "android": {
-            "compileSdkVersion": 34,
-            "targetSdkVersion": 34,
-            "buildToolsVersion": "34.0.0"
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35,
+            "buildToolsVersion": "35.0.0"
           }
         }
       ],
-      "expo-build-properties",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35,
+            "buildToolsVersion": "35.0.0",
+            "minSdkVersion": 23
+          }
+        }
+      ],
       [
         "expo-local-authentication",
         {

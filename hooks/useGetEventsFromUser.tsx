@@ -74,6 +74,7 @@ const useGetEventsFromUser = () => {
             name: cur?.event_item?.name,
             event: cur?.event,
             cover: cur?.ticket?.cover,
+            type: cur?.event_item?.type,
           };
         }, {});
       });
@@ -93,6 +94,7 @@ const useGetEventsFromUser = () => {
             is_validated: cur?.ticket?.is_validated,
             name: cur?.event_item?.name,
             event: cur?.event,
+            type: cur?.event_item?.type,
           };
         }, {});
       });
@@ -105,8 +107,10 @@ const useGetEventsFromUser = () => {
       };
       // .filter((ticket) => !ticket?.is_validated),
       // .filter((ticket) => !ticket?.is_validated),
-      setTickets(result?.tickets);
-      setDrinks(result?.drinks);
+      setTickets(
+        result?.tickets.filter((ticket) => ticket?.type === "ENTRANCE")
+      );
+      setDrinks(result?.drinks.filter((drink) => drink?.type === "DRINK"));
       setEvents(result?.events);
 
       console.log("useGetEventsFromUser: Success, setting loading to false");

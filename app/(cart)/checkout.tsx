@@ -35,7 +35,6 @@ import useCreatePayment from "@/hooks/useCreatePayment";
 const Checkout = () => {
   const navigation = useNavigation();
   const params: any = useLocalSearchParams();
-  console.log("checkout params", params);
 
   const { orderId } = params;
   const { user }: any = useUserStore();
@@ -59,10 +58,8 @@ const Checkout = () => {
           <TouchableOpacity
             onPress={() => {
               clearTicketToNominate();
-              if (params?.goBackTo) {
-                return router.replace(`/${params?.goBackTo}`);
-              }
-              return router.replace(`/(home)`);
+
+              return router.back();
             }}
             className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2"
           >
@@ -81,10 +78,11 @@ const Checkout = () => {
             onPress={() => {
               clearCart();
               if (params?.goBackTo) {
-                return router.replace(`/${params?.goBackTo}`);
+                router.dismissAll();
+                return router.replace(`/${params?.goBackTo}?canceled=true`);
               }
 
-              return router.replace("/(home)");
+              return router.replace("/(home)?canceled=true");
             }}
             className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2"
           >
@@ -96,7 +94,7 @@ const Checkout = () => {
           </TouchableOpacity>
         ),
     });
-  }, [scrollY]);
+  }, [scrollY, navigation, params, clearCart, clearTicketToNominate]);
 
   React.useEffect(() => {
     (async () => {
@@ -131,6 +129,7 @@ const Checkout = () => {
   };
 
   const { authorizeTransaction } = useAuthorizeTransaction();
+  console.log("event", event);
   const { createInscription } = useCreateInscription(event?.id);
   const { createPayment } = useCreatePayment();
 
@@ -147,7 +146,9 @@ const Checkout = () => {
         const { status } = newPayment;
         if (status === "AUTHORIZED") {
           setLoadingSubmit(false);
-          return router.push(`/(cart)/success?orderId=${orderId}`);
+          return router.push(
+            `/(cart)/success?orderId=${orderId}&eventId=${event?.id}`
+          );
         }
       }
 
@@ -159,7 +160,9 @@ const Checkout = () => {
       const { status } = newPayment;
       if (status === "AUTHORIZED") {
         setLoadingSubmit(false);
-        return router.push(`/(cart)/success?orderId=${orderId}`);
+        return router.push(
+          `/(cart)/success?orderId=${orderId}&eventId=${event?.id}`
+        );
       }
     } catch (error) {
       console.log(">>>>", error);
@@ -220,11 +223,6 @@ const Checkout = () => {
     return nominee?.dni && nominee?.email;
   });
 
-  console.log("installments", installments);
-  console.log("user.tbk_card_type", user?.tbk_card_type);
-  console.log("user.tbk_card_number", user?.tbk_card_number);
-  console.log("user.tbk_user_id", user?.tbk_user_id);
-  console.log(["RedCompra", "PrePago"].includes(user?.tbk_card_type));
   return (
     <LinearGradient
       // Background Linear Gradient

@@ -171,6 +171,7 @@ class Client {
           ApiErrorHandler.logError(error, operationName);
           return { error };
         }
+        // console.log("token", token);
         headers.Authorization = `Bearer ${token}`;
       }
 
@@ -821,116 +822,19 @@ class Client {
     );
   }
 
-  async getUserFirstUpcomingEvent(): Promise<ApiResponse<any>> {
-    const document = gql`
-      query GetUserFirstUpcomingEvent {
-        getUserFirstUpcomingEvent {
-          tickets {
-            id
-            base64
-            event {
-              id
-              name
-              start_at
-              place
-              description
-              image
-            }
-            is_validated
-          }
-          event {
-            id
-            name
-            start_at
-            place
-            image
-            end_hour
-            end_at
-            description
-          }
-          event_item {
-            name
-            type
-            cover
-          }
-        }
-      }
-    `;
-
-    return this.makeRequest(document, {}, "GetUserFirstUpcomingEvent", true);
-  }
-
-  async getUserFirstTodayEvent(): Promise<ApiResponse<any>> {
-    const document = gql`
-      query GetUserFirstUpcomingEvent {
-        getUserFirstUpcomingEvent {
-          tickets {
-            id
-            base64
-            event {
-              id
-              name
-              start_at
-              place
-              description
-              image
-            }
-            is_validated
-          }
-          event {
-            id
-            name
-            start_at
-            place
-            image
-            end_hour
-            end_at
-            description
-          }
-          event_item {
-            name
-            type
-            cover
-          }
-        }
-      }
-    `;
-
-    return this.makeRequest(document, {}, "GetUserFirstUpcomingEvent", true);
-  }
-
   async getUserUpcomingEvents(): Promise<ApiResponse<any>> {
     const document = gql`
       query GetUserUpcomingEvents {
         getUserUpcomingEvents {
-          data {
-            tickets {
-              id
-              base64
-              event {
-                id
-                name
-                start_at
-                place
-                description
-                image
-              }
-              is_validated
-            }
-            event {
-              id
-              name
-              start_at
-              place
-              image
-              end_hour
-              end_at
-              description
-            }
-            event_item {
-              name
-              type
-            }
+          events {
+            id
+            name
+            start_at
+            place
+            image
+            end_hour
+            end_at
+            description
           }
         }
       }

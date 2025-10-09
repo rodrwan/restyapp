@@ -46,7 +46,8 @@ export default function EventCard({ event, imageHeight }: EventCardProps) {
         <Text className="text-md text-secondary-300">
           Desde $
           {Number(
-            event?.items.filter((item) => item?.type === "ENTRANCE")?.[0]?.price
+            event?.items?.filter((item) => item?.type === "ENTRANCE")?.[0]
+              ?.price ?? 0
           ).toLocaleString("es-CL")}
         </Text>
       </View>

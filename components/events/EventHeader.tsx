@@ -5,9 +5,10 @@ import Colors from "@/constants/Colors";
 
 interface EventHeaderProps {
   clearCart: () => void;
+  canceled: boolean;
 }
 
-export function EventHeader({ clearCart }: EventHeaderProps) {
+export function EventHeader({ clearCart, canceled }: EventHeaderProps) {
   if (Platform.OS !== "ios") {
     return <View className="flex flex-row justify-center items-center p-2" />;
   }
@@ -16,7 +17,12 @@ export function EventHeader({ clearCart }: EventHeaderProps) {
     <TouchableOpacity
       onPress={() => {
         clearCart();
-        router.replace("/");
+        console.log("EventHeader canceled", canceled);
+        if (canceled) {
+          router.replace("/(home)");
+        } else {
+          router.back();
+        }
       }}
       className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2"
     >

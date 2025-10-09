@@ -9,7 +9,7 @@ import {
   Dimensions,
   ActivityIndicator,
 } from "react-native";
-import { useCallback, useMemo, useEffect, useState } from "react";
+import React, { useCallback, useMemo, useEffect, useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -168,21 +168,28 @@ const Courtesies = () => {
   }, [courtesies, updateTicket]);
 
   // Polling effect
+  const intervalRef = React.useRef<number | null>(null);
+
   useEffect(() => {
-    let intervalId: NodeJS.Timeout | null = null;
+    // Limpiar interval existente antes de crear uno nuevo
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
 
     if (!courtesies?.is_validated && activeItem?.courtesy.id) {
-      intervalId = setInterval(() => {
+      intervalRef.current = setInterval(() => {
         handleGetCourtesies();
-      }, POLLING_INTERVAL) as unknown as NodeJS.Timeout;
+      }, POLLING_INTERVAL) as unknown as number;
     }
 
     return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
       }
     };
-  }, [activeItem?.courtesy.id, courtesies?.is_validated, handleGetCourtesies]);
+  }, [activeItem?.courtesy.id, courtesies?.is_validated]);
 
   // Early returns
   if (!isReady || !eventIdString) {

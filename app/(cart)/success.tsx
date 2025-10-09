@@ -40,7 +40,7 @@ const SuccessPage = () => {
   const { clearCart } = useCartStore();
   const { getEvents }: any = useGetEventsFromUser();
   const { getOrderById, loading, data }: any = useGetOrderById();
-  const { orderId } = useLocalSearchParams();
+  const { orderId, eventId } = useLocalSearchParams();
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -48,21 +48,7 @@ const SuccessPage = () => {
       headerTransparent: true,
       headerTitle: "Pago exitoso",
       headerTintColor: Colors.primary[500],
-      headerLeft: () =>
-        Platform.OS === "ios" ? (
-          <TouchableOpacity
-            onPress={() => navigation?.goBack()}
-            className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2"
-          >
-            <Ionicons
-              name="chevron-back-outline"
-              size={20}
-              color={Colors.primary[500]}
-            />
-          </TouchableOpacity>
-        ) : (
-          <View />
-        ),
+      headerLeft: () => <View />,
       headerRight: () => (
         <TouchableOpacity
           onPress={() => router.push("/menu")}
@@ -72,7 +58,7 @@ const SuccessPage = () => {
         </TouchableOpacity>
       ),
     });
-  }, []);
+  }, [eventId, navigation]);
 
   React.useEffect(() => {
     clearCart();
@@ -80,7 +66,7 @@ const SuccessPage = () => {
 
   React.useEffect(() => {
     getOrderById(orderId);
-  }, [orderId]);
+  }, [orderId, getOrderById]);
 
   if (loading) {
     return (

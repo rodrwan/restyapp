@@ -158,6 +158,7 @@ const CompleteProfile = () => {
               }}
               otherStyles="mt-7"
               keyboardType="default"
+              autoComplete="true"
             />
 
             <View className="mt-4">

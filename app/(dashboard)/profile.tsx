@@ -77,6 +77,8 @@ const ProfilePage = () => {
           </View>
         </ScrollView>
 
+        {profileIncomplete && <ProfileBanner onPress={handleCompleteProfile} />}
+
         {/* Botón al final de la pantalla */}
         <View className="px-4 pb-8">
           <TouchableOpacity
@@ -88,8 +90,6 @@ const ProfilePage = () => {
             </Text>
           </TouchableOpacity>
         </View>
-
-        {profileIncomplete && <ProfileBanner onPress={handleCompleteProfile} />}
       </View>
     </LinearGradient>
   );

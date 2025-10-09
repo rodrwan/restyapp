@@ -12,6 +12,7 @@ export interface Ticket {
   base64: string;
   event: Event;
   is_validated: boolean;
+  type: string;
 }
 
 export interface Drink {
@@ -19,6 +20,7 @@ export interface Drink {
   base64: string;
   event: Event;
   is_validated: boolean;
+  type: string;
 }
 
 export interface CourtesyEvent {
@@ -32,6 +34,7 @@ export interface Courtesy {
   description?: string;
   base64: string;
   is_validated: boolean;
+  type: string;
 }
 
 export interface User {
@@ -51,5 +54,10 @@ export interface User {
 }
 
 export interface UpcomingEvent {
-  event: Event;
+  id: string;
+  name: string;
+  description: string;
+  image: string;
+  start_at: string;
+  place: string;
 }

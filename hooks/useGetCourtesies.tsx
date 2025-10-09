@@ -1,5 +1,5 @@
 import { Alert } from "react-native";
-import { useEffect, useRef, useState, useCallback } from "react";
+import React from "react";
 import HTTPClient from "@/lib/api";
 import { Courtesy } from "@/components/dashboard/types";
 import useUserStore from "@/stores/useUser";
@@ -15,26 +15,27 @@ interface UseGetCourtesiesReturn {
 }
 
 const useGetCourtesies = (eventId: string): UseGetCourtesiesReturn => {
-  const [data, setData] = useState<Courtesy | null>(null);
-  const [isLoadingGetCourtesies, setLoading] = useState(false); // Start with false
-  const [error, setError] = useState<string | null>(null);
+  const [data, setData] = React.useState<Courtesy | null>(null);
+  const [isLoadingGetCourtesies, setLoading] = React.useState(false); // Start with false
+  const [error, setError] = React.useState<string | null>(null);
   const { setCourtesies } = useUserStore();
 
-  const getCourtesies = useCallback(async () => {
-    console.log("getCourtesies called with eventId:", eventId);
+  const getCourtesies = React.useCallback(async () => {
+    if (!eventId || eventId.trim() === "" || eventId === "default") {
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await client.getCourtesies(eventId);
-      console.log("getCourtesies response:", res);
       if (res?.error?.message === "session has expired") {
         throw new Error("expired session");
       }
       setData(res.data.getCourtesies.data);
-      // console.log(">>>> res.data", res.data.getCourtesies.data);
       setCourtesies(res.data.getCourtesies.data);
     } catch (err: any) {
-      console.log("getCourtesies error:", err);
-      // console.error("Error getting courtesy:", err);
       const errorMessage =
         err?.response?.errors?.[0]?.message === "session has expired"
           ? "expired session"
@@ -47,27 +48,12 @@ const useGetCourtesies = (eventId: string): UseGetCourtesiesReturn => {
           "Tu sesión ha expirado. Por favor, inicia sesión nuevamente."
         );
       }
-      throw new Error(errorMessage);
     } finally {
       setLoading(false);
     }
   }, [eventId, setCourtesies]);
 
-  useEffect(() => {
-    if (eventId && eventId.trim() !== "" && eventId !== "default") {
-      console.log(
-        "useGetCourtesies: Valid eventId found, calling getCourtesies"
-      );
-      getCourtesies();
-    } else {
-      console.log("useGetCourtesies: No valid eventId, skipping call");
-      // Si no hay eventId válido, no hacer nada y limpiar loading
-      setLoading(false);
-      setError(null);
-    }
-  }, [eventId, getCourtesies]);
-
-  const refetch = useCallback(() => getCourtesies(), [getCourtesies]);
+  const refetch = React.useCallback(() => getCourtesies(), [getCourtesies]);
 
   return {
     data,

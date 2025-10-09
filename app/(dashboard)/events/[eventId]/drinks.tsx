@@ -43,6 +43,7 @@ const zoomOut = {
 
 const Drinks = () => {
   const { eventId }: any = useLocalSearchParams();
+  console.log("Drinks eventId", eventId);
   const navigation = useNavigation();
   const scrollX = React.useRef(new Animated.Value(0)).current;
   const { user, updateTicket } = useUserStore();
@@ -76,27 +77,29 @@ const Drinks = () => {
 
   const [activeItem, setActiveItem] = React.useState<any>(user?.drinks?.[0]);
 
+  const intervalRef = React.useRef<number | null>(null);
+
   React.useEffect(() => {
-    let intervalId: number | null = null;
+    // Limpiar interval existente antes de crear uno nuevo
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
 
     if (!ticketFound?.is_validated && activeItem?.item?.id) {
-      // Limpiar cualquier intervalo existente antes de crear uno nuevo
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
-
-      intervalId = setInterval(async () => {
+      intervalRef.current = setInterval(async () => {
         try {
           await getTicket(activeItem.item.id);
         } catch (error) {
-          console.error("Error al obtener ticket:", error);
+          // Error silencioso
         }
-      }, 10 * 1000);
+      }, 10 * 1000) as unknown as number;
     }
 
     return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
       }
     };
   }, [activeItem?.item?.id, ticketFound?.is_validated]);
@@ -153,9 +156,12 @@ const Drinks = () => {
                 className="p-2"
                 data={user?.drinks
                   ?.filter((drink) => drink.event?.id === eventId)
-                  .filter((drink) => {
+                  ?.filter((drink: any) => !drink.is_validated)
+                  ?.filter((drink) => {
                     return !drink.is_validated;
-                  })}
+                  })
+                  .sort((a: any, b: any) => a.type - b.type)
+                  .sort((a: any, b: any) => a.is_validated - b.is_validated)}
                 onViewableItemsChanged={viewableItemsChanged}
                 contentOffset={{ x: 0, y: 0 }}
                 viewabilityConfig={{

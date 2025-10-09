@@ -22,7 +22,7 @@ import useGetEventsFromUser from "@/hooks/useGetEventsFromUser";
 import useUserStore from "@/stores/useUser";
 import Toast from "react-native-toast-message";
 import { LinearGradient } from "expo-linear-gradient";
-import useGetUserFirstUpcomingEvent from "@/hooks/useGetUserFirstUpcomingEvent";
+import useGetUserFirstUpcomingEvent from "@/hooks/useGetUserUpcomingEvents";
 import { useAuthContext } from "@/context/AuthProvider";
 import { POLICY_URL } from "@/constants";
 import * as WebBrowser from "expo-web-browser";

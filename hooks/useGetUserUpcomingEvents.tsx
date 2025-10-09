@@ -6,15 +6,15 @@ import React from "react";
 
 const client = HTTPClient.getInstance();
 
-const GetUserFirstUpcomingEvent = () => {
+const useGetUserUpcomingEvents = () => {
   const [loadingUpcomingEvent, setLoadingUpcomingEvent] = React.useState(false);
   const { setUpcomingEvent } = useUserStore();
 
-  const getUserFirstUpcomingEvent = React.useCallback(async () => {
+  const getUserUpcomingEvents = React.useCallback(async () => {
     setLoadingUpcomingEvent(true);
     try {
-      const result = await client.getUserFirstUpcomingEvent();
-      setUpcomingEvent(result?.data?.getUserFirstUpcomingEvent);
+      const result = await client.getUserUpcomingEvents();
+      setUpcomingEvent(result?.data?.getUserUpcomingEvents?.events);
       setLoadingUpcomingEvent(false);
       return result;
     } catch (err: any) {
@@ -23,7 +23,7 @@ const GetUserFirstUpcomingEvent = () => {
     }
   }, [setUpcomingEvent]);
 
-  return { loadingUpcomingEvent, getUserFirstUpcomingEvent };
+  return { loadingUpcomingEvent, getUserUpcomingEvents };
 };
 
-export default GetUserFirstUpcomingEvent;
+export default useGetUserUpcomingEvents;

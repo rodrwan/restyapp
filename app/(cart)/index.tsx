@@ -21,6 +21,7 @@ const Cart = () => {
   } = useCartStore();
   const { session } = useAuthContext();
   const params: any = useLocalSearchParams();
+  console.log("Cart params", params);
 
   React.useEffect(() => {
     if (!session) {
@@ -40,10 +41,7 @@ const Cart = () => {
         Platform.OS === "ios" ? (
           <TouchableOpacity
             onPress={() => {
-              if (params?.goBackTo) {
-                return router.replace(`/${params?.goBackTo}`);
-              }
-              return router.replace(`/(home)`);
+              return router.back();
             }}
             className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2"
           >
@@ -61,9 +59,9 @@ const Cart = () => {
           onPress={() => {
             clearCart();
             if (params?.goBackTo) {
-              return router.replace(`/${params?.goBackTo}`);
+              return router.replace(`/${params?.goBackTo}?canceled=true`);
             }
-            return router.replace(`/(home)`);
+            return router.replace(`/(home)?canceled=true`);
           }}
           className="flex flex-row items-center rounded-full border border-primary-400 justify-center items-center p-2"
         >
@@ -75,7 +73,7 @@ const Cart = () => {
         </TouchableOpacity>
       ),
     });
-  }, []);
+  }, [navigation, params, clearCart]);
 
   const onSubmit = async () => {
     try {
@@ -89,13 +87,13 @@ const Cart = () => {
       const newOrder = await create(itemsInCart);
       console.log("newOrder", newOrder, !newOrder);
       if (!newOrder) {
-        return router.push(
-          `/(auth)/sign-in?redirectTo=(cart)?goBackTo=${params?.goBackTo}`
+        return router.replace(
+          `/(auth)/sign-in?redirectTo=(cart)?goBackTo=${params?.goBackTo}&eventId=${params?.eventId}`
         );
       }
       if (newOrder?.length === 0) {
-        return router.push(
-          `/(auth)/sign-in?redirectTo=(cart)?goBackTo=${params?.goBackTo}`
+        return router.replace(
+          `/(auth)/sign-in?redirectTo=(cart)?goBackTo=${params?.goBackTo}&eventId=${params?.eventId}`
         );
       }
 
@@ -103,7 +101,7 @@ const Cart = () => {
         newOrder.items.filter((item: any) => item.type === "ENTRANCE")
       );
       return router.push(
-        `/(cart)/checkout?orderId=${newOrder.id}&goBackTo=${params?.goBackTo}`
+        `/(cart)/checkout?orderId=${newOrder.id}&goBackTo=${params?.goBackTo}&eventId=${params?.eventId}`
       );
     } catch (error) {
       console.log(">>>", error);

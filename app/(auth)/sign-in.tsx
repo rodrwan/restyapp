@@ -22,7 +22,7 @@ import { Ionicons } from "@expo/vector-icons";
 import useSession from "@/hooks/useSession";
 import useGetEventsFromUser from "@/hooks/useGetEventsFromUser";
 import Toast from "react-native-toast-message";
-import useGetUserFirstUpcomingEvent from "@/hooks/useGetUserFirstUpcomingEvent";
+import useGetUserUpcomingEvents from "@/hooks/useGetUserUpcomingEvents";
 import { LinearGradient } from "expo-linear-gradient";
 import { useAuthContext } from "@/context/AuthProvider";
 import SignWithApple from "@/components/SignWithApple";
@@ -33,7 +33,7 @@ const SignIn = () => {
   const { createSession } = useSession();
   const { signIn } = useAuthContext();
   const { getEvents } = useGetEventsFromUser();
-  const { getUserFirstUpcomingEvent } = useGetUserFirstUpcomingEvent();
+  const { getUserUpcomingEvents } = useGetUserUpcomingEvents();
 
   const navigation = useNavigation();
   const params: any = useLocalSearchParams();
@@ -101,7 +101,7 @@ const SignIn = () => {
 
       signIn(sessionResp.access_token);
       getEvents();
-      getUserFirstUpcomingEvent();
+      getUserUpcomingEvents();
 
       return router.replace(`/${params?.redirectTo ?? "(dashboard)"}`);
     } catch (err: any) {
@@ -183,7 +183,7 @@ const SignIn = () => {
 
             <View className="flex flex-row items-center justify-center mt-6">
               <Text className="text-sm text-gray-100 font-pregular text-center">
-                Al iniciar sesión con Google o Apple, aceptas nuestras{" "}
+                Al iniciar sesión con Google, aceptas nuestras{" "}
                 <TouchableWithoutFeedback
                   onPress={async () => {
                     await WebBrowser.openBrowserAsync(TERMS_URL);
@@ -193,7 +193,7 @@ const SignIn = () => {
                     Condiciones de uso
                   </Text>
                 </TouchableWithoutFeedback>{" "}
-                y nuestra{" "}
+                y
                 <TouchableWithoutFeedback
                   onPress={async () => {
                     await WebBrowser.openBrowserAsync(POLICY_URL);

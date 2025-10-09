@@ -9,10 +9,10 @@ import EventCard from "./components/EventCard";
 import { useAuthContext } from "@/context/AuthProvider";
 import useUserStore from "@/stores/useUser";
 import HomeUpcomingEvent from "@/components/dashboard/HomeUpcomingEvent";
-import useGetUserFirstUpcomingEvent from "@/hooks/useGetUserFirstUpcomingEvent";
 import { useSession as useSessionStore } from "@/stores/useSession";
 import Colors from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
+import useGetUserUpcomingEvents from "@/hooks/useGetUserUpcomingEvents";
 
 export default function HomePage() {
   const { data, refetch } = useGetEventsWithPagination();
@@ -20,8 +20,8 @@ export default function HomePage() {
   const { width } = useWindowDimensions();
   const { session } = useAuthContext();
   const { isAuthenticated } = useSessionStore();
-  const { upcomingEvent } = useUserStore();
-  const { getUserFirstUpcomingEvent } = useGetUserFirstUpcomingEvent();
+  const { upcomingEvents } = useUserStore();
+  const { getUserUpcomingEvents } = useGetUserUpcomingEvents();
 
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -33,9 +33,9 @@ export default function HomePage() {
   // useAuth en _layout.tsx ya se encarga de verificar la validez de la sesión
   React.useEffect(() => {
     if (isAuthenticated) {
-      getUserFirstUpcomingEvent();
+      getUserUpcomingEvents();
     }
-  }, [isAuthenticated, getUserFirstUpcomingEvent]);
+  }, [isAuthenticated, getUserUpcomingEvents]);
 
   const imageHeight = useMemo(() => width - 32, [width]); // 16px padding on each side
   const sortedEvents = useMemo(() => (data ?? []).sort(sortByStartAt), [data]);
@@ -85,8 +85,8 @@ export default function HomePage() {
 
   return (
     <LinearGradient colors={["#04121A", "#041e2b"]} className="flex-1">
-      {session && upcomingEvent && upcomingEvent?.event?.id !== "" ? ( // if session is true and we have data, show the upcomming event section
-        <HomeUpcomingEvent upcomingEvent={upcomingEvent} />
+      {session && upcomingEvents?.length > 0 ? ( // if session is true and we have data, show the upcomming event section
+        <HomeUpcomingEvent upcomingEvents={upcomingEvents} />
       ) : null}
       <FlatList
         className="flex-1"

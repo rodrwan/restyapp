@@ -52,6 +52,7 @@ const TicketPage = () => {
     tickets,
     error,
   } = useGetUserTickets(eventId);
+
   const scrollX = React.useRef(new Animated.Value(0)).current;
   const { data: ticketFound, getTicket }: any = useGetTicketById();
   const [scrollY, setScrollY] = React.useState(0);
@@ -110,25 +111,31 @@ const TicketPage = () => {
   }, [tickets, activeItem]);
 
   React.useEffect(() => {
+    // Limpiar interval existente antes de crear uno nuevo
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
     // Solo crear interval si el ticket no está validado y tenemos un activeItem
     if (!ticketFound?.is_validated && activeItem?.id) {
       intervalRef.current = setInterval(async () => {
         try {
           await getTicket(activeItem.id);
         } catch (error) {
-          // console.error("Error al obtener ticket:", error);
+          // Error silencioso
         }
-      }, 10 * 1000);
+      }, 10 * 1000) as unknown as number;
     }
 
-    // Cleanup function - esto se ejecuta cuando el componente se desmonta
+    // Cleanup function - se ejecuta cuando el componente se desmonta o cuando cambian las dependencias
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
     };
-  }, [activeItem?.id, ticketFound?.is_validated, getTicket]); // Added getTicket back
+  }, [activeItem?.id, ticketFound?.is_validated]); // Removí getTicket de las dependencias
 
   React.useEffect(() => {
     if (ticketFound) {
@@ -204,7 +211,13 @@ const TicketPage = () => {
                       }
                     )}
                     className="p-2 h-full"
-                    data={tickets}
+                    data={tickets
+                      .filter((item: any) => !item.is_validated)
+                      .filter((item: any) => item.type === "ENTRANCE")
+                      .sort((a: any, b: any) => a.type - b.type)
+                      .sort(
+                        (a: any, b: any) => a.is_validated - b.is_validated
+                      )}
                     onViewableItemsChanged={viewableItemsChanged}
                     contentOffset={{ x: 0, y: 0 }}
                     viewabilityConfig={{
@@ -325,7 +338,9 @@ const TicketPage = () => {
                 )}
               </View>
               <ScalingDots
-                data={tickets}
+                data={tickets
+                  .filter((item: any) => !item.is_validated)
+                  .filter((item: any) => item.type === "ENTRANCE")}
                 scrollX={scrollX}
                 inActiveDotColor={Colors.secondary[400]}
                 activeDotColor={Colors.secondary[500]}
@@ -334,17 +349,9 @@ const TicketPage = () => {
             <View className="flex flex-row justify-between mt-4 mx-1">
               <TouchableOpacity
                 onPress={() =>
-                  router.push(`/(dashboard)/events/${eventId}/drinks`)
-                }
-                className="py-4 bg-success-100 justify-center items-center my-4 rounded-xl w-[45%]"
-              >
-                <Text className="font-bold text-secondary-500">Barra</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() =>
                   router.push(`/(dashboard)/events/${eventId}/buy`)
                 }
-                className="py-4 bg-success-100 justify-center items-center my-4 rounded-xl w-[45%]"
+                className="py-4 bg-success-100 justify-center items-center my-4 rounded-xl w-full"
               >
                 <Text className="font-bold text-secondary-500">Comprar</Text>
               </TouchableOpacity>

@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import React, { useLayoutEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { router, useNavigation } from "expo-router";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import * as Animatable from "react-native-animatable";
 
 import useUserStore from "@/stores/useUser";
@@ -42,6 +42,7 @@ const TicketsPage = () => {
   const navigation = useNavigation();
   const scrollX = React.useRef(new Animated.Value(0)).current;
   const { user } = useUserStore();
+  const { eventId } = useLocalSearchParams();
 
   useLayoutEffect(() => {
     navigation.setOptions({

@@ -12,26 +12,33 @@ import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import Colors from "@/constants/Colors";
-import useUserStore from "@/stores/useUser";
 import useCartStore from "@/stores/useCart";
 import useGetEventById from "@/hooks/useGetEventById";
 import { LinearGradient } from "expo-linear-gradient";
 import LoadingScreen from "@/components/LoadingScreen";
+import useEventStore from "@/stores/useEvent";
 
 const Buy = () => {
+  const { setEvent } = useEventStore();
   const { eventId }: any = useLocalSearchParams();
+  console.log("Buy eventId", eventId);
   const navigation = useNavigation<any>();
-  const { user } = useUserStore();
+
   const {
     items: itemsInCart,
     addToCart,
     removeFromCart,
     clearCart,
   } = useCartStore();
+
   const {
     data: { event },
     loading: loadingEvent,
   }: any = useGetEventById(eventId);
+
+  React.useEffect(() => {
+    setEvent(event);
+  }, [event]);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -60,7 +67,7 @@ const Buy = () => {
         </TouchableOpacity>
       ),
     });
-  }, []);
+  }, [navigation, clearCart]);
 
   // Mostrar loading mientras se carga el evento
   if (loadingEvent) {

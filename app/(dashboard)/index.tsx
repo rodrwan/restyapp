@@ -4,7 +4,7 @@ import { LinearGradient } from "expo-linear-gradient";
 
 import useUserStore from "@/stores/useUser";
 import useGetEventsFromUser from "@/hooks/useGetEventsFromUser";
-import useGetUserFirstUpcomingEvent from "@/hooks/useGetUserFirstUpcomingEvent";
+import useGetUserUpcomingEvents from "@/hooks/useGetUserUpcomingEvents";
 
 // Import components from local components folder
 import {
@@ -21,61 +21,67 @@ interface HomePageProps {}
 
 // Main Component
 const HomePage: React.FC<HomePageProps> = () => {
-  const { loadingUpcomingEvent, getUserFirstUpcomingEvent } =
-    useGetUserFirstUpcomingEvent();
-  const { user, upcomingEvent } = useUserStore();
+  const { loadingUpcomingEvent, getUserUpcomingEvents } =
+    useGetUserUpcomingEvents();
+  const { user, upcomingEvents } = useUserStore();
   const { loadingGetEvents, getEvents } = useGetEventsFromUser();
-  // Solo inicializar useGetCourtesies si tenemos un eventId válido
   const { isLoadingGetCourtesies, getCourtesies } = useGetCourtesies(
-    upcomingEvent?.event?.id || ""
+    upcomingEvents?.[0]?.id || ""
   );
 
-  // Effects - Run only once on mount to prevent infinite loop
+  // Track if courtesies have been loaded
+  const hasLoadedCourtesiesRef = React.useRef(false);
+
+  // Effects - Load data on mount
   React.useEffect(() => {
     getEvents();
-    getUserFirstUpcomingEvent();
-  }, [getEvents, getUserFirstUpcomingEvent]);
+    getUserUpcomingEvents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  // Separate effect for courtesies - only run when we have a valid eventId
+  // Load courtesies only once when upcomingEvents is available
+  const eventId = upcomingEvents?.[0]?.id;
   React.useEffect(() => {
-    if (upcomingEvent?.event?.id && upcomingEvent.event.id.trim() !== "") {
+    if (eventId && eventId.trim() !== "" && !hasLoadedCourtesiesRef.current) {
+      hasLoadedCourtesiesRef.current = true;
       getCourtesies();
     }
-  }, [upcomingEvent?.event?.id, getCourtesies]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [eventId]);
 
   // Callbacks
   const handleRefresh = useCallback(() => {
-    getUserFirstUpcomingEvent();
-  }, [getUserFirstUpcomingEvent]);
+    hasLoadedCourtesiesRef.current = false;
+    getUserUpcomingEvents();
+  }, [getUserUpcomingEvents]);
 
   // Memoized values
   const hasValidEventId =
-    upcomingEvent?.event?.id && upcomingEvent.event.id.trim() !== "";
+    upcomingEvents?.[0]?.id && upcomingEvents[0]?.id.trim() !== "";
   const isLoading =
     loadingGetEvents ||
     loadingUpcomingEvent ||
     (hasValidEventId && isLoadingGetCourtesies);
-
   const hasUpcomingEvent = useMemo(() => {
     // Verificar que el evento existe Y tiene datos válidos (no vacíos)
-    const hasEvent = !!upcomingEvent?.event;
+    const hasEvent = !!upcomingEvents?.[0];
     const hasValidId =
-      upcomingEvent?.event?.id && upcomingEvent.event.id.trim() !== "";
+      upcomingEvents?.[0]?.id && upcomingEvents[0]?.id.trim() !== "";
     const hasValidName =
-      upcomingEvent?.event?.name && upcomingEvent.event.name.trim() !== "";
+      upcomingEvents?.[0]?.name && upcomingEvents[0]?.name.trim() !== "";
 
     const result = hasEvent && hasValidId && hasValidName;
 
     return result;
-  }, [upcomingEvent?.event]);
+  }, [upcomingEvents]);
 
   const nextEvents = useMemo(() => {
-    if (!user?.events || !upcomingEvent?.event?.id) return [];
+    if (!user?.events || !upcomingEvents?.[0]?.id) return [];
 
     return user.events
-      .filter((event) => event.id !== upcomingEvent.event.id)
+      .filter((event) => event.id !== upcomingEvents[0]?.id)
       .filter(isEventPast);
-  }, [user?.events, upcomingEvent?.event?.id]);
+  }, [user?.events, upcomingEvents]);
 
   // Loading state - only show full loading screen if both are loading
   if (isLoading) {
@@ -101,7 +107,7 @@ const HomePage: React.FC<HomePageProps> = () => {
         {!hasUpcomingEvent ? (
           <EmptyEventsState />
         ) : (
-          <UpcomingEvent upcomingEvent={upcomingEvent} user={user!} />
+          <UpcomingEvent upcomingEvent={upcomingEvents[0]} user={user!} />
         )}
 
         <NextEventsSection events={nextEvents} />

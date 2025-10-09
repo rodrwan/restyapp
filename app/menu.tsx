@@ -179,7 +179,10 @@ const MenuPage = () => {
           color={Colors.primary[500]}
         />
       ),
-      onPress: () => router.replace("/"),
+      onPress: () => {
+        router.dismissAll();
+        router.replace("/");
+      },
     },
     {
       label: "Mis eventos",
@@ -190,14 +193,20 @@ const MenuPage = () => {
           color={Colors.primary[500]}
         />
       ),
-      onPress: () => router.replace("/(dashboard)"),
+      onPress: () => {
+        router.dismissAll();
+        router.replace("/(dashboard)");
+      },
     },
     {
       label: "Mi cuenta",
       icon: (
         <Ionicons name="person-outline" size={32} color={Colors.primary[500]} />
       ),
-      onPress: () => router.replace("/(dashboard)/profile"),
+      onPress: () => {
+        router.dismissAll();
+        router.replace("/(dashboard)/profile");
+      },
     },
   ];
 

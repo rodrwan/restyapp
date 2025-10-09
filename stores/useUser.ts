@@ -5,6 +5,7 @@ interface Ticket {
   base64: string;
   event: Event;
   is_validated: boolean;
+  type: string;
 }
 
 interface Drink {
@@ -12,7 +13,9 @@ interface Drink {
   base64: string;
   event: Event;
   is_validated: boolean;
+  type: string;
 }
+
 interface CourtesyEvent {
   courtesy: Courtesy;
   event: Event;
@@ -24,6 +27,7 @@ interface Courtesy {
   description?: string;
   base64: string;
   is_validated: boolean;
+  type: string;
 }
 
 interface Event {
@@ -54,7 +58,7 @@ interface User {
 interface Store {
   user: User;
   upcomingEventFetched: boolean;
-  upcomingEvent: any;
+  upcomingEvents: any[];
   setUser: (user: User | null) => void;
   setTickets: (tickets: Ticket[]) => void;
   setDrinks: (drinks: Drink[]) => void;
@@ -64,7 +68,7 @@ interface Store {
     cardNumber: string,
     cardType: string
   ) => void;
-  setUpcomingEvent: (event: any) => void;
+  setUpcomingEvent: (events: any[]) => void;
   setTodayEvent: (event: any) => void;
   updateTicket: (ticket: Ticket) => void;
   setCourtesies: (courtesies: CourtesyEvent[]) => void;
@@ -89,7 +93,7 @@ const initialState = {
 
 const useUserStore = create<Store>((set) => ({
   user: initialState,
-  upcomingEvent: {},
+  upcomingEvents: [],
   upcomingEventFetched: false,
   todayEvent: {},
   todayEventFetched: false,
@@ -123,10 +127,10 @@ const useUserStore = create<Store>((set) => ({
       ...state,
       user: { ...state.user, tbk_card_type: cardType },
     })),
-  setUpcomingEvent: (event: any) => {
+  setUpcomingEvent: (events: any[]) => {
     set((state) => ({
       ...state,
-      upcomingEvent: event,
+      upcomingEvents: events,
       upcomingEventFetched: true,
     }));
   },

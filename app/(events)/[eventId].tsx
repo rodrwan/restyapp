@@ -8,7 +8,7 @@ import {
   Platform,
 } from "react-native";
 import React, { useLayoutEffect, useRef } from "react";
-import { useLocalSearchParams, useNavigation } from "expo-router";
+import { useLocalSearchParams, useNavigation, router } from "expo-router";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
@@ -33,17 +33,20 @@ export default function EventPage() {
     clearCart,
   } = useCartStore();
 
+  const { eventId, canceled }: any = useLocalSearchParams();
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerShown: Platform.OS === "ios",
       headerTransparent: true,
       headerTitle: "",
       headerTintColor: Colors.primary[500],
-      headerLeft: () => <EventHeader clearCart={clearCart} />,
+      headerLeft: () => (
+        <EventHeader clearCart={clearCart} canceled={canceled} />
+      ),
     });
-  }, []);
+  }, [navigation, canceled, clearCart]);
 
-  const { eventId }: any = useLocalSearchParams();
   const {
     data: { event },
     loading,
@@ -52,6 +55,7 @@ export default function EventPage() {
   React.useEffect(() => {
     setEvent(event);
   }, [event]);
+
   if (!eventId || loading) {
     return (
       <LinearGradient
@@ -208,11 +212,7 @@ export default function EventPage() {
           <TouchableOpacity
             activeOpacity={0.9}
             onPress={() => {
-              navigation.replace("(cart)", {
-                screen: "index",
-                initial: false,
-                params: { goBackTo: `(events)/${eventId}` },
-              });
+              router.push(`/(cart)?goBackTo=(events)/${eventId}`);
             }}
             className="bg-primary-400 w-[90%] mx-auto left-0 right-0 p-4 rounded-3xl items-center justify-center border border-primary-700 content-center"
           >
