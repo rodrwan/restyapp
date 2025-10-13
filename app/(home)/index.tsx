@@ -79,10 +79,10 @@ export default function HomePage() {
 
   return (
     <LinearGradient colors={["#04121A", "#041e2b"]} className="flex-1">
+      <FoodFlatList />
       {session && upcomingEvents?.length > 0 ? ( // if session is true and we have data, show the upcomming event section
         <HomeUpcomingEvent upcomingEvents={upcomingEvents} />
       ) : null}
-      <FoodFlatList />
       <FlatList
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 16 }}
