@@ -1,18 +1,21 @@
 import { View, FlatList, useWindowDimensions, Text } from "react-native";
 import React, { useState, useCallback, useMemo } from "react";
 import { LinearGradient } from "expo-linear-gradient";
+
+import { useAuthContext } from "@/context/AuthProvider";
+import useUserStore from "@/stores/useUser";
+import { useSession as useSessionStore } from "@/stores/useSession";
+
+import HomeUpcomingEvent from "@/components/dashboard/HomeUpcomingEvent";
+import FoodFlatList from "@/components/food/FoodFlatList";
 import EmptyState from "@/components/EmptyState";
+
 import useGetEventsWithPagination from "@/hooks/useGetEvents";
+import useGetUserUpcomingEvents from "@/hooks/useGetUserUpcomingEvents";
+
 import { Event } from "./types";
 import { sortByStartAt } from "./utils";
 import EventCard from "./components/EventCard";
-import { useAuthContext } from "@/context/AuthProvider";
-import useUserStore from "@/stores/useUser";
-import HomeUpcomingEvent from "@/components/dashboard/HomeUpcomingEvent";
-import { useSession as useSessionStore } from "@/stores/useSession";
-import Colors from "@/constants/Colors";
-import { Ionicons } from "@expo/vector-icons";
-import useGetUserUpcomingEvents from "@/hooks/useGetUserUpcomingEvents";
 
 export default function HomePage() {
   const { data, refetch } = useGetEventsWithPagination();
@@ -56,21 +59,12 @@ export default function HomePage() {
   const renderHeader = useCallback(
     () => (
       <View style={{ paddingHorizontal: 8, paddingVertical: 16 }}>
-        {session ? (
-          <Text className="text-white font-bold text-2xl mx-2">
-            Más Eventos{" "}
-            <Ionicons
-              name="add-outline"
-              size={20}
-              color={Colors.primary[500]}
-            />
-          </Text>
-        ) : (
-          <Text className="text-white font-bold text-2xl mx-2">Eventos</Text>
-        )}
+        <Text className="text-white font-bold text-2xl mx-2">
+          ¿Tienes planes para hoy?
+        </Text>
       </View>
     ),
-    [session]
+    []
   );
 
   const renderEmpty = useCallback(
@@ -88,6 +82,7 @@ export default function HomePage() {
       {session && upcomingEvents?.length > 0 ? ( // if session is true and we have data, show the upcomming event section
         <HomeUpcomingEvent upcomingEvents={upcomingEvents} />
       ) : null}
+      <FoodFlatList />
       <FlatList
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 16 }}

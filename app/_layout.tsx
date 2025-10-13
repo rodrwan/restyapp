@@ -56,6 +56,7 @@ function RootLayoutNav() {
         <Stack.Screen name="(events)" options={{ headerShown: false }} />
         <Stack.Screen name="(cart)" options={{ headerShown: false }} />
         <Stack.Screen name="(dashboard)" options={{ headerShown: false }} />
+        <Stack.Screen name="(rest)" options={{ headerShown: false }} />
         <Stack.Screen name="menu" />
 
         <Stack.Screen
