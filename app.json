@@ -38,8 +38,8 @@
           {
             "CFBundleURLSchemes": [
               "com.googleusercontent.apps.769679276829-og604t40g8f121sikec8vtpogmkq6iie",
-              "mangoticket",
-              "com.mangoticket.mangoticketapp"
+              "resty",
+              "com.resty.restyapp"
             ]
           }
         ],
@@ -50,7 +50,7 @@
         }
       },
       "associatedDomains": [
-        "applinks:spotlight.mangoticket.com"
+        "applinks:resty.com"
       ],
       "appleTeamId": "P98BMU72AA"
     },
@@ -114,7 +114,7 @@
       [
         "expo-local-authentication",
         {
-          "faceIDPermission": "Allow Mangoticket to use Face ID."
+          "faceIDPermission": "Allow Resty to use Face ID."
         }
       ],
       "expo-font",

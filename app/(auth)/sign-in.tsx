@@ -88,7 +88,7 @@ const SignIn = () => {
       const sessionResp = await createSession(
         form.email,
         form.password,
-        "mangoticket"
+        "resty"
       );
 
       if (!sessionResp) {

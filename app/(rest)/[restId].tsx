@@ -11,7 +11,6 @@ import EmptyState from "@/components/EmptyState";
 
 import Colors from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
-import CustomButton from "@/components/CustomButton";
 import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import LoadingScreen from "@/components/LoadingScreen";

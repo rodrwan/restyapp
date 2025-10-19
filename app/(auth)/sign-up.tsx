@@ -97,7 +97,7 @@ const SignUp = () => {
         form.email,
         form.password,
         "",
-        "mangoticket"
+        "resty"
       );
       if (!sessionResp) {
         throw new Error("Error al iniciar sesión");

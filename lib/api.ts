@@ -181,7 +181,7 @@ class Client {
         this.config.timeout
       );
 
-      headers.origin = "https://mangoticket.com";
+      headers.origin = "https://resty.com";
       const response = await fetch(this.config.baseUrl, {
         method: "POST",
         headers,

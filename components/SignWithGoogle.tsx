@@ -101,7 +101,7 @@ const SignWithGoogle = ({ setUser, redirectTo }: any) => {
             console.log("Google error ", error);
         }
       } else {
-        console.log("Mangoticket error", error);
+        console.log("Resty Google error", error);
       }
     }
 

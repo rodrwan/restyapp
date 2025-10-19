@@ -77,7 +77,7 @@ const SignWithApple = ({ setUser, redirectTo }: any) => {
         router.replace(`/${redirectTo}`);
       }
     } catch (error) {
-      console.log("Mangoticket Apple error", error);
+      console.log("Resty Apple error", error);
     }
 
     setSubmitting(false);
