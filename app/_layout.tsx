@@ -18,7 +18,13 @@ SplashScreen.preventAutoHideAsync();
 
 function RootLayout() {
   const [loaded, error] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+    PlusJakartaSansNormal: require("../assets/fonts/PlusJakartaSans-Regular.ttf"),
+    PlusJakartaSansBold: require("../assets/fonts/PlusJakartaSans-Bold.ttf"),
+    PlusJakartaSansMedium: require("../assets/fonts/PlusJakartaSans-Medium.ttf"),
+    PlusJakartaSansSemiBold: require("../assets/fonts/PlusJakartaSans-SemiBold.ttf"),
+    PlusJakartaSansBlack: require("../assets/fonts/PlusJakartaSans-ExtraBold.ttf"),
+    PlusJakartaSansLight: require("../assets/fonts/PlusJakartaSans-Light.ttf"),
+    PlusJakartaSansThin: require("../assets/fonts/PlusJakartaSans-ExtraLight.ttf"),
     ...FontAwesome.font,
   });
 

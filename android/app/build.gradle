@@ -87,9 +87,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.mangoticketapp.mangoticketapp'
+    namespace 'com.resty.restyapp'
     defaultConfig {
-        applicationId 'com.mangoticketapp.mangoticketapp'
+        applicationId 'com.resty.restyapp'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

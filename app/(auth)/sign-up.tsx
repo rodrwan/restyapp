@@ -22,7 +22,6 @@ import useGetEventsFromUser from "@/hooks/useGetEventsFromUser";
 import useUserStore from "@/stores/useUser";
 import Toast from "react-native-toast-message";
 import { LinearGradient } from "expo-linear-gradient";
-import useGetUserFirstUpcomingEvent from "@/hooks/useGetUserUpcomingEvents";
 import { useAuthContext } from "@/context/AuthProvider";
 import { POLICY_URL } from "@/constants";
 import * as WebBrowser from "expo-web-browser";
@@ -32,7 +31,6 @@ const SignUp = () => {
   const { getEvents } = useGetEventsFromUser();
   const { signIn } = useAuthContext();
   const { setUser } = useUserStore();
-  const { getUserFirstUpcomingEvent } = useGetUserFirstUpcomingEvent();
   const params: any = useLocalSearchParams();
 
   const navigation = useNavigation();
@@ -111,7 +109,6 @@ const SignUp = () => {
 
       signIn(sessionResp?.access_token);
       getEvents();
-      getUserFirstUpcomingEvent();
       return router.replace(`/${params?.redirectTo}`);
     } catch (err: any) {
       Toast.show({
@@ -126,7 +123,10 @@ const SignUp = () => {
   };
 
   return (
-    <LinearGradient colors={["#04121A", "#041e2b"]} className="flex-1">
+    <LinearGradient
+      colors={[Colors.black[100], Colors.white]}
+      className="flex-1"
+    >
       <SafeAreaView className="h-full">
         <KeyboardAwareScrollView
           onScroll={(event) => {
@@ -140,8 +140,7 @@ const SignUp = () => {
             }}
           >
             <Logo />
-
-            <Text className="text-2xl font-semibold text-white mt-10 font-psemibold">
+            <Text className="text-2xl font-semibold text-black-900 font-psemibold">
               Registro
             </Text>
 
@@ -197,7 +196,7 @@ const SignUp = () => {
                 )}
               </View>
               <View className="flex-row flex-wrap">
-                <Text className="text-gray-100">Acepto las </Text>
+                <Text className="text-black-400">Acepto las </Text>
                 <TouchableWithoutFeedback
                   onPress={async () => {
                     await WebBrowser.openBrowserAsync(POLICY_URL);
@@ -218,7 +217,7 @@ const SignUp = () => {
             />
 
             <View className="flex justify-center pt-5 flex-row gap-2 pb-8">
-              <Text className="text-lg text-gray-100 font-pregular">
+              <Text className="text-lg text-black-400 font-pregular">
                 Ya tienes cuenta?
               </Text>
               <Link

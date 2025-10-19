@@ -1015,6 +1015,81 @@ class Client {
     const token = await this.getAccessToken();
     return !!token;
   }
+
+  async getRestaurantMenuById(restaurantId: string): Promise<ApiResponse<any>> {
+    const document = gql`
+      query GetMenu($restaurantId: ID!) {
+        getMenu(restaurantId: $restaurantId) {
+          restaurant {
+            id
+            name
+            address
+            phone
+            rating
+            imageUrl
+          }
+          categories {
+            name
+            dishes {
+              name
+              price
+              isAvailable
+              imageUrl
+              description
+              customizationOptions {
+                description
+                priceModifier
+              }
+            }
+            subCategories {
+              name
+              dishes {
+                name
+                price
+                imageUrl
+                isAvailable
+                description
+                customizationOptions {
+                  description
+                  priceModifier
+                }
+              }
+            }
+          }
+        }
+      }
+    `;
+
+    return this.makeRequest(document, { restaurantId }, "GetMenu");
+  }
+
+  async getPopularRestaurants(): Promise<
+    ApiResponse<{
+      getPopularRestaurants: {
+        id: string;
+        name: string;
+        address: string;
+        phone: string;
+        imageUrl: string;
+        rating: number;
+      }[];
+    }>
+  > {
+    const document = gql`
+      query GetPopularRestaurants {
+        getPopularRestaurants {
+          id
+          name
+          address
+          phone
+          imageUrl
+          rating
+        }
+      }
+    `;
+
+    return this.makeRequest(document, {}, "GetPopularRestaurants");
+  }
 }
 
 export default Client;

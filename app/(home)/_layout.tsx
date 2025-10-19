@@ -4,6 +4,7 @@ import { View } from "react-native";
 import useAuth from "@/hooks/useAuth";
 import React from "react";
 import LoadingScreen from "@/components/LoadingScreen";
+import Colors from "@/constants/Colors";
 
 export const unstable_settings = {
   // Ensure any route can link back to `/`
@@ -26,7 +27,7 @@ export default function HomeLayoutNav() {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" />
       </Stack>
-      <StatusBar backgroundColor="#041e2b" style="light" />
+      <StatusBar backgroundColor={Colors.white} style="dark" />
     </View>
   );
 }

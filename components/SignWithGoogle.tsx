@@ -110,7 +110,7 @@ const SignWithGoogle = ({ setUser, redirectTo }: any) => {
 
   return (
     <TouchableOpacity
-      className={`flex flex-row w-full min-h-[60px] bg-white justify-center items-center rounded-xl ${
+      className={`flex flex-row w-full min-h-[60px] bg-white justify-center items-center rounded-xl border border-black-200 ${
         Platform.OS !== "ios" ? "w-full" : ""
       }`}
       onPress={() => {

@@ -1,22 +1,38 @@
 {
   "expo": {
-    "name": "Mangoticket",
-    "slug": "mangoticket",
+    "name": "Resty",
+    "slug": "resty",
     "version": "1.2.0",
     "orientation": "portrait",
-    "scheme": "mangoticket",
-    "icon": "./assets/images/icon.png",
+    "scheme": "resty",
+    "icon": "./assets/images/AppIcon-1024-green.png",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/splash.png",
+      "image": "./assets/images/ios_dark_portrait_1284x2778.png",
       "resizeMode": "contain",
-      "backgroundColor": "#041e2b"
+      "backgroundColor": "#072A2D"
     },
     "ios": {
       "supportsTablet": false,
       "usesAppleSignIn": true,
       "userInterfaceStyle": "automatic",
-      "bundleIdentifier": "com.mangoticket.mangoticketapp",
+      "bundleIdentifier": "com.resty.restyapp",
+      "icon": "./assets/images/AppIcon-1024-green.png",
+      "splash": {
+        "image": "./assets/images/ios_light_portrait_1284x2778.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#072A2D",
+        "dark": {
+          "image": "./assets/images/ios_dark_portrait_1284x2778.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#072A2D"
+        },
+        "light": {
+          "image": "./assets/images/ios_light_portrait_1284x2778.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#072A2D"
+        }
+      },
       "infoPlist": {
         "CFBundleURLTypes": [
           {
@@ -39,15 +55,32 @@
       "appleTeamId": "P98BMU72AA"
     },
     "android": {
+      "icon": "./assets/images/AppIcon-1024-light.png",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/icons/android/ic_launcher_foreground.png",
+        "backgroundColor": "#072A2D",
+        "monochromeImage": "./assets/icons/android/ic_launcher_foreground.png"
       },
-      "package": "com.mangoticketapp.mangoticketapp",
+      "splash": {
+        "image": "./assets/images/android_light_portrait_1080x2340.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#072A2D",
+        "dark": {
+          "image": "./assets/images/android_dark_portrait_1080x2340.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#072A2D"
+        }
+      },
+      "package": "com.resty.restyapp",
       "permissions": [
         "android.permission.USE_BIOMETRIC",
         "android.permission.USE_FINGERPRINT"
       ]
+    },
+    "androidStatusBar": {
+      "backgroundColor": "#072A2D",
+      "barStyle": "light-content",
+      "translucent": false
     },
     "web": {
       "bundler": "metro",
@@ -86,7 +119,85 @@
       ],
       "expo-font",
       "expo-secure-store",
-      "expo-apple-authentication"
+      "expo-apple-authentication",
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/PlusJakartaSans-Regular.ttf",
+            "./assets/fonts/PlusJakartaSans-Bold.ttf",
+            "./assets/fonts/PlusJakartaSans-Medium.ttf",
+            "./assets/fonts/PlusJakartaSans-SemiBold.ttf",
+            "./assets/fonts/PlusJakartaSans-ExtraBold.ttf",
+            "./assets/fonts/PlusJakartaSans-Black.ttf",
+            "./assets/fonts/PlusJakartaSans-Light.ttf",
+            "./assets/fonts/PlusJakartaSans-ExtraLight.ttf",
+            "./assets/fonts/PlusJakartaSans-Thin.ttf"
+          ],
+          "android": {
+            "fonts": [
+              {
+                "fontFamily": "Inter",
+                "fontDefinitions": [
+                  {
+                    "path": "./assets/fonts/PlusJakartaSans-ExtraLight.ttf",
+                    "weight": 100,
+                    "style": "thin"
+                  },
+                  {
+                    "path": "./assets/fonts/PlusJakartaSans-Light.ttf",
+                    "weight": 300,
+                    "style": "light"
+                  },
+                  {
+                    "path": "./assets/fonts/PlusJakartaSans-Regular.ttf",
+                    "weight": 400,
+                    "style": "normal"
+                  },
+                  {
+                    "path": "./assets/fonts/PlusJakartaSans-Medium.ttf",
+                    "weight": 500,
+                    "style": "medium"
+                  },
+                  {
+                    "path": "./assets/fonts/PlusJakartaSans-SemiBold.ttf",
+                    "weight": 600,
+                    "style": "semiBold"
+                  },
+                  {
+                    "path": "./assets/fonts/PlusJakartaSans-Bold.ttf",
+                    "weight": 700,
+                    "style": "bold"
+                  },
+                  {
+                    "path": "./assets/fonts/PlusJakartaSans-ExtraBold.ttf",
+                    "weight": 800,
+                    "style": "extraBold"
+                  },
+                  {
+                    "path": "./assets/fonts/PlusJakartaSans-Black.ttf",
+                    "weight": 900,
+                    "style": "black"
+                  }
+                ]
+              }
+            ]
+          },
+          "ios": {
+            "fonts": [
+              "./assets/fonts/PlusJakartaSans-Regular.ttf",
+              "./assets/fonts/PlusJakartaSans-Bold.ttf",
+              "./assets/fonts/PlusJakartaSans-Medium.ttf",
+              "./assets/fonts/PlusJakartaSans-SemiBold.ttf",
+              "./assets/fonts/PlusJakartaSans-ExtraBold.ttf",
+              "./assets/fonts/PlusJakartaSans-Black.ttf",
+              "./assets/fonts/PlusJakartaSans-Light.ttf",
+              "./assets/fonts/PlusJakartaSans-ExtraLight.ttf",
+              "./assets/fonts/PlusJakartaSans-Thin.ttf"
+            ]
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

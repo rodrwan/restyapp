@@ -30,7 +30,7 @@ export function CreditCard({
       <View className="absolute right-0 top-0 w-2/3 h-full">
         <LinearGradient
           colors={[
-            "#f79008",
+            "#52B86D",
             "rgba(247, 144, 8, 0.3)",
             "rgba(247, 144, 8, 0.1)",
           ]}

@@ -26,8 +26,8 @@
         <action android:name="android.intent.action.VIEW"/>
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
-        <data android:scheme="mangoticket"/>
-        <data android:scheme="exp+mangoticket"/>
+        <data android:scheme="resty"/>
+        <data android:scheme="exp+resty"/>
       </intent-filter>
     </activity>
   </application>

@@ -19,7 +19,7 @@ const Dot = ({ selected }: any) => {
       <View
         style={{
           ...styles.dot,
-          backgroundColor: selected ? "#f79008" : "transparent",
+          backgroundColor: selected ? "#52B86D" : "transparent",
         }}
       />
     </View>
@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     height: 24,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: "#f79008",
+    borderColor: "#52B86D",
     alignItems: "center",
     justifyContent: "center",
   },

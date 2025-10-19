@@ -25,7 +25,6 @@ import Toast from "react-native-toast-message";
 import useGetUserUpcomingEvents from "@/hooks/useGetUserUpcomingEvents";
 import { LinearGradient } from "expo-linear-gradient";
 import { useAuthContext } from "@/context/AuthProvider";
-import SignWithApple from "@/components/SignWithApple";
 import * as WebBrowser from "expo-web-browser";
 import { POLICY_URL, TERMS_URL } from "@/constants";
 
@@ -117,7 +116,10 @@ const SignIn = () => {
   };
 
   return (
-    <LinearGradient colors={["#04121A", "#041e2b"]} className="flex-1">
+    <LinearGradient
+      colors={[Colors.black[100], Colors.white]}
+      className="flex-1"
+    >
       <SafeAreaView className="h-full">
         <KeyboardAwareScrollView>
           <View
@@ -127,9 +129,10 @@ const SignIn = () => {
             }}
           >
             <Logo />
-            <Text className="text-2xl font-semibold text-white mt-12 font-psemibold">
+            <Text className="text-2xl font-semibold text-black-900 font-psemibold">
               Inicia Sesión
             </Text>
+
             <FormField
               title="Email"
               value={form.email}
@@ -154,7 +157,7 @@ const SignIn = () => {
               isLoading={isSubmitting}
             />
             <View className="flex flex-row items-center justify-center mt-6">
-              <Text className="text-base text-gray-100 font-pregular ">
+              <Text className="text-base text-black-400 font-pregular ">
                 ¡Ingresa con!
               </Text>
             </View>
@@ -182,7 +185,7 @@ const SignIn = () => {
             }
 
             <View className="flex flex-row items-center justify-center mt-6">
-              <Text className="text-sm text-gray-100 font-pregular text-center">
+              <Text className="text-sm text-black-400 font-pregular text-center">
                 Al iniciar sesión con Google, aceptas nuestras{" "}
                 <TouchableWithoutFeedback
                   onPress={async () => {
@@ -193,7 +196,7 @@ const SignIn = () => {
                     Condiciones de uso
                   </Text>
                 </TouchableWithoutFeedback>{" "}
-                y
+                y{" "}
                 <TouchableWithoutFeedback
                   onPress={async () => {
                     await WebBrowser.openBrowserAsync(POLICY_URL);
@@ -207,7 +210,7 @@ const SignIn = () => {
             </View>
 
             <View className="flex justify-center pt-6 flex-row gap-2">
-              <Text className="text-lg text-gray-100 font-pregular">
+              <Text className="text-lg text-black-400 font-pregular">
                 No tienes cuenta?
               </Text>
               <Link

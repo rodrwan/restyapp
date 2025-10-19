@@ -51,7 +51,7 @@ const LogoutButton = ({
 }) => {
   return session ? (
     <TouchableOpacity onPress={onPress}>
-      <Text className="self-center text-white font-base text-base">
+      <Text className="self-center text-black-900 font-base text-base">
         Cerrar session
       </Text>
     </TouchableOpacity>
@@ -68,7 +68,8 @@ function useHeaderConfiguration() {
       headerTitle: "Menu",
       headerTintColor: Colors.primary[500],
       headerStyle: {
-        backgroundColor: "#04121A",
+        backgroundColor: Colors.white,
+        color: Colors.black[900],
       },
       headerLeft: () => (
         <HeaderIcon name="chevron-back-outline" onPress={navigation?.goBack} />
@@ -128,7 +129,7 @@ const TermsAndConditions = () => {
       className={`flex flex-col items-center p-2 mb-4 mt-auto pt-4 justify-center items-center`}
     >
       <View className="flex flex-col items-center">
-        <Text className="ml-4 self-center text-white font-bold text-xl">
+        <Text className="ml-4 self-center text-black-900 font-bold text-xl">
           Terminos y Condiciones
         </Text>
       </View>
@@ -145,12 +146,12 @@ const MenuHero = ({
 }) => {
   return !isAuthenticated ? (
     <View className="p-4 items-center justify-center w-full rounded-b-lg">
-      <Text className="text-white text-center text-base">
-        Inicia sesión para ver tus eventos
+      <Text className="text-black-900 text-center text-base">
+        Inicia sesión para ver el detalle de tus actividades
       </Text>
       <TouchableOpacity
         onPress={() => router.replace("/(dashboard)/profile")}
-        className="bg-primary-400 rounded-lg p-2 mt-4 w-full"
+        className="bg-primary-500 rounded-lg p-2 mt-4 w-full"
       >
         <Text className="text-white text-center text-lg font-bold">
           Iniciar sesión
@@ -211,12 +212,12 @@ const MenuPage = () => {
   ];
 
   return (
-    <LinearGradient colors={["#04121A", "#041e2b"]}>
+    <LinearGradient colors={[Colors.black[100], Colors.white]}>
       <SafeAreaView className="flex h-full px-2 justify-between">
         <View className="flex flex-col items-center justify-center rounded-lg border border-primary-100">
           {/* hero */}
           <Image
-            source={require("../assets/images/hero.png")}
+            source={require("../assets/images/hero_menu.png")}
             className={`w-full h-48  ${
               isAuthenticated ? "rounded-lg" : "rounded-t-lg"
             }`}
